@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">RegisterFormActivity</string>
+
+    <string name="hello_world">Hello world! You are in HomePage activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_home_page">HomePageActivity</string>
+</resources>
