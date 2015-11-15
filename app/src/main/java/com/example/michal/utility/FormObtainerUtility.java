@@ -4,7 +4,7 @@ import android.widget.CheckBox;
 
 import com.example.michal.pojo.TypeWork;
 
-public class FormObtainer {
+public class FormObtainerUtility {
 
     public static boolean obtainCheckboxStatus(CheckBox checkbox){
         //if checkbox.isChecked return true, then true, else return false

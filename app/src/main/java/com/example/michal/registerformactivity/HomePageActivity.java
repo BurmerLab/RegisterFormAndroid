@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.parse.ParseClassName;
 
@@ -14,6 +15,17 @@ public class HomePageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String userName = extras.getString("UserName");
+            String userPassword = extras.getString("UserPassword");
+            String userEmail = extras.getString("UserEmail");
+            Integer userTypeWork = extras.getInt("UserTypeWork");
+            if (userName != null && userPassword != null && userEmail != null && userTypeWork != null) {
+                Toast.makeText(this, "TOAST2", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.michal.registerformactivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,12 +10,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.michal.pojo.TypeWork;
 import com.example.michal.pojo.User;
-import com.example.michal.utility.FormObtainer;
-import com.parse.ParseClassName;
+import com.example.michal.utility.FormObtainerUtility;
 
-@ParseClassName("MainActivity")
 public class MainActivity extends Activity {
 
     protected EditText mUsername;
@@ -29,7 +27,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         //initialize
         mUsername = (EditText) findViewById(R.id.userNameRegisteredEditText);
         mEmail = (EditText) findViewById(R.id.emailRegisteredEditText);
@@ -39,7 +36,6 @@ public class MainActivity extends Activity {
         mStandardTypeWorkCheckbox = (CheckBox) findViewById(R.id.standardTypeWorkRegisteredCheckbox);
 
         makeDisableCheckboxes();
-
 
         //listen to register button click
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
@@ -51,10 +47,21 @@ public class MainActivity extends Activity {
                 user.setUserName(mUsername.getText().toString());
                 user.setPassword(mUserPassword.getText().toString());
                 user.setEmail(mEmail.getText().toString());
-                user.setTypeWork(FormObtainer.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox));
+                user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox));
 
                 //wyswietla sie toast
-                Toast.makeText(MainActivity.this, "TOAST!, checbox status: " + FormObtainer.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "TOAST!, checbox status: " + FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox), Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                intent.putExtra("UserName", user.getUserName());
+                intent.putExtra("UserPassword", user.getPassword());
+                intent.putExtra("UserEmail", user.getEmail());
+                intent.putExtra("UserTypeWork", user.getTypeWork());
+
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+
             }
 
         });
