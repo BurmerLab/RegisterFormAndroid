@@ -4,14 +4,24 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
+
+import java.util.ArrayList;
+import java.util.List;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.example.michal.pojo.User;
 import com.example.michal.utility.FormObtainerUtility;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends Activity {
 
@@ -21,6 +31,8 @@ public class MainActivity extends Activity {
     protected CheckBox mFlexibleTypeWorkCheckbox;
     protected CheckBox mStandardTypeWorkCheckbox;
     protected Button mRegisterButton;
+    private Spinner spinner1, spinner2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +62,10 @@ public class MainActivity extends Activity {
                 user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox));
 
                 //wyswietla sie toast
-                Toast.makeText(MainActivity.this, "TOAST!, checbox status: " + FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox), Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this, "TOAST!, checbox status: " +
+//                        FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkCheckbox, mStandardTypeWorkCheckbox), Toast.LENGTH_LONG).show();
 
-                Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                Intent intent = new Intent(MainActivity.this, WorkMapRegisterActivity.class);
                 intent.putExtra("UserName", user.getUserName());
                 intent.putExtra("UserPassword", user.getPassword());
                 intent.putExtra("UserEmail", user.getEmail());

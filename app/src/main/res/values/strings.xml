@@ -1,7 +1,40 @@
 <resources>
-    <string name="app_name">RegisterFormActivity</string>
+    <string name="app_name">MytWay</string>
 
     <string name="hello_world">Hello world! You are in HomePage activity</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_home_page">HomePageActivity</string>
+    <string name="title_activity_work_map_register">Where You work?</string>
+    <string name="title_activity_main">Main</string>
+    <string name="marker_title_where_is_your_work_place">Where You work?</string>
+    <string name="flexible_type_work">Flexible</string>
+    <string name="standard_type_work">Standard</string>
+
+
+
+    <string name="name_register_text">Name</string>
+    <string name="email_register_text">Email</string>
+    <string name="password_register_text">Password</string>
+    <string name="work_type_register_text">Work type</string>
+    <string name="length_work_hours_register_text">How long</string>
+
+
+
+
+    <string name="length_work_hours_text">Please choose work time</string>
+    <string-array name="length_work_hours_list">
+        <item>1 Hours</item>
+        <item>2 Hours</item>
+        <item>3 Hours</item>
+        <item>4 Hours</item>
+        <item>5 Hours</item>
+        <item>6 Hours</item>
+        <item>7 Hours</item>
+        <item>8 Hours</item>
+        <item>9 Hours</item>
+        <item>10 Hours</item>
+        <item>11 Hours</item>
+        <item>12 Hours</item>
+    </string-array>
+
 </resources>

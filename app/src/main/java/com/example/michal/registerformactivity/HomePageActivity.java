@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.parse.ParseClassName;
 
-@ParseClassName("HomePageActivity")
 public class HomePageActivity extends Activity {
 
     @Override
@@ -23,7 +22,12 @@ public class HomePageActivity extends Activity {
             String userEmail = extras.getString("UserEmail");
             Integer userTypeWork = extras.getInt("UserTypeWork");
             if (userName != null && userPassword != null && userEmail != null && userTypeWork != null) {
-                Toast.makeText(this, "TOAST2", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Welcome: " + userName + userEmail + userPassword, Toast.LENGTH_LONG).show();
+
+//                SQLiteDatabse mydatabase = openOrCreateDatabase("your database name",MODE_PRIVATE,null);
+
+
+
             }
         }
     }
