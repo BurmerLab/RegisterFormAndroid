@@ -14,22 +14,20 @@
         tools:layout="@layout/abc_action_bar_title_item" />
 
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.88"></FrameLayout>
 
     <Button
         android:id="@+id/buttonRegisterWorkLocalization"
-        android:layout_width="149dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="Save"
-        android:padding="10dp"
-        android:paddingRight="10dp"
-        android:layout_weight="0.03"
+        android:text="@string/work_type_save_button_text"
+        android:background="@color/application_color"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_vertical_margin"
+
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="24dp" />
-    <!--</fragment>-->
+        android:layout_centerHorizontal="true" />
+
     </RelativeLayout>

@@ -16,7 +16,8 @@
     <string name="email_register_text">Email</string>
     <string name="password_register_text">Password</string>
     <string name="work_type_register_text">Work type</string>
-    <string name="length_work_hours_register_text">How long</string>
+    <string name="length_work_hours_register_text">Work length</string>
+    <string name="work_type_save_button_text">Save</string>
 
 
 
