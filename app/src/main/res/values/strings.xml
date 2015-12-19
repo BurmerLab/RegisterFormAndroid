@@ -38,4 +38,8 @@
         <item>12 Hours</item>
     </string-array>
 
+    <string name="when_you_start_standard_work_time">When You start? </string>
+    <string name="your_start_work_time">You start your work at: </string>
+
+
 </resources>

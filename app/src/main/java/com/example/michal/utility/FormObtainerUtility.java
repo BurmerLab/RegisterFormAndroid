@@ -1,6 +1,7 @@
 package com.example.michal.utility;
 
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 
 import com.example.michal.pojo.TypeWork;
 
@@ -11,7 +12,7 @@ public class FormObtainerUtility {
         return checkbox.isChecked() ? true : false;
     }
 
-    public static int obtainTypeWorkNumber(CheckBox flexTypeWorkCheckbox, CheckBox standardTypeWorkCheckbox){
+    public static int obtainTypeWorkNumber(RadioButton flexTypeWorkCheckbox, RadioButton standardTypeWorkCheckbox){
         int typeWorkNumber;
 
         int typeWorkStatus;
