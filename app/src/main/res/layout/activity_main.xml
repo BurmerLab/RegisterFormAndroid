@@ -133,7 +133,8 @@
         android:id="@+id/startStandardWorkTimeRegisterTextView"
         android:layout_below="@+id/idTableInRadioGroup"
         android:layout_marginTop="26dp"
-        android:enabled="false" />
+        android:enabled="false"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

@@ -104,6 +104,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 radioGroupFlexible.clearCheck();
                 ((RadioButton) radioGroupFlexible.findViewById(R.id.flexibleTypeWorkRegisterRadioButton)).setChecked(false);
+                mSetStartStandardWorkTimeRegisterTextView.setVisibility(View.VISIBLE);
                 mSetStartStandardWorkTimeRegisterTextView.setEnabled(true);
             }
         });
@@ -113,6 +114,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 radioGroupStandard.clearCheck();
                 ((RadioButton) radioGroupStandard.findViewById(R.id.standardTypeWorkRegisterRadioButton)).setChecked(false);
+                mSetStartStandardWorkTimeRegisterTextView.setVisibility(View.GONE);
             }
         });
 
