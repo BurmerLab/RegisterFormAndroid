@@ -1,6 +1,5 @@
 package com.example.michal.workingCopy;
 
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -30,7 +29,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.michal.registerformactivity.R;
+import com.example.michal.activity.R;
 
 public class Main extends Activity implements OnClickListener {
 
@@ -78,7 +77,6 @@ public class Main extends Activity implements OnClickListener {
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                     Log.i("tag","jestem w ifie");
-
                 return;
             }
 
@@ -87,7 +85,6 @@ public class Main extends Activity implements OnClickListener {
         } else {
             alertbox("Gps Status!!", "Your GPS is: OFF");
         }
-
     }
 
     /*----Method to Check GPS is enable or disable ----- */

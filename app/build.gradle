@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.example.michal.registerformactivity"
+        applicationId "com.example.michal.activity.registerformactivity"
         minSdkVersion 20
         targetSdkVersion 23
         versionCode 1
@@ -16,6 +16,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    dexOptions {
+        preDexLibraries = false;
     }
 }
 

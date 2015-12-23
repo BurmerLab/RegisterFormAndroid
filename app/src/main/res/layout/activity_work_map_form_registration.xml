@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/workMapRegistration"
-        tools:context="com.example.michal.registerformactivity.WorkMapRegisterActivity"
+        tools:context="com.example.michal.activity.registerformactivity.WorkMapRegisterActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         tools:layout="@layout/abc_action_bar_title_item" />
 

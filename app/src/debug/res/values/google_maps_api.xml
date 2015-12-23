@@ -7,7 +7,7 @@
 https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=7D:0B:7C:F4:ED:4E:F1:1A:AC:3D:61:0F:32:74:82:35:CE:F6:30:CF%3Bcom.example.michal.registerformactivity
 
     You can also add your credentials to an existing key, using this line:
-    7D:0B:7C:F4:ED:4E:F1:1A:AC:3D:61:0F:32:74:82:35:CE:F6:30:CF;com.example.michal.registerformactivity
+    7D:0B:7C:F4:ED:4E:F1:1A:AC:3D:61:0F:32:74:82:35:CE:F6:30:CF;com.example.michal.activity.registerformactivity
 
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.

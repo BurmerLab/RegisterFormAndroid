@@ -16,30 +16,22 @@
     <string name="email_register_text">Email</string>
     <string name="password_register_text">Password</string>
     <string name="work_type_register_text">Work type</string>
-    <string name="length_work_hours_register_text">Work length</string>
+    <string name="length_work_hours_register_text">Set work length</string>
+    <string name="start_work_time">Set start work time</string>
     <string name="work_type_save_button_text">Save</string>
 
-
-
+    <!-- Buttons names in start activity-->
+    <string name="login_activity">Login</string>
+    <string name="register_activity">Sign up</string>
 
     <string name="length_work_hours_text">Please choose work time</string>
-    <string-array name="length_work_hours_list">
-        <item>1 Hours</item>
-        <item>2 Hours</item>
-        <item>3 Hours</item>
-        <item>4 Hours</item>
-        <item>5 Hours</item>
-        <item>6 Hours</item>
-        <item>7 Hours</item>
-        <item>8 Hours</item>
-        <item>9 Hours</item>
-        <item>10 Hours</item>
-        <item>11 Hours</item>
-        <item>12 Hours</item>
-    </string-array>
 
     <string name="when_you_start_standard_work_time">When You start? </string>
+    <string name="how_long_is_your_day">How long is Your day?</string>
     <string name="your_start_work_time">You start your work at: </string>
+    <string name="work_length">Work length: </string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_activity_login">activity_login</string>
 
 
 </resources>

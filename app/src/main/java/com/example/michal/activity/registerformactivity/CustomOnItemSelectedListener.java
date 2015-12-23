@@ -1,4 +1,4 @@
-package com.example.michal.registerformactivity;
+package com.example.michal.activity.registerformactivity;
 
 import android.view.View;
 import android.widget.AdapterView;

@@ -1,4 +1,4 @@
-package com.example.michal.registerformactivity;
+package com.example.michal.activity.registerformactivity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.parse.ParseClassName;
+import com.example.michal.activity.R;
 
 public class HomePageActivity extends Activity {
 
