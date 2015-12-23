@@ -1,7 +1,8 @@
-package com.example.michal.registerformactivity;
+package com.example.michal.activity.registerformactivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -18,9 +19,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
-
+import com.example.michal.activity.R;
 import com.example.michal.geolocalization.GeolocalizationResources;
-import com.example.michal.utility.FormObtainerUtility;
+import com.example.michal.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -40,20 +41,26 @@ public class WorkMapRegisterActivity extends FragmentActivity {
     private double longitudeLocalization;
 
     private Geocoder geoCoder;
-
     protected Button registerWorkLocalizationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_work_map_register);
+        setContentView(R.layout.activity_work_map_form_registration);
         setUpMapIfNeeded();
 
         geoCoder = new Geocoder(this);
 
         //initialize
         registerWorkLocalizationButton = (Button) findViewById(R.id.buttonRegisterWorkLocalization);
+
+        Intent intent = getIntent();
+        User user = (User) intent.getParcelableExtra("user");
+                        Toast.makeText(WorkMapRegisterActivity.this, "User: "
+                                + user.getUserName() +
+                                " email:" + user.getEmail()
+                                , Toast.LENGTH_LONG).show();
 
         registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
             @Override
