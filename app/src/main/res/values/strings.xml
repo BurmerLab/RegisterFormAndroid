@@ -7,6 +7,8 @@
     <string name="title_activity_work_map_register">Where You work?</string>
     <string name="title_activity_main">Main</string>
     <string name="marker_title_where_is_your_work_place">Where You work?</string>
+    <string name="marker_title_where_is_your_home_place">Where is Your home?</string>
+
     <string name="flexible_type_work">Flexible</string>
     <string name="standard_type_work">Standard</string>
 
@@ -32,6 +34,10 @@
     <string name="work_length">Work length: </string>
     <string name="title_activity_start">StartActivity</string>
     <string name="title_activity_activity_login">activity_login</string>
+    <string name="title_activity_activity_home_place_form_registration">
+        activity_home_place_form_registration
+    </string>
+    <string name="title_activity_mytway">MytwayActivity</string>
 
 
 </resources>

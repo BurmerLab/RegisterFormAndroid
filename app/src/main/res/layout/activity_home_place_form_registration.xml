@@ -8,15 +8,13 @@
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/workMapRegistration"
-        tools:context="com.mytway.activity.registerformactivity.WorkPlaceRegisterActivity"
+        android:id="@+id/homeMapRegistration"
+        tools:context="com.mytway.activity.registerformactivity.HomePlaceRegisterActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         tools:layout="@layout/abc_action_bar_title_item" />
 
-
-
     <Button
-        android:id="@+id/buttonRegisterWorkLocalization"
+        android:id="@+id/buttonRegisterHomeLocalization"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/work_type_save_button_text"
@@ -30,4 +28,4 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+</RelativeLayout>

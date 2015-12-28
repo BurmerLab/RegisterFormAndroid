@@ -1,4 +1,4 @@
-package com.example.michal.activity.registerformactivity;
+package com.mytway.activity.registerformactivity;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

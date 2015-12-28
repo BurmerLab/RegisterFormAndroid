@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.michal.activity.StartActivity"
+    tools:context="com.mytway.activity.StartActivity"
     android:background="@drawable/great_architects">
 
     <Button
