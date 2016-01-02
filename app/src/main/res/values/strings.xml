@@ -12,13 +12,12 @@
     <string name="flexible_type_work">Flexible</string>
     <string name="standard_type_work">Standard</string>
 
-
-
     <string name="name_register_text">Name</string>
     <string name="email_register_text">Email</string>
     <string name="password_register_text">Password</string>
     <string name="work_type_register_text">Work type</string>
     <string name="length_work_hours_register_text">Set work length</string>
+    <string name="start_work_time_register_text">Set start work hour</string>
     <string name="start_work_time">Set start work time</string>
     <string name="work_type_save_button_text">Save</string>
 
@@ -26,7 +25,7 @@
     <string name="login_activity">Login</string>
     <string name="register_activity">Sign up</string>
 
-    <string name="length_work_hours_text">Please choose work time</string>
+    <!--<string name="length_work_hours_text">Please choose work time</string>-->
 
     <string name="when_you_start_standard_work_time">When You start? </string>
     <string name="how_long_is_your_day">How long is Your day?</string>
@@ -38,6 +37,16 @@
         activity_home_place_form_registration
     </string>
     <string name="title_activity_mytway">MytwayActivity</string>
+
+
+
+    <!--Registration Validation error messages-->
+    <string name="field_required">Required</string>
+    <string name="length_of_registration_password_is_not_enought">Password length not eought</string>
+    <string name="work_length_empty">Work length is empty</string>
+    <string name="start_work_time_empty">Start work time is empty</string>
+    <string name="work_type_not_selected">Work type not selected</string>
+    <string name="invalid_email">Invalid email</string>
 
 
 </resources>
