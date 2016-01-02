@@ -4,6 +4,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.mytway.pojo.Position;
 import com.mytway.properties.Properties;
 
 import java.util.regex.Pattern;
@@ -96,5 +97,14 @@ public class Validation {
         }
         editText.setError(errorMessage);
         return false;
+    }
+
+    public static boolean homePositionIsNotTheSameWorkPosition(Position homePosition, Position workPosition, TextView textView, String errorMessage) {
+        if(homePosition.equals(workPosition)){
+            return true;
+        }else{
+            textView.setError(errorMessage);
+            return false;
+        }
     }
 }

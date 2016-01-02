@@ -47,6 +47,7 @@
     <string name="start_work_time_empty">Start work time is empty</string>
     <string name="work_type_not_selected">Work type not selected</string>
     <string name="invalid_email">Invalid email</string>
+    <string name="home_place_equals_work_place">Home and work can\'t be in the same localization</string>
 
 
 </resources>
