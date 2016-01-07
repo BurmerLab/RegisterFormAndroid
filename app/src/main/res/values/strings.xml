@@ -17,6 +17,8 @@
     <string name="password_register_text">Password</string>
     <string name="work_type_register_text">Work type</string>
     <string name="length_work_hours_register_text">Set work length</string>
+    <string name="set_work_days">Set work days</string>
+
     <string name="start_work_time_register_text">Set start work hour</string>
     <string name="start_work_time">Set start work time</string>
     <string name="work_type_save_button_text">Save</string>
@@ -48,6 +50,19 @@
     <string name="work_type_not_selected">Work type not selected</string>
     <string name="invalid_email">Invalid email</string>
     <string name="home_place_equals_work_place">Home and work can\'t be in the same localization</string>
+    <string name="select_work_week">Select work week</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="ok_button">OK</string>
 
+
+    <string-array name="work_days_in_week">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
 
 </resources>
