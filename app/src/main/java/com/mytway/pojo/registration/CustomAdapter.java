@@ -11,15 +11,15 @@ import android.widget.TextView;
 
 import com.mytway.activity.R;
 
-public class CustomAdapter extends ArrayAdapter<Model>{
-    Model[] modelItems = null;
+public class CustomAdapter extends ArrayAdapter<CheckboxModel>{
+    CheckboxModel[] checkboxModelItems = null;
     Context context;
 
-    public CustomAdapter(Context context, Model[] resource) {
+    public CustomAdapter(Context context, CheckboxModel[] resource) {
         super(context, R.layout.row,resource);
         // TODO Auto-generated constructor stub
         this.context = context;
-        this.modelItems = resource;
+        this.checkboxModelItems = resource;
     }
 
     @Override
@@ -31,9 +31,9 @@ public class CustomAdapter extends ArrayAdapter<Model>{
         TextView name = (TextView) convertView.findViewById(R.id.textView1);
 
         CheckBox cb = (CheckBox) convertView.findViewById(R.id.checkBox1);
-        name.setText(modelItems[position].getName());
+        name.setText(checkboxModelItems[position].getName());
 
-        if(modelItems[position].getValue() == 1)
+        if(checkboxModelItems[position].getValue() == 1)
             cb.setChecked(true);
         else
             cb.setChecked(false);
