@@ -29,4 +29,6 @@ dependencies {
     compile files('libs/Parse-1.10.3/ParseCrashReporting-1.10.3.jar')
     compile 'com.google.android.gms:play-services:8.1.0'
     compile 'com.android.support:appcompat-v7:23.1.0'
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.9.5"
 }

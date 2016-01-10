@@ -53,6 +53,7 @@
     <string name="select_work_week">Select work week</string>
     <string name="cancel_button">Cancel</string>
     <string name="ok_button">OK</string>
+    <string name="work_days_not_selected">Work days not selected</string>
 
 
     <string-array name="work_days_in_week">

@@ -1,10 +1,12 @@
 package com.mytway.validation;
 
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.mytway.pojo.Position;
+import com.mytway.pojo.registration.CheckboxModel;
 import com.mytway.properties.Properties;
 
 import java.util.regex.Pattern;
@@ -101,10 +103,27 @@ public class Validation {
 
     public static boolean homePositionIsNotTheSameWorkPosition(Position homePosition, Position workPosition, TextView textView, String errorMessage) {
         if(homePosition.equals(workPosition)){
-            return true;
-        }else{
             textView.setError(errorMessage);
             return false;
+        }else{
+            return true;
         }
+    }
+
+    public static boolean hasSelectedWorkDays(ListView mWorkDaysInWeeklistView) {
+        boolean isSelectedAnyCheckbox = false;
+
+        if(mWorkDaysInWeeklistView.getAdapter() != null){
+            int count = mWorkDaysInWeeklistView.getAdapter().getCount();
+
+            for(int x = 0; x <= count-1; x++){
+                CheckboxModel checkboxModel = (CheckboxModel) mWorkDaysInWeeklistView.getAdapter().getItem(x);
+                if(checkboxModel.getValue() == 1){
+                    isSelectedAnyCheckbox = true;
+                }
+            }
+        }
+
+        return isSelectedAnyCheckbox;
     }
 }
