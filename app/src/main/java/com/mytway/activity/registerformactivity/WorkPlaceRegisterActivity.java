@@ -1,6 +1,7 @@
 package com.mytway.activity.registerformactivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,12 +13,14 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
 import com.mytway.geolocalization.GeolocalizationResources;
 import com.mytway.pojo.Position;
@@ -30,7 +33,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class WorkPlaceRegisterActivity extends FragmentActivity {
+public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -42,43 +47,119 @@ public class WorkPlaceRegisterActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_work_map_form_registration);
-        setUpMapIfNeeded();
+//        setUpMapIfNeeded();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.workMapRegistration);
+        mapFragment.getMapAsync(this);
 
 
         //initialize
         registerWorkLocalizationButton = (Button) findViewById(R.id.buttonRegisterWorkLocalization);
 
-        Intent intent = getIntent();
-        final User user = intent.getParcelableExtra("user");
-        Toast.makeText(WorkPlaceRegisterActivity.this, "User: "
-                + user.getUserName() +
-                " email:" + user.getEmail() +
-                " start:" + user.getStartStandardTimeWork()
-                , Toast.LENGTH_LONG).show();
+//        Intent intent = getIntent();
+//        final User user = intent.getParcelableExtra("user");
+//        Toast.makeText(WorkPlaceRegisterActivity.this, "User: "
+//                + user.getUserName() +
+//                " email:" + user.getEmail() +
+//                " start:" + user.getStartStandardTimeWork()
+//                , Toast.LENGTH_LONG).show();
 
-        registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+//        registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
 
-                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
-                user.setWorkPlace(workPosition);
-
-                Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
-                intent.putExtra("user", user);
-                startActivity(intent);
-
-            }
-        });
-
+//                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
+//                user.setWorkPlace(workPosition);
+//
+//                Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
+//                intent.putExtra("user", user);
+//                startActivity(intent);
+//            }
+//        });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext(),CopyOfMap.this)) {
+            fetchLocationData();
+            setUpMap();
+        }else{
+            requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_REQUEST_CODE_LOCATION, getApplicationContext(), CopyOfMap.this);
+        }
+
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
     }
+
+    public static void requestPermission(String strPermission,int perCode,Context _c,Activity _a){
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(_a,strPermission)){
+            Toast.makeText(getApplicationContext(),"GPS permission allows us to access location data. Please allow in App Settings for additional functionality.",Toast.LENGTH_LONG).show();
+        } else {
+
+            ActivityCompat.requestPermissions(_a,new String[]{strPermission},perCode);
+        }
+    }
+
+    public static boolean checkPermission(String strPermission,Context _c,Activity _a){
+        int result = ContextCompat.checkSelfPermission(_c, strPermission);
+        if (result == PackageManager.PERMISSION_GRANTED){
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case PERMISSION_REQUEST_CODE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    fetchLocationData();
+
+                } else {
+
+                    Toast.makeText(getApplicationContext(),"Permission Denied, You cannot access location data.",Toast.LENGTH_LONG).show();
+
+                }
+                break;
+
+        }
+    }
+
+
+    private void fetchLocationData()
+    {
+        //code to use the granted permission (location)
+    }
+}
+
+
+
+
+
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+////        setUpMapIfNeeded();
+//    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -94,6 +175,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity {
 
     private void setUpMap() {
 //        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
+
 
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
@@ -114,6 +196,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity {
 
             return;
         }
+
         Location myLocation = locationManager.getLastKnownLocation(provider);
 
         LocationListener locationListener = new LocationListener() {
@@ -167,7 +250,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity {
 
         setLatitudeLocalization(myLocation.getLatitude());
         setLongitudeLocalization(myLocation.getLongitude());
-
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -223,6 +305,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity {
         int resId = getResources().getIdentifier(aString, "string", packageName);
         return getString(resId);
     }
+
 
 
 }
