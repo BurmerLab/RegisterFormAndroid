@@ -64,9 +64,11 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 //                " start:" + user.getStartStandardTimeWork()
 //                , Toast.LENGTH_LONG).show();
 
-//        registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
+        registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
 
 //                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
 //                user.setWorkPlace(workPosition);
@@ -74,8 +76,8 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 //                Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
 //                intent.putExtra("user", user);
 //                startActivity(intent);
-//            }
-//        });
+            }
+        });
     }
 
     @Override
@@ -90,7 +92,8 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
             requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
                                                 PERMISSION_REQUEST_CODE_LOCATION,
                                                 getApplicationContext(),
-                                                WorkPlaceRegisterActivity.this);
+                                                WorkPlaceRegisterActivity.this,
+                                                getString(R.string.localization_will_help_with_choose_your_work_place));
         }
 
         // Add a marker in Sydney and move the camera
@@ -99,14 +102,10 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-
-
     private void fetchLocationData() {
         Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
+        setUpMap();
     }
-
-
-
 
 //    @Override
 //    protected void onResume() {
@@ -144,8 +143,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            Log.i("tag", "jestem w ifie Permission problem");
-
             return;
         }
 
@@ -159,17 +156,14 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
-
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-
             }
         };
         // set map type
@@ -190,7 +184,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         // Zoom in the Google Map
         mMap.animateCamera(CameraUpdateFactory.zoomTo(GeolocalizationResources.MAP_ZOOM_ALTITUDE));
 
-        final String markerTitleWhereIsYourWorkPlace = getResources().getString(R.string.marker_title_where_is_your_work_place);
+        final String markerTitleWhereIsYourWorkPlace = getResources().getString(R.string.tap_on_map_to_indicate_work_place);
 
         Marker defaultMarker = mMap.addMarker(new MarkerOptions()
 //                .snippet("Lat: " + myLocation.getLatitude() + ", Lng: " + myLocation.getLongitude())
@@ -258,10 +252,11 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         return getString(resId);
     }
 
-    public static void requestPermission(String strPermission, int perCode,Context context ,Activity activity){
+    public static void requestPermission(String strPermission, int perCode,Context context ,Activity activity, String requestMessage){
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, strPermission)){
-            Toast.makeText(context.getApplicationContext(), "GPS permission allows us to access location data. Please allow in App Settings for additional functionality.",Toast.LENGTH_LONG).show();
+            Toast.makeText(context.getApplicationContext(), requestMessage, Toast.LENGTH_LONG).show();
+
         } else {
             ActivityCompat.requestPermissions(activity,new String[]{strPermission},perCode);
         }
@@ -269,6 +264,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
     public static boolean checkPermission(String strPermission ,Context _c){
         int result = ContextCompat.checkSelfPermission(_c, strPermission);
+
         if (result == PackageManager.PERMISSION_GRANTED){
             return true;
 
@@ -291,6 +287,5 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
                 break;
         }
     }
-
 
 }
