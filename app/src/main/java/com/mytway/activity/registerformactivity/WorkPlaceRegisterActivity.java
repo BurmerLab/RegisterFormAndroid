@@ -37,7 +37,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
     private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMap mMap;
 
     private double latitudeLocalization;
     private double longitudeLocalization;
@@ -49,11 +49,9 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
 //        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_work_map_form_registration);
-//        setUpMapIfNeeded();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.workMapRegistration);
         mapFragment.getMapAsync(this);
-
 
         //initialize
         registerWorkLocalizationButton = (Button) findViewById(R.id.buttonRegisterWorkLocalization);
@@ -84,73 +82,28 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext(),CopyOfMap.this)) {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
+                && checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
             fetchLocationData();
-            setUpMap();
+//            setUpMap();
         }else{
-            requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_REQUEST_CODE_LOCATION, getApplicationContext(), CopyOfMap.this);
+            requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                                                PERMISSION_REQUEST_CODE_LOCATION,
+                                                getApplicationContext(),
+                                                WorkPlaceRegisterActivity.this);
         }
-
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+//        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-
-    }
-
-    public static void requestPermission(String strPermission,int perCode,Context _c,Activity _a){
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(_a,strPermission)){
-            Toast.makeText(getApplicationContext(),"GPS permission allows us to access location data. Please allow in App Settings for additional functionality.",Toast.LENGTH_LONG).show();
-        } else {
-
-            ActivityCompat.requestPermissions(_a,new String[]{strPermission},perCode);
-        }
-    }
-
-    public static boolean checkPermission(String strPermission,Context _c,Activity _a){
-        int result = ContextCompat.checkSelfPermission(_c, strPermission);
-        if (result == PackageManager.PERMISSION_GRANTED){
-
-            return true;
-
-        } else {
-
-            return false;
-
-        }
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
 
-            case PERMISSION_REQUEST_CODE_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    fetchLocationData();
-
-                } else {
-
-                    Toast.makeText(getApplicationContext(),"Permission Denied, You cannot access location data.",Toast.LENGTH_LONG).show();
-
-                }
-                break;
-
-        }
+    private void fetchLocationData() {
+        Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
     }
-
-
-    private void fetchLocationData()
-    {
-        //code to use the granted permission (location)
-    }
-}
-
-
 
 
 
@@ -175,7 +128,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
     private void setUpMap() {
 //        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
-
 
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
@@ -306,6 +258,39 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         return getString(resId);
     }
 
+    public static void requestPermission(String strPermission, int perCode,Context context ,Activity activity){
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, strPermission)){
+            Toast.makeText(context.getApplicationContext(), "GPS permission allows us to access location data. Please allow in App Settings for additional functionality.",Toast.LENGTH_LONG).show();
+        } else {
+            ActivityCompat.requestPermissions(activity,new String[]{strPermission},perCode);
+        }
+    }
+
+    public static boolean checkPermission(String strPermission ,Context _c){
+        int result = ContextCompat.checkSelfPermission(_c, strPermission);
+        if (result == PackageManager.PERMISSION_GRANTED){
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case PERMISSION_REQUEST_CODE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fetchLocationData();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Permission Denied, You cannot access location data.",Toast.LENGTH_LONG).show();
+                }
+
+                break;
+        }
+    }
 
 
 }
