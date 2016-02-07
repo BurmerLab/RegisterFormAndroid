@@ -27,7 +27,8 @@ import com.mytway.pojo.User;
 import com.mytway.pojo.WorkWeek;
 import com.mytway.pojo.registration.CheckboxModel;
 import com.mytway.pojo.registration.CustomAdapter;
-import com.mytway.properties.Properties;
+import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.FormObtainerUtility;
 import com.mytway.validation.Validation;
 
 public class RegistrationActivity extends Activity {
@@ -99,31 +100,30 @@ public class RegistrationActivity extends Activity {
             @Override
             public void onClick(View view) {
 
-//                if (checkValidation()) {
-                if (true) {
+                if (checkValidation()) {
                     User user = new User();
-//                    user.setUserName(mUserName.getText().toString());
-//                    user.setPassword(mUserPassword.getText().toString());
-//                    user.setEmail(mEmail.getText().toString());
-//                    user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
-//                    user.setLengthTimeWork(mWorkTimeLengthButton.getText().toString());
-//                    user.setStartStandardTimeWork(mStartStandardWorkTimeRegisterButton.getText().toString());
-//
-//                    WorkWeek workWeek = new WorkWeek();
-//                    int count = mWorkDaysInWeeklistView.getAdapter().getCount();
-//                    for (int x = 0; x <= count - 1; x++) {
-//                        populateWorkWeek(workWeek, x);
-//                    }
-//                    user.setWorkWeek(workWeek);
-//
-////                    Toast.makeText(RegistrationActivity.this, "WorkWeek: isFriday? " + workWeek.getFriday(), Toast.LENGTH_SHORT).show();
-//
+                    user.setUserName(mUserName.getText().toString());
+                    user.setPassword(mUserPassword.getText().toString());
+                    user.setEmail(mEmail.getText().toString());
+                    user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
+                    user.setLengthTimeWork(mWorkTimeLengthButton.getText().toString());
+                    user.setStartStandardTimeWork(mStartStandardWorkTimeRegisterButton.getText().toString());
+
+                    WorkWeek workWeek = new WorkWeek();
+                    int count = mWorkDaysInWeeklistView.getAdapter().getCount();
+                    for (int x = 0; x <= count - 1; x++) {
+                        populateWorkWeek(workWeek, x);
+                    }
+                    user.setWorkWeek(workWeek);
+
+//                    Toast.makeText(RegistrationActivity.this, "WorkWeek: isFriday? " + workWeek.getFriday(), Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(RegistrationActivity.this, WorkPlaceRegisterActivity.class);
-//                    intent.putExtra("user", user);
-//                    intent.putExtra("week", workWeek);
-//                    if (user.getStartStandardTimeWork() != null) {
-//                        intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
-//                    }
+                    intent.putExtra("user", user);
+                    intent.putExtra("week", workWeek);
+                    if (user.getStartStandardTimeWork() != null) {
+                        intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
+                    }
 
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivity(intent);
@@ -178,16 +178,14 @@ public class RegistrationActivity extends Activity {
                    }
                });
                builderSingle.show();
-
-
            }
        });
 
         mWorkTimeLengthButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int hour = Properties.HOURS_WORK_LENGTH_TIME_REGISTRATION;
-                int minute = Properties.MINUTS_WORK_LENGTH_TIME_REGISTRATION;
+                int hour = PropertiesValues.HOURS_WORK_LENGTH_TIME_REGISTRATION;
+                int minute = PropertiesValues.MINUTS_WORK_LENGTH_TIME_REGISTRATION;
 
                 TimePickerDialog mWorkLengthTimePicker = new TimePickerDialog(RegistrationActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -205,8 +203,8 @@ public class RegistrationActivity extends Activity {
         mStartStandardWorkTimeRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                int hour = Properties.HOURS_START_WORK_TIME_REGISTRATION;
-                int minute = Properties.MINUTES_START_WORK_TIME_REGISTRATION;
+                int hour = PropertiesValues.HOURS_START_WORK_TIME_REGISTRATION;
+                int minute = PropertiesValues.MINUTES_START_WORK_TIME_REGISTRATION;
 
                 TimePickerDialog mStartWorkTimePicker;
                 mStartWorkTimePicker = new TimePickerDialog(RegistrationActivity.this, new TimePickerDialog.OnTimeSetListener() {

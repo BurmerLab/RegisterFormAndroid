@@ -25,8 +25,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mytway.properties.Properties;
+import com.mytway.pojo.Position;
+import com.mytway.pojo.User;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
+import com.mytway.validation.Validation;
 
 public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -54,7 +57,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         registerHomeLocalizationButton = (Button) findViewById(R.id.buttonRegisterHomeLocalization);
 
         Intent intent = getIntent();
-//        final User user = intent.getParcelableExtra("user");
+        final User user = intent.getParcelableExtra("user");
 
 //        Toast.makeText(HomePlaceRegisterActivity.this, "UserTable: "
 //                + user.getUserName() +
@@ -67,11 +70,11 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
             @Override
             public void onClick(View v) {
                 Toast.makeText(HomePlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
-//                Position workPosition = user.getWorkPlace();
-//                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
-//
-//                if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
-//                    user.setHomePlace(homePosition);
+                Position workPosition = user.getWorkPlace();
+                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
+
+                if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
+                    user.setHomePlace(homePosition);
 //
 //                    UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
 //
@@ -123,6 +126,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 //                } else {
 //                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
 //                }
+                }
             }
         });
     }
@@ -201,7 +205,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, PropertiesValues.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
             }
         });
 

@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.mytway.pojo.Position;
 import com.mytway.pojo.registration.CheckboxModel;
-import com.mytway.properties.Properties;
+import com.mytway.properties.PropertiesValues;
 
 import java.util.regex.Pattern;
 
@@ -94,7 +94,7 @@ public class Validation {
 
     // validating password with retype password
     public static boolean isValidPassword(EditText editText, String errorMessage) {
-        if (editText.getText().toString() != null && editText.getText().toString().length() > Properties.PASSWORD_LENGTH_REQUIRED) {
+        if (editText.getText().toString() != null && editText.getText().toString().length() > PropertiesValues.PASSWORD_LENGTH_REQUIRED) {
             return true;
         }
         editText.setError(errorMessage);

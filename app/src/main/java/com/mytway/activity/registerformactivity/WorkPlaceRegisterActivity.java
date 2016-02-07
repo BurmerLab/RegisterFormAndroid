@@ -25,7 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mytway.properties.Properties;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
 
 public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -52,7 +52,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         registerWorkLocalizationButton = (Button) findViewById(R.id.buttonRegisterWorkLocalization);
 
         Intent intent = getIntent();
-
         final User user = intent.getParcelableExtra("user");
 //        Toast.makeText(WorkPlaceRegisterActivity.this, "User: "
 //                + user.getUserName() +
@@ -150,7 +149,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, PropertiesValues.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
             }
         });
         // Show the current location in Google Map
