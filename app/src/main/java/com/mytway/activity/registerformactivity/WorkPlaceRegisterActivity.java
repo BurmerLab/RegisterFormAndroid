@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,24 +13,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
-import com.mytway.geolocalization.GeolocalizationResources;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mytway.properties.Properties;
 
 public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -56,8 +52,9 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         //initialize
         registerWorkLocalizationButton = (Button) findViewById(R.id.buttonRegisterWorkLocalization);
 
-//        Intent intent = getIntent();
-//        final User user = intent.getParcelableExtra("user");
+        Intent intent = getIntent();
+
+        final User user = intent.getParcelableExtra("user");
 //        Toast.makeText(WorkPlaceRegisterActivity.this, "User: "
 //                + user.getUserName() +
 //                " email:" + user.getEmail() +
@@ -70,12 +67,12 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
                 Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
 
-//                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
-//                user.setWorkPlace(workPosition);
-//
-//                Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
-//                intent.putExtra("user", user);
-//                startActivity(intent);
+                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
+                user.setWorkPlace(workPosition);
+
+                Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
             }
         });
     }
@@ -87,7 +84,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
                 && checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
             fetchLocationData();
-//            setUpMap();
         }else{
             requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
                                                 PERMISSION_REQUEST_CODE_LOCATION,
@@ -95,38 +91,14 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
                                                 WorkPlaceRegisterActivity.this,
                                                 getString(R.string.localization_will_help_with_choose_your_work_place));
         }
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     private void fetchLocationData() {
-        Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
+//        Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
         setUpMap();
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-////        setUpMapIfNeeded();
-//    }
-
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.workMapRegistration)).getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-        }
-    }
-
     private void setUpMap() {
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
 
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
@@ -142,7 +114,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             return;
         }
 
@@ -151,7 +122,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // redraw the marker when get location update.
-//                drawMarker(location);
+                drawMarker(location);
             }
 
             @Override
@@ -166,6 +137,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onProviderDisabled(String provider) {
             }
         };
+
         // set map type
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
@@ -176,18 +148,23 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         double longitude = myLocation.getLongitude();
 
         // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
+        final LatLng latLng = new LatLng(latitude, longitude);
 
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_PLACE_MAP_ZOOM_LEVEL));
+            }
+        });
         // Show the current location in Google Map
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
         // Zoom in the Google Map
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(GeolocalizationResources.MAP_ZOOM_ALTITUDE));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(GeolocalizationResources.MAP_ZOOM_ALTITUDE));
 
         final String markerTitleWhereIsYourWorkPlace = getResources().getString(R.string.tap_on_map_to_indicate_work_place);
 
         Marker defaultMarker = mMap.addMarker(new MarkerOptions()
-//                .snippet("Lat: " + myLocation.getLatitude() + ", Lng: " + myLocation.getLongitude())
                 .position(new LatLng(latitude, longitude))
                 .title(markerTitleWhereIsYourWorkPlace)
                 .flat(true)
@@ -202,7 +179,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onMapClick(LatLng point) {
                 mMap.clear();
                 Marker insertedMarkerManually = mMap.addMarker(new MarkerOptions()
-//                        .snippet("Lat: " + point.latitude + ", Lng: " + point.longitude)
                         .snippet("Please press Save button")
                         .position(point)
                         .title(markerTitleWhereIsYourWorkPlace)
@@ -223,9 +199,9 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         LatLng currentPosition = new LatLng(location.getLatitude(),location.getLongitude());
         mMap.addMarker(new MarkerOptions()
                 .position(currentPosition)
-                .snippet("Lat:" + location.getLatitude() + "Lng:"+ location.getLongitude())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title("ME"));
+                .title("ME")
+                .flat(true)
+                .draggable(true));
         setLatitudeLocalization(location.getLatitude());
         setLongitudeLocalization(location.getLongitude());
     }
