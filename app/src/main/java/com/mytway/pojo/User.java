@@ -133,4 +133,31 @@ public class User implements Parcelable {
         }
     };
 
+    public String decodeWorkWeekToString(WorkWeek workWeek){
+        StringBuilder result = new StringBuilder();
+
+        if(workWeek.getMonday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getTuesday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getWednesday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getThursday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getFriday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getSaturday()) result.append(1);
+        else result.append(0);
+
+        if(workWeek.getSunday()) result.append(1);
+        else result.append(0);
+
+        return result.toString();
+    }
+
 }

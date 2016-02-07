@@ -1,19 +1,13 @@
-package com.mytway.activity.registerformactivity;
+package com.mytway.activity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
-
-import com.mytway.activity.HandShakeActivity;
-import com.mytway.activity.R;
-import com.mytway.activity.application.MytwayActivity;
-import com.mytway.utility.SaveSharedPreference;
 
 public class StartActivity extends Activity {
 
@@ -22,7 +16,6 @@ public class StartActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
 
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         String restoredText = prefs.getString("text", null);

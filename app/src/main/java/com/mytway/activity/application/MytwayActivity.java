@@ -8,9 +8,13 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
+import com.mytway.database.UserRepo;
+import com.mytway.database.UserTable;
 import com.mytway.pojo.User;
 
 public class MytwayActivity extends Activity {
+
+    private int userId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +25,7 @@ public class MytwayActivity extends Activity {
         final User user = intent.getParcelableExtra("user");
 
         Toast.makeText(MytwayActivity.this,
-                "User: " + user.getUserName() +
+                "UserTable: " + user.getUserName() +
                 " email: " + user.getEmail() +
                 " pass: " + user.getPassword() +
                 " type: " + user.getTypeWork().getStatusCode() +
@@ -29,8 +33,15 @@ public class MytwayActivity extends Activity {
                 " WorkLat: " + user.getWorkPlace().getLatitude() +
                 " HomeLat: " + user.getHomePlace().getLatitude() +
                 " Days: " + user.getWorkWeek().getFriday()
-
                 , Toast.LENGTH_LONG).show();
+
+//        UserRepo userRepo = new UserRepo(this);
+//        UserTable userTable = userRepo.getUserById(userId);
+//
+//        int userId = userRepo.insert(userTable);
+
+
+
     }
 
     @Override

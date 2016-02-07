@@ -1,0 +1,24 @@
+1/18/2016
+Zmienilem pojo w UserTable zamiast HomePosition jest homeLatitude i HomeLongitude i tak samo dla work.
+WorkWeek pozostaje stringiem i jego String wyglada tak: 0101110 (pon wt, sro, czw, pia, sob, nie)
+
+1/23/2016
+Przetestowac myTWay activity- zapis do bazy
+sprawdzic jak testowac baze, i gdzie leza pliki stworzone przez sqllite na podstawie tego mozna testowac czy to dziala
+
+2/1/2016
+Problem jest w mapach- uzywaja one FragmentActivity ktory ma metody deprecated, i przez to jest lipa,
+Dodatkowo jeszcze problem moze byc w permissionach nowych dla androida 23
+Tutaj cos troche o tym pisza:
+http://stackoverflow.com/questions/21916701/android-view-inflateexception-binary-xml-file-line-9-error-inflating-class-fr
+
+pisza:
+java.lang.ClassCastException: com.example.helloworld.IndexActivity@4174c9f8 must implement OnFragmentInteractionListener
+Your IndexActivity class is supposed to implement some OnFragmentInteractionListener interface, and it does not.
+
+2/6/2016
+Prawie wszystko gotowe od strony google map, zrobilem mape, dodawanie markera, geolokalizacje, do zrobienia:
+- przy pierwsyzm uruchomieniu activity WorkPlaceReg... nie wyswietla sie lokalizacja uzytkownika. Jak sie obruci ekran to sie wyzwietli.
+Tak jak by brakowalo jakiegos odswiezenia- czegos brakuje .
+Przedebugowac moze sie uda znalezc.
+p.s w registerActivity, zmienilem w ifie zeby nie sprawdzalo checkValidation

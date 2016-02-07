@@ -5,14 +5,13 @@ import android.os.Parcelable;
 
 public class WorkWeek implements Parcelable {
 
-    private Boolean monday;
-    private Boolean tuesday;
-    private Boolean wednesday;
-    private Boolean thursday;
-    private Boolean friday;
-    private Boolean saturday;
-    private Boolean sunday;
-
+    private Boolean monday = false;
+    private Boolean tuesday = false;
+    private Boolean wednesday = false;
+    private Boolean thursday = false;
+    private Boolean friday = false;
+    private Boolean saturday = false;
+    private Boolean sunday = false;
 
     public WorkWeek() {
     }

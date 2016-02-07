@@ -28,7 +28,6 @@ import com.mytway.pojo.WorkWeek;
 import com.mytway.pojo.registration.CheckboxModel;
 import com.mytway.pojo.registration.CustomAdapter;
 import com.mytway.properties.Properties;
-import com.mytway.utility.FormObtainerUtility;
 import com.mytway.validation.Validation;
 
 public class RegistrationActivity extends Activity {
@@ -54,7 +53,6 @@ public class RegistrationActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_registration);
 
-
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putString("text", "dupa");
         editor.putInt("nr", 2);
@@ -67,7 +65,6 @@ public class RegistrationActivity extends Activity {
 //            int selectionStart = prefs.getInt("selection-start", -1);
 //            int selectionEnd = prefs.getInt("selection-end", -1);
 //        }
-
 
         //initialize
         mUserName = (EditText) findViewById(R.id.userNameRegisteredEditText);
@@ -85,7 +82,6 @@ public class RegistrationActivity extends Activity {
 
         mStartStandardWorkTimeRegisterButton.setVisibility(View.GONE);
 
-//        http://techlovejump.com/android-listview-with-checkbox/
         checkboxModelItems = new CheckboxModel[7];
         final String[] daysInWeek = getResources().getStringArray(R.array.work_days_in_week);
 
@@ -103,30 +99,31 @@ public class RegistrationActivity extends Activity {
             @Override
             public void onClick(View view) {
 
-                if (checkValidation()) {
+//                if (checkValidation()) {
+                if (true) {
                     User user = new User();
-                    user.setUserName(mUserName.getText().toString());
-                    user.setPassword(mUserPassword.getText().toString());
-                    user.setEmail(mEmail.getText().toString());
-                    user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
-                    user.setLengthTimeWork(mWorkTimeLengthButton.getText().toString());
-                    user.setStartStandardTimeWork(mStartStandardWorkTimeRegisterButton.getText().toString());
-
-                    WorkWeek workWeek = new WorkWeek();
-                    int count = mWorkDaysInWeeklistView.getAdapter().getCount();
-                    for (int x = 0; x <= count - 1; x++) {
-                        populateWorkWeek(workWeek, x);
-                    }
-                    user.setWorkWeek(workWeek);
-
-//                    Toast.makeText(RegistrationActivity.this, "WorkWeek: isFriday? " + workWeek.getFriday(), Toast.LENGTH_SHORT).show();
-
+//                    user.setUserName(mUserName.getText().toString());
+//                    user.setPassword(mUserPassword.getText().toString());
+//                    user.setEmail(mEmail.getText().toString());
+//                    user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
+//                    user.setLengthTimeWork(mWorkTimeLengthButton.getText().toString());
+//                    user.setStartStandardTimeWork(mStartStandardWorkTimeRegisterButton.getText().toString());
+//
+//                    WorkWeek workWeek = new WorkWeek();
+//                    int count = mWorkDaysInWeeklistView.getAdapter().getCount();
+//                    for (int x = 0; x <= count - 1; x++) {
+//                        populateWorkWeek(workWeek, x);
+//                    }
+//                    user.setWorkWeek(workWeek);
+//
+////                    Toast.makeText(RegistrationActivity.this, "WorkWeek: isFriday? " + workWeek.getFriday(), Toast.LENGTH_SHORT).show();
+//
                     Intent intent = new Intent(RegistrationActivity.this, WorkPlaceRegisterActivity.class);
-                    intent.putExtra("user", user);
-                    intent.putExtra("week", workWeek);
-                    if (user.getStartStandardTimeWork() != null) {
-                        intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
-                    }
+//                    intent.putExtra("user", user);
+//                    intent.putExtra("week", workWeek);
+//                    if (user.getStartStandardTimeWork() != null) {
+//                        intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
+//                    }
 
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivity(intent);
@@ -143,7 +140,7 @@ public class RegistrationActivity extends Activity {
                mWorkDaysInWeeklistView.setAdapter(adapter);
 
                AlertDialog.Builder builderSingle = new AlertDialog.Builder(RegistrationActivity.this);
-               builderSingle.setIcon(R.drawable.common_signin_btn_icon_disabled_focus_dark);
+//               builderSingle.setIcon(R.drawable.common_signin_btn_icon_disabled_focus_dark);
                builderSingle.setTitle(getResources().getString(R.string.select_work_week));
 
                builderSingle.setNegativeButton(getResources().getString(R.string.cancel_button),

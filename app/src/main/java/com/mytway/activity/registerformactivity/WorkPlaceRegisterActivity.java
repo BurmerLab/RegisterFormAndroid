@@ -1,7 +1,6 @@
 package com.mytway.activity.registerformactivity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,7 +11,6 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -28,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.properties.Properties;
+import com.mytway.utility.permission.PermissionUtil;
 
 public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -81,15 +80,15 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
-                && checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
+        if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
+                && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
             fetchLocationData();
         }else{
-            requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
-                                                PERMISSION_REQUEST_CODE_LOCATION,
-                                                getApplicationContext(),
-                                                WorkPlaceRegisterActivity.this,
-                                                getString(R.string.localization_will_help_with_choose_your_work_place));
+            PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                                            PERMISSION_REQUEST_CODE_LOCATION,
+                                            getApplicationContext(),
+                                            WorkPlaceRegisterActivity.this,
+                                            getString(R.string.localization_will_help_with_choose_your_work_place));
         }
     }
 
@@ -99,7 +98,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     }
 
     private void setUpMap() {
-
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
@@ -137,7 +135,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onProviderDisabled(String provider) {
             }
         };
-
         // set map type
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
@@ -153,7 +150,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_PLACE_MAP_ZOOM_LEVEL));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
             }
         });
         // Show the current location in Google Map
@@ -228,40 +225,16 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         return getString(resId);
     }
 
-    public static void requestPermission(String strPermission, int perCode,Context context ,Activity activity, String requestMessage){
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, strPermission)){
-            Toast.makeText(context.getApplicationContext(), requestMessage, Toast.LENGTH_LONG).show();
-
-        } else {
-            ActivityCompat.requestPermissions(activity,new String[]{strPermission},perCode);
-        }
-    }
-
-    public static boolean checkPermission(String strPermission ,Context _c){
-        int result = ContextCompat.checkSelfPermission(_c, strPermission);
-
-        if (result == PackageManager.PERMISSION_GRANTED){
-            return true;
-
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-
             case PERMISSION_REQUEST_CODE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     fetchLocationData();
                 } else {
                     Toast.makeText(getApplicationContext(),"Permission Denied, You cannot access location data.",Toast.LENGTH_LONG).show();
                 }
-
                 break;
         }
     }
-
 }
