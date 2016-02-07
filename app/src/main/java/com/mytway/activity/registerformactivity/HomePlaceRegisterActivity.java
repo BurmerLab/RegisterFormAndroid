@@ -5,24 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
-import com.mytway.activity.application.MytwayActivity;
-import com.mytway.geolocalization.GeolocalizationResources;
-import com.mytway.pojo.Position;
-import com.mytway.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -30,16 +25,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.mytway.validation.Validation;
+import com.mytway.properties.Properties;
+import com.mytway.utility.permission.PermissionUtil;
 
-public class HomePlaceRegisterActivity extends FragmentActivity {
+public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
+
+    private int userId = 0;
     private GoogleMap mMap;
 
     private double latitudeLocalization;
     private double longitudeLocalization;
 
-    private Geocoder geoCoder;
     protected Button registerHomeLocalizationButton;
 
     @Override
@@ -47,67 +45,110 @@ public class HomePlaceRegisterActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home_place_form_registration);
-        setUpMapIfNeeded();
+//        setUpMapIfNeeded();
 
-        geoCoder = new Geocoder(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMapRegistration);
+        mapFragment.getMapAsync(this);
 
         //initialize
         registerHomeLocalizationButton = (Button) findViewById(R.id.buttonRegisterHomeLocalization);
 
         Intent intent = getIntent();
-        final User user = intent.getParcelableExtra("user");
+//        final User user = intent.getParcelableExtra("user");
 
-        Toast.makeText(HomePlaceRegisterActivity.this, "User: "
-                + user.getUserName() +
-                " email:" + user.getEmail() +
-                " start:" + user.getStartStandardTimeWork() +
-                " Work: " + user.getWorkPlace()
-                , Toast.LENGTH_LONG).show();
+//        Toast.makeText(HomePlaceRegisterActivity.this, "UserTable: "
+//                + user.getUserName() +
+//                " email:" + user.getEmail() +
+//                " start:" + user.getStartStandardTimeWork() +
+//                " Work: " + user.getWorkPlace()
+//                , Toast.LENGTH_LONG).show();
 
         registerHomeLocalizationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Position workPosition = user.getWorkPlace();
-                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
-
-                if(Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))){
-                    user.setHomePlace(homePosition);
-
-                    Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);
-                    intent.putExtra("user", user);
-                    if (intent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(intent);
-                    }
-                }else{
-
-                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(HomePlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
+//                Position workPosition = user.getWorkPlace();
+//                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
+//
+//                if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
+//                    user.setHomePlace(homePosition);
+//
+//                    UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
+//
+//                    UserTable userTable = new UserTable();
+//
+//                    userTable.userId = userId;
+//                    userTable.userName = user.getUserName();
+//                    userTable.password = user.getPassword();
+//                    userTable.typeWork = user.getTypeWork().getStatusCode();
+//                    userTable.lengthTimeWork = user.getLengthTimeWork();
+//                    userTable.startStandardTimeWork = user.getStartStandardTimeWork();
+//                    userTable.workPlaceLatitude = user.getWorkPlace().getLatitude();
+//                    userTable.workPlaceLongitude = user.getWorkPlace().getLongitude();
+//                    userTable.homePlaceLatitude = user.getHomePlace().getLatitude();
+//                    userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
+//                    userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
+//
+//                    if (userId == 0) {
+//                        userId = userRepo.insert(userTable);
+//
+//                        DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
+//
+//                        try {
+//                            String destinationPath = Environment.getExternalStorageDirectory().toString();
+//                            File file = new File(destinationPath);
+//                            if (!file.exists()) {
+//                                file.mkdirs();
+//                                file.createNewFile();
+//                                // ---copy the db from the /data/data/ folder into
+//                                // the sdcard databases folder--- here MyDB is database name
+//                                DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
+//                                        + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
+//                            }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                        Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        userRepo.update(userTable);
+//                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);
+//                    intent.putExtra("user", user);
+//                    if (intent.resolveActivity(getPackageManager()) != null) {
+//                        startActivity(intent);
+//                    }
+//                } else {
+//                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
-
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-    }
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMapRegistration)).getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
+        if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
+                && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
+            fetchLocationData();
+        }else{
+            PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                                PERMISSION_REQUEST_CODE_LOCATION,
+                                getApplicationContext(),
+                                HomePlaceRegisterActivity.this,
+                                getString(R.string.localization_will_help_with_choose_your_home_place));
         }
     }
 
-    private void setUpMap() {
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
+    private void fetchLocationData() {
+//        Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
+        setUpMap();
+    }
 
+    private void setUpMap() {
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
@@ -122,32 +163,27 @@ public class HomePlaceRegisterActivity extends FragmentActivity {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            Log.i("tag", "jestem w ifie Permission problem");
-
             return;
         }
+
         Location myLocation = locationManager.getLastKnownLocation(provider);
 
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // redraw the marker when get location update.
-//                drawMarker(location);
+                drawMarker(location);
             }
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
-
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-
             }
         };
         // set map type
@@ -160,13 +196,14 @@ public class HomePlaceRegisterActivity extends FragmentActivity {
         double longitude = myLocation.getLongitude();
 
         // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
+        final LatLng latLng = new LatLng(latitude, longitude);
 
-        // Show the current location in Google Map
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
-        // Zoom in the Google Map
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(GeolocalizationResources.MAP_ZOOM_ALTITUDE));
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Properties.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
+            }
+        });
 
         final String markerTitleWhereIsYourHomePlace = getResources().getString(R.string.marker_title_where_is_your_home_place);
 
@@ -181,13 +218,11 @@ public class HomePlaceRegisterActivity extends FragmentActivity {
         setLatitudeLocalization(myLocation.getLatitude());
         setLongitudeLocalization(myLocation.getLongitude());
 
-
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 mMap.clear();
                 Marker insertedMarkerManually = mMap.addMarker(new MarkerOptions()
-//                        .snippet("Lat: " + point.latitude + ", Lng: " + point.longitude)
                         .snippet("Please press Save button")
                         .position(point)
                         .title(markerTitleWhereIsYourHomePlace)
@@ -227,6 +262,20 @@ public class HomePlaceRegisterActivity extends FragmentActivity {
         String packageName = getPackageName();
         int resId = getResources().getIdentifier(aString, "string", packageName);
         return getString(resId);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+
+            case PERMISSION_REQUEST_CODE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fetchLocationData();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Permission Denied, You cannot access location data.",Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
     }
 
 }
