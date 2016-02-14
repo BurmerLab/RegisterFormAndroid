@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
+import com.mytway.geolocalization.Geolocalization;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
 
-public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
+public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback{
 
     private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
 
@@ -97,6 +98,9 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     }
 
     private void setUpMap() {
+        //tutaj by mozna czesc kodu odpowiedzialnego za geolokalizacje wydzielic do Geolokalizacja, zwracala by ona obiekt Geolokalizacja a w nim
+        // latitude i longitude doublowe.
+
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
@@ -115,7 +119,14 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         }
 
         Location myLocation = locationManager.getLastKnownLocation(provider);
+        //Do przetestowania i przerobienia
+//        if(myLocation == null){
+//            myLocation = Geolocalization.getLocation(WorkPlaceRegisterActivity.this);
+//        }
 
+        if(myLocation == null){
+            Toast.makeText(WorkPlaceRegisterActivity.this, "lokalization is NULL!!!", Toast.LENGTH_SHORT).show();
+        }
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // redraw the marker when get location update.
@@ -134,16 +145,14 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onProviderDisabled(String provider) {
             }
         };
+
         // set map type
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // Get latitude of the current location
+        // Get latitude and longitude of the current location
         double latitude = myLocation.getLatitude();
-
-        // Get longitude of the current location
         double longitude = myLocation.getLongitude();
 
-        // Create a LatLng object for the current location
         final LatLng latLng = new LatLng(latitude, longitude);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -152,11 +161,6 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, PropertiesValues.WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL));
             }
         });
-        // Show the current location in Google Map
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
-        // Zoom in the Google Map
-//        mMap.animateCamera(CameraUpdateFactory.zoomTo(GeolocalizationResources.MAP_ZOOM_ALTITUDE));
 
         final String markerTitleWhereIsYourWorkPlace = getResources().getString(R.string.tap_on_map_to_indicate_work_place);
 
