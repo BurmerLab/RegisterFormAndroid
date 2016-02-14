@@ -1,13 +1,9 @@
 package com.mytway.activity.registerformactivity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -17,7 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
-import com.mytway.geolocalization.Geolocalization;
+import com.mytway.geolocalization.MytwayGeolocalization;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -98,62 +94,20 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     }
 
     private void setUpMap() {
-        //tutaj by mozna czesc kodu odpowiedzialnego za geolokalizacje wydzielic do Geolokalizacja, zwracala by ona obiekt Geolokalizacja a w nim
-        // latitude i longitude doublowe.
 
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        // Get LocationManager object from System Service LOCATION_SERVICE
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        // Create a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-
-        // Get the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
+        MytwayGeolocalization geolocalization = new MytwayGeolocalization(WorkPlaceRegisterActivity.this);
+        latitudeLocalization = geolocalization.getLatitude();
+        longitudeLocalization = geolocalization.getLongitude();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        Location myLocation = locationManager.getLastKnownLocation(provider);
-        //Do przetestowania i przerobienia
-//        if(myLocation == null){
-//            myLocation = Geolocalization.getLocation(WorkPlaceRegisterActivity.this);
-//        }
-
-        if(myLocation == null){
-            Toast.makeText(WorkPlaceRegisterActivity.this, "lokalization is NULL!!!", Toast.LENGTH_SHORT).show();
-        }
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // redraw the marker when get location update.
-                drawMarker(location);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-
-        // set map type
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        // Get latitude and longitude of the current location
-        double latitude = myLocation.getLatitude();
-        double longitude = myLocation.getLongitude();
-
-        final LatLng latLng = new LatLng(latitude, longitude);
+        final LatLng latLng = new LatLng(latitudeLocalization, longitudeLocalization);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -165,14 +119,11 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         final String markerTitleWhereIsYourWorkPlace = getResources().getString(R.string.tap_on_map_to_indicate_work_place);
 
         Marker defaultMarker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latitude, longitude))
+                .position(new LatLng(latitudeLocalization, longitudeLocalization))
                 .title(markerTitleWhereIsYourWorkPlace)
                 .flat(true)
                 .draggable(true));
         defaultMarker.showInfoWindow();
-
-        setLatitudeLocalization(myLocation.getLatitude());
-        setLongitudeLocalization(myLocation.getLongitude());
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
