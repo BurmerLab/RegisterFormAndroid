@@ -1,14 +1,11 @@
 package com.mytway.activity.registerformactivity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -25,11 +22,21 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mytway.activity.application.MytwayActivity;
+import com.mytway.database.DBHelper;
+import com.mytway.database.UserRepo;
+import com.mytway.database.UserTable;
+import com.mytway.geolocalization.MytwayGeoLocalization;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -48,7 +55,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home_place_form_registration);
-//        setUpMapIfNeeded();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMapRegistration);
         mapFragment.getMapAsync(this);
@@ -75,57 +81,56 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
-//
-//                    UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
-//
-//                    UserTable userTable = new UserTable();
-//
-//                    userTable.userId = userId;
-//                    userTable.userName = user.getUserName();
-//                    userTable.password = user.getPassword();
-//                    userTable.typeWork = user.getTypeWork().getStatusCode();
-//                    userTable.lengthTimeWork = user.getLengthTimeWork();
-//                    userTable.startStandardTimeWork = user.getStartStandardTimeWork();
-//                    userTable.workPlaceLatitude = user.getWorkPlace().getLatitude();
-//                    userTable.workPlaceLongitude = user.getWorkPlace().getLongitude();
-//                    userTable.homePlaceLatitude = user.getHomePlace().getLatitude();
-//                    userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
-//                    userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
-//
-//                    if (userId == 0) {
-//                        userId = userRepo.insert(userTable);
-//
-//                        DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
-//
-//                        try {
-//                            String destinationPath = Environment.getExternalStorageDirectory().toString();
-//                            File file = new File(destinationPath);
-//                            if (!file.exists()) {
-//                                file.mkdirs();
-//                                file.createNewFile();
-//                                // ---copy the db from the /data/data/ folder into
-//                                // the sdcard databases folder--- here MyDB is database name
-//                                DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
-//                                        + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
-//                            }
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        userRepo.update(userTable);
-//                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);
-//                    intent.putExtra("user", user);
-//                    if (intent.resolveActivity(getPackageManager()) != null) {
-//                        startActivity(intent);
-//                    }
-//                } else {
-//                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
-//                }
+
+                    UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
+                    UserTable userTable = new UserTable();
+
+                    userTable.userId = userId;
+                    userTable.userName = user.getUserName();
+                    userTable.password = user.getPassword();
+                    userTable.typeWork = user.getTypeWork().getStatusCode();
+                    userTable.lengthTimeWork = user.getLengthTimeWork();
+                    userTable.startStandardTimeWork = user.getStartStandardTimeWork();
+                    userTable.workPlaceLatitude = user.getWorkPlace().getLatitude();
+                    userTable.workPlaceLongitude = user.getWorkPlace().getLongitude();
+                    userTable.homePlaceLatitude = user.getHomePlace().getLatitude();
+                    userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
+                    userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
+
+                    if (userId == 0) {
+                        userId = userRepo.insert(userTable);
+
+                        DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
+
+                        try {
+                            String destinationPath = Environment.getExternalStorageDirectory().toString();
+                            File file = new File(destinationPath);
+                            if (!file.exists()) {
+                                file.mkdirs();
+                                file.createNewFile();
+                                // ---copy the db from the /data/data/ folder into
+                                // the sdcard databases folder--- here MyDB is database name
+                                DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
+                                        + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
+                    } else {
+                        userRepo.update(userTable);
+                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
+                    }
+
+                    Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);
+                    intent.putExtra("user", user);
+
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -156,51 +161,17 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        // Get LocationManager object from System Service LOCATION_SERVICE
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        // Create a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-
-        // Get the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
+        MytwayGeoLocalization geolocalization = new MytwayGeoLocalization(HomePlaceRegisterActivity.this);
+        latitudeLocalization = geolocalization.getLatitude();
+        longitudeLocalization = geolocalization.getLongitude();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        Location myLocation = locationManager.getLastKnownLocation(provider);
-
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // redraw the marker when get location update.
-                drawMarker(location);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
-        // set map type
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        // Get latitude of the current location
-        double latitude = myLocation.getLatitude();
-
-        // Get longitude of the current location
-        double longitude = myLocation.getLongitude();
-
         // Create a LatLng object for the current location
-        final LatLng latLng = new LatLng(latitude, longitude);
+        final LatLng latLng = new LatLng(latitudeLocalization, longitudeLocalization);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -213,14 +184,11 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 
         Marker defaultMarker = mMap.addMarker(new MarkerOptions()
 //                .snippet("Lat: " + myLocation.getLatitude() + ", Lng: " + myLocation.getLongitude())
-                .position(new LatLng(latitude, longitude))
+                .position(new LatLng(latitudeLocalization, longitudeLocalization))
                 .title(markerTitleWhereIsYourHomePlace)
                 .flat(true)
                 .draggable(true));
         defaultMarker.showInfoWindow();
-
-        setLatitudeLocalization(myLocation.getLatitude());
-        setLongitudeLocalization(myLocation.getLongitude());
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override

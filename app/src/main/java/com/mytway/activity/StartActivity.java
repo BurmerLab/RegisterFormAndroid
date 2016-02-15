@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.mytway.database.UserRepo;
+
 public class StartActivity extends Activity {
 
     @Override

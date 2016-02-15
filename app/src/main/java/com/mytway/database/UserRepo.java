@@ -117,7 +117,7 @@ public class UserRepo {
                 UserTable.WORK_PLACE_LONGITUDE + "," +
                 UserTable.HOME_PLACE_LATITUDE + "," +
                 UserTable.HOME_PLACE_LONGITUDE + "," +
-                UserTable.WORK_WEEK + "," +
+                UserTable.WORK_WEEK + "" +
                 " FROM " + UserTable.TABLE
                 + " WHERE " +
                 UserTable.KEY_ID + "=?";// It's a good practice to use parameter ?, instead of concatenate string
@@ -126,6 +126,53 @@ public class UserRepo {
         UserTable userTable = new UserTable();
 
         Cursor cursor = db.rawQuery(selectQuery, new String[] { String.valueOf(Id) } );
+
+        if (cursor.moveToFirst()) {
+            do {
+                userTable.userId = cursor.getInt(cursor.getColumnIndex(UserTable.KEY_ID));
+                userTable.userName = cursor.getString(cursor.getColumnIndex(UserTable.KEY_USER_NAME));
+                userTable.password  =cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
+                userTable.typeWork  =cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
+
+                userTable.lengthTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
+                userTable.startStandardTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
+                userTable.workPlaceLatitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LATITUDE));
+                userTable.workPlaceLongitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LONGITUDE));
+                userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
+                userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
+                userTable.workWeek  =cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return userTable;
+    }
+
+    public UserTable getUserByUserName(String userName){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT  " +
+                UserTable.KEY_ID + "," +
+                UserTable.KEY_USER_NAME + "," +
+                UserTable.EMAIL + "," +
+                UserTable.PASSWORD + "," +
+                UserTable.TYPE_WORK + "," +
+                UserTable.LENGTH_TIME_WORK + "," +
+                UserTable.START_STANDARD_TIME + "," +
+                UserTable.WORK_PLACE_LATITUDE + "," +
+                UserTable.WORK_PLACE_LONGITUDE + "," +
+                UserTable.HOME_PLACE_LATITUDE + "," +
+                UserTable.HOME_PLACE_LONGITUDE + "," +
+                UserTable.WORK_WEEK + "" +
+                " FROM " + UserTable.TABLE
+                + " WHERE " +
+                UserTable.KEY_USER_NAME + "=?";// It's a good practice to use parameter ?, instead of concatenate string
+
+        UserTable userTable = new UserTable();
+
+//        Cursor cursor = db.rawQuery(selectQuery, new String[] { userName } );
+        Cursor cursor = db.rawQuery(selectQuery, new String[] { userName } );
 
         if (cursor.moveToFirst()) {
             do {
