@@ -12,15 +12,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MytwayGeolocalization extends Service implements LocationListener {
     private final Context mContext;
 
-    // flag for GPS Status
     boolean isGPSEnabled = false;
 
-    // flag for network status
     boolean isNetworkEnabled = false;
 
     boolean canGetLocation = false;
@@ -45,7 +42,7 @@ public class MytwayGeolocalization extends Service implements LocationListener {
 
     public android.location.Location getLocation() {
         try {
-            locationManager = (LocationManager) mContext.getSystemService(mContext.LOCATION_SERVICE);
+            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
             // getting GPS status
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -73,7 +70,6 @@ public class MytwayGeolocalization extends Service implements LocationListener {
                     }
                 }
 
-                // First get location from Network Provider
                 if (isNetworkEnabled) {
                     if (location == null) {
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
@@ -85,7 +81,6 @@ public class MytwayGeolocalization extends Service implements LocationListener {
                             updateGPSCoordinates(location);
                         }
                     }
-
                 }
             }
         } catch (Exception e) {
@@ -108,7 +103,7 @@ public class MytwayGeolocalization extends Service implements LocationListener {
     }
 
     public void onLocationChanged(Location location) {
-        Toast.makeText(mContext, "Localization Changed : lat:" + getLatitude() +" lon: "+ getLongitude(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, "Localization Changed : lat:" + getLatitude() +" lon: "+ getLongitude(), Toast.LENGTH_SHORT).show();
         updateGPSCoordinates(location);
     }
 
