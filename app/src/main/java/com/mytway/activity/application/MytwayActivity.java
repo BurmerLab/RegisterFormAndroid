@@ -24,16 +24,16 @@ public class MytwayActivity extends Activity {
         Intent intent = getIntent();
         final User user = intent.getParcelableExtra("user");
 
-        Toast.makeText(MytwayActivity.this,
-                "UserTable: " + user.getUserName() +
-                " email: " + user.getEmail() +
-                " pass: " + user.getPassword() +
-                " type: " + user.getTypeWork().getStatusCode() +
-                " start: " + user.getStartStandardTimeWork() +
-                " WorkLat: " + user.getWorkPlace().getLatitude() +
-                " HomeLat: " + user.getHomePlace().getLatitude() +
-                " Days: " + user.getWorkWeek().getFriday()
-                , Toast.LENGTH_LONG).show();
+//        Toast.makeText(MytwayActivity.this,
+//                "UserTable: " + user.getUserName() +
+//                " email: " + user.getEmail() +
+//                " pass: " + user.getPassword() +
+//                " type: " + user.getTypeWork().getStatusCode() +
+//                " start: " + user.getStartStandardTimeWork() +
+//                " WorkLat: " + user.getWorkPlace().getLatitude() +
+//                " HomeLat: " + user.getHomePlace().getLatitude() +
+//                " Days: " + user.getWorkWeek().getFriday()
+//                , Toast.LENGTH_LONG).show();
 
 //        UserRepo userRepo = new UserRepo(this);
 //        UserTable userTable = userRepo.getUserById(userId);

@@ -9,7 +9,9 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.mytway.activity.application.MytwayActivity;
 import com.mytway.database.UserRepo;
+import com.mytway.properties.SharedPreferencesNames;
 
 public class StartActivity extends Activity {
 
@@ -19,30 +21,20 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        String restoredText = prefs.getString("text", null);
-        int nr = prefs.getInt("nr", 0);
+//        Retrieve sharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, MODE_PRIVATE);
+        Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
 
-        Toast.makeText(StartActivity.this, "text: " + restoredText + " nr: " + nr, Toast.LENGTH_SHORT).show();
-        if (restoredText != null){
-            int selectionStart = prefs.getInt("selection-start", -1);
-            int selectionEnd = prefs.getInt("selection-end", -1);
+        if(isUserLogged){
+            // Call Mytway activity
+            Intent intent = new Intent(getApplicationContext(), MytwayActivity.class);
+            startActivity(intent);
         }
-
+        else{
+            // call Login or register Activity
             Intent intent = new Intent(getApplicationContext(), HandShakeActivity.class);
             startActivity(intent);
-
-//        if(SaveSharedPreference.getUserName(StartActivity.this).length() == 0){
-//            // call Login Activity
-//            Intent intent = new Intent(getApplicationContext(), HandShakeActivity.class);
-//            startActivity(intent);
-//        }
-//        else
-//        {
-//            // Call Next Activity
-//            Intent intent = new Intent(getApplicationContext(), MytwayActivity.class);
-//            startActivity(intent);
-//        }
+        }
     }
 
     @Override
