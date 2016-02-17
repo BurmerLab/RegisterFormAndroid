@@ -29,10 +29,8 @@ public class HandShakeActivity extends Activity {
         mRegisterActivityButton = (Button) findViewById(R.id.register_activity_button);
 
         mLoginActivityButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(HandShakeActivity.this, LoginActivity.class);
 
                 if (intent.resolveActivity(getPackageManager()) != null) {
@@ -42,10 +40,8 @@ public class HandShakeActivity extends Activity {
         });
 
         mRegisterActivityButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(HandShakeActivity.this, RegistrationActivity.class);
 
                 if (intent.resolveActivity(getPackageManager()) != null) {
@@ -73,7 +69,6 @@ public class HandShakeActivity extends Activity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

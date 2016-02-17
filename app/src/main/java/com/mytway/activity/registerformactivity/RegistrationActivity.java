@@ -54,19 +54,6 @@ public class RegistrationActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_registration);
 
-        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-        editor.putString("text", "dupa");
-        editor.putInt("nr", 2);
-        editor.apply();
-//        editor.commit();
-
-//        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-//        String restoredText = prefs.getString("text", null);
-//        if (restoredText != null){
-//            int selectionStart = prefs.getInt("selection-start", -1);
-//            int selectionEnd = prefs.getInt("selection-end", -1);
-//        }
-
         //initialize
         mUserName = (EditText) findViewById(R.id.userNameRegisteredEditText);
         mEmail = (EditText) findViewById(R.id.emailRegisteredEditText);
@@ -116,8 +103,6 @@ public class RegistrationActivity extends Activity {
                     }
                     user.setWorkWeek(workWeek);
 
-//                    Toast.makeText(RegistrationActivity.this, "WorkWeek: isFriday? " + workWeek.getFriday(), Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(RegistrationActivity.this, WorkPlaceRegisterActivity.class);
                     intent.putExtra("user", user);
                     intent.putExtra("week", workWeek);
@@ -140,7 +125,6 @@ public class RegistrationActivity extends Activity {
                mWorkDaysInWeeklistView.setAdapter(adapter);
 
                AlertDialog.Builder builderSingle = new AlertDialog.Builder(RegistrationActivity.this);
-//               builderSingle.setIcon(R.drawable.common_signin_btn_icon_disabled_focus_dark);
                builderSingle.setTitle(getResources().getString(R.string.select_work_week));
 
                builderSingle.setNegativeButton(getResources().getString(R.string.cancel_button),
@@ -266,16 +250,12 @@ public class RegistrationActivity extends Activity {
         return workWeek;
     }
 
-    //http://techlovejump.com/android-listview-with-checkbox/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
-
-
 
     //  Validation Automatic
     private void formRegisterAutoValidation() {

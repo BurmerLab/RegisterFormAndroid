@@ -13,7 +13,7 @@
         android:inputType="textPersonName"
         android:hint="Username"
         android:ems="10"
-        android:id="@+id/usernameLogin"
+        android:id="@+id/loginUserName"
         android:text="mike"
         android:backgroundTint="@color/application_color"
         android:layout_alignParentBottom="true"
@@ -31,7 +31,7 @@
         android:id="@+id/loginPassword"
         android:autoLink="none"
         android:backgroundTint="@color/application_color"
-        android:layout_alignTop="@+id/usernameLogin"
+        android:layout_alignTop="@+id/loginUserName"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="39dp"
         android:layout_alignParentStart="true" />
@@ -44,4 +44,11 @@
         android:background="@color/application_button_color"
         android:layout_below="@+id/loginPassword"
         android:layout_alignParentStart="true" />
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/horizontalScrollView"
+        android:layout_above="@+id/loginUserName"
+        android:layout_marginBottom="136dp" />
 </RelativeLayout>
