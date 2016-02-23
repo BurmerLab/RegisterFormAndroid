@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <color name="application_color">#ff9746</color>
+    <color name="application_background_color">#ffb163</color>
     <color name="application_button_color">#ff9107</color>
 
 </resources>

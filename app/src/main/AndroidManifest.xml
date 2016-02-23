@@ -46,13 +46,14 @@
             android:label="@string/title_activity_start">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".registerformactivity.TabbedActivity"
-            android:label="@string/title_activity_tabbed"></activity>
+            android:name=".pagger.ScreenSlideActivity"
+            android:label="@string/title_activity_mytway" />
+
     </application>
 
 </manifest>
