@@ -160,4 +160,13 @@ public class User implements Parcelable {
         return result.toString();
     }
 
+    public String obtainTimeFromTitleString(String originalText){
+
+        String[] time = originalText.replaceAll("\\s","").split(":", originalText.length());
+
+        String result = time[1] +":"+ time[2];
+        return result;
+
+    }
+
 }

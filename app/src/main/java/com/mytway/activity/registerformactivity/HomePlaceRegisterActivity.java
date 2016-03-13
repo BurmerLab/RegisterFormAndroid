@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
+import android.util.Log;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
@@ -30,6 +32,8 @@ import com.mytway.geolocalization.MytwayGeolocalization;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.EthernetConnectivity;
+import com.mytway.utility.MytwayWebservice;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
 
@@ -41,13 +45,15 @@ import java.io.IOException;
 public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
+    private static final String TAG = "MytwayWebservice";
 
     private int userId = 0;
     private GoogleMap mMap;
 
+    private String jsonMessage = "";
+
     private double latitudeLocalization;
     private double longitudeLocalization;
-
     protected Button registerHomeLocalizationButton;
 
     @Override
@@ -55,6 +61,14 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home_place_form_registration);
+
+//        isEthernetConnectAvailable = EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this);
+
+        if(!EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
+            Toast.makeText(HomePlaceRegisterActivity.this,
+                    getResources().getString(R.string.no_internet_connection),
+                    Toast.LENGTH_SHORT).show();
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMapRegistration);
         mapFragment.getMapAsync(this);
@@ -88,6 +102,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.userId = userId;
                     userTable.userName = user.getUserName();
                     userTable.password = user.getPassword();
+                    userTable.email = user.getEmail();
                     userTable.typeWork = user.getTypeWork().getStatusCode();
                     userTable.lengthTimeWork = user.getLengthTimeWork();
                     userTable.startStandardTimeWork = user.getStartStandardTimeWork();
@@ -98,26 +113,38 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
 
                     if (userId == 0) {
-                        userId = userRepo.insert(userTable);
+                        if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
+                            userId = userRepo.insert(userTable);
 
-                        DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
+                            setJsonMessage(userTable.createJson());
 
-                        try {
-                            String destinationPath = Environment.getExternalStorageDirectory().toString();
-                            File file = new File(destinationPath);
-                            if (!file.exists()) {
-                                file.mkdirs();
-                                file.createNewFile();
-                                // ---copy the db from the /data/data/ folder into
-                                // the sdcard databases folder--- here MyDB is database name
-                                DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
-                                        + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
+                            if(EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
+                                Toast.makeText(HomePlaceRegisterActivity.this, "Insert to External DB", Toast.LENGTH_SHORT).show();
+                                new MytwayWebserviceInsertUser().execute();
+                            }else{
+                                Toast.makeText(HomePlaceRegisterActivity.this, "Nie zainsertowalem do external DB", Toast.LENGTH_SHORT).show();
+                                //Nima neta, dodac do kolejki do wyslania jak tylko net zostanie wlaczony
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
 
-                        Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
+                            DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
+
+                            try {
+                                String destinationPath = Environment.getExternalStorageDirectory().toString();
+                                File file = new File(destinationPath);
+                                if (!file.exists()) {
+                                    file.mkdirs();
+                                    file.createNewFile();
+                                    // ---copy the db from the /data/data/ folder into
+                                    // the sdcard databases folder--- here MyDB is database name
+                                    DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
+                                            + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         userRepo.update(userTable);
                         Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
@@ -250,4 +277,25 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         }
     }
 
+    private class MytwayWebserviceInsertUser extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object... arg0) {
+            MytwayWebservice mytwayWebservice = new MytwayWebservice();
+            if(!getJsonMessage().equals("")){
+                mytwayWebservice.insertUserToMytwayWebservice(getJsonMessage());
+            }else{
+                Log.i(TAG, "JsonMessage is empty");
+            }
+            return null;
+        }
+    }
+
+    public String getJsonMessage() {
+        return jsonMessage;
+    }
+
+    public void setJsonMessage(String jsonMessage) {
+        this.jsonMessage = jsonMessage;
+    }
 }

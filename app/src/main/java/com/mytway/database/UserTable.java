@@ -32,4 +32,22 @@ public class UserTable {
     public double homePlaceLongitude;
     public String workWeek;
 
+    public String createJson(){
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"userName\" : ").append("\"").append(userName).append("\", ");
+        json.append("\"email\" : ").append("\"").append(email).append("\", ");
+        json.append("\"password\" : ").append("\"").append(password).append("\", ");
+        json.append("\"typeWork\" : ").append("\"").append(typeWork).append("\", ");
+        json.append("\"lengthTimeWork\" : ").append("\"").append(lengthTimeWork).append("\", ");
+        json.append("\"startStandardTimeWork\" : ").append("\"").append(startStandardTimeWork).append("\", ");
+        json.append("\"workPlaceLatitude\" : ").append("\"").append(workPlaceLatitude).append("\", ");
+        json.append("\"workPlaceLongitude\" : ").append("\"").append(workPlaceLongitude).append("\", ");
+        json.append("\"homePlaceLatitude\" : ").append("\"").append(homePlaceLatitude).append("\", ");
+        json.append("\"homePlaceLongitude\" : ").append("\"").append(homePlaceLongitude).append("\", ");
+        json.append("\"workWeek\" : ").append("\"").append(workWeek).append("\"");
+        json.append("}");
+        return json.toString();
+    }
+
 }

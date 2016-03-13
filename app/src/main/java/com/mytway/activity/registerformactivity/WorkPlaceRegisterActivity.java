@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.permission.PermissionUtil;
 
 public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback{
@@ -42,6 +43,12 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_work_map_form_registration);
+
+        if(!EthernetConnectivity.isEthernetOnline(WorkPlaceRegisterActivity.this)){
+            Toast.makeText(WorkPlaceRegisterActivity.this,
+                    getResources().getString(R.string.no_internet_connection),
+                    Toast.LENGTH_SHORT).show();
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.workMapRegistration);
         mapFragment.getMapAsync(this);

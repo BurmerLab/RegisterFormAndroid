@@ -23,7 +23,8 @@ public class StartActivity extends Activity {
 
 //        Retrieve sharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, MODE_PRIVATE);
-        Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
+//        Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
+        Boolean isUserLogged = false;
 
         if(isUserLogged){
             // Call Mytway activity

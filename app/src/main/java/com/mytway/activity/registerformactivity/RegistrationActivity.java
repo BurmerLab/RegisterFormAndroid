@@ -3,12 +3,18 @@ package com.mytway.activity.registerformactivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -19,6 +25,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -28,11 +35,18 @@ import com.mytway.pojo.WorkWeek;
 import com.mytway.pojo.registration.CheckboxModel;
 import com.mytway.pojo.registration.CustomAdapter;
 import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.FormObtainerUtility;
+import com.mytway.utility.MytwayWebservice;
 import com.mytway.validation.Validation;
+
+import org.json.JSONException;
+
+import java.util.concurrent.ExecutionException;
 
 public class RegistrationActivity extends Activity {
 
+    private static final String TAG = "RegistrationActivity";
     private EditText mUserName;
     private EditText mEmail;
     private EditText mUserPassword;
@@ -45,6 +59,8 @@ public class RegistrationActivity extends Activity {
     private RadioGroup mRadioGroupStandard;
     private RadioGroup mRadioGroupFlexible;
 
+    private User user = new User();
+
     ListView mWorkDaysInWeeklistView;
     public CheckboxModel[] checkboxModelItems;
 
@@ -53,6 +69,7 @@ public class RegistrationActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_registration);
+        this.registerReceiver(this.mConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         //initialize
         mUserName = (EditText) findViewById(R.id.userNameRegisteredEditText);
@@ -80,6 +97,7 @@ public class RegistrationActivity extends Activity {
         checkboxModelItems[4] = new CheckboxModel(daysInWeek[4], 1);
         checkboxModelItems[5] = new CheckboxModel(daysInWeek[5], 0);
         checkboxModelItems[6] = new CheckboxModel(daysInWeek[6], 0);
+
 // --------------------------------------------------------------------------
         formRegisterAutoValidation();
 
@@ -88,30 +106,37 @@ public class RegistrationActivity extends Activity {
             public void onClick(View view) {
 
                 if (checkValidation()) {
-                    User user = new User();
-                    user.setUserName(mUserName.getText().toString());
-                    user.setPassword(mUserPassword.getText().toString());
-                    user.setEmail(mEmail.getText().toString());
-                    user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
-                    user.setLengthTimeWork(mWorkTimeLengthButton.getText().toString());
-                    user.setStartStandardTimeWork(mStartStandardWorkTimeRegisterButton.getText().toString());
 
-                    WorkWeek workWeek = new WorkWeek();
-                    int count = mWorkDaysInWeeklistView.getAdapter().getCount();
-                    for (int x = 0; x <= count - 1; x++) {
-                        populateWorkWeek(workWeek, x);
-                    }
-                    user.setWorkWeek(workWeek);
+                    if(isUserNameExistInExternalDatabase(mUserName)){
+                        mUserName.setError(getResources().getString(R.string.user_name_occupied));
+                        Toast.makeText(RegistrationActivity.this, "PROBLEM-> user name zajety!", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(RegistrationActivity.this, "SPOKO! NIMA DUPLIKATU", Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(RegistrationActivity.this, WorkPlaceRegisterActivity.class);
-                    intent.putExtra("user", user);
-                    intent.putExtra("week", workWeek);
-                    if (user.getStartStandardTimeWork() != null) {
-                        intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
-                    }
+                        user.setUserName(mUserName.getText().toString());
+                        user.setPassword(mUserPassword.getText().toString());
+                        user.setEmail(mEmail.getText().toString());
+                        user.setTypeWork(FormObtainerUtility.obtainTypeWorkNumber(mFlexibleTypeWorkRadioButton, mStandardTypeWorkRadioButton));
+                        user.setLengthTimeWork(user.obtainTimeFromTitleString(mWorkTimeLengthButton.getText().toString()));
+                        user.setStartStandardTimeWork(user.obtainTimeFromTitleString(mStartStandardWorkTimeRegisterButton.getText().toString()));
 
-                    if (intent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(intent);
+                        WorkWeek workWeek = new WorkWeek();
+                        int count = mWorkDaysInWeeklistView.getAdapter().getCount();
+                        for (int x = 0; x <= count - 1; x++) {
+                            populateWorkWeek(workWeek, x);
+                        }
+                        user.setWorkWeek(workWeek);
+
+                        Intent intent = new Intent(RegistrationActivity.this, WorkPlaceRegisterActivity.class);
+                        intent.putExtra("user", user);
+                        intent.putExtra("week", workWeek);
+                        if (user.getStartStandardTimeWork() != null) {
+                            intent.putExtra("UserStartStandardTimeWork", user.getStartStandardTimeWork());
+                        }
+
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
                     }
                 }
             }
@@ -182,8 +207,6 @@ public class RegistrationActivity extends Activity {
             }
         });
 
-
-
         mStartStandardWorkTimeRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,10 +247,48 @@ public class RegistrationActivity extends Activity {
                 mFlexibleTypeWorkRadioButton.setError(null);
             }
         });
-
-
-
     }
+
+    private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+            String reason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
+            boolean isFailover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
+
+            NetworkInfo currentNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+            NetworkInfo otherNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
+
+            if(currentNetworkInfo.isConnected()) {
+                mUserName.setEnabled(true);
+                mEmail.setEnabled(true);
+                mUserPassword.setEnabled(true);
+                mRegisterButton.setEnabled(true);
+                mWorkTimeLengthButton.setEnabled(true);
+                mFlexibleTypeWorkRadioButton.setEnabled(true);
+                mStandardTypeWorkRadioButton.setEnabled(true);
+                mStartStandardWorkTimeRegisterButton.setEnabled(true);
+                mRadioGroupStandard.setEnabled(true);
+                mRadioGroupFlexible.setEnabled(true);
+                mWorkDaysInWeek.setEnabled(true);
+                mWorkDaysInWeeklistView.setEnabled(true);
+            }else{
+                //If no internet, then Disable Form
+                mUserName.setEnabled(false);
+                mEmail.setEnabled(false);
+                mUserPassword.setEnabled(false);
+                mRegisterButton.setEnabled(false);
+                mWorkTimeLengthButton.setEnabled(false);
+                mFlexibleTypeWorkRadioButton.setEnabled(false);
+                mStandardTypeWorkRadioButton.setEnabled(false);
+                mStartStandardWorkTimeRegisterButton.setEnabled(false);
+                mRadioGroupStandard.setEnabled(false);
+                mRadioGroupFlexible.setEnabled(false);
+                mWorkDaysInWeek.setEnabled(false);
+                mWorkDaysInWeeklistView.setEnabled(false);
+                Toast.makeText(RegistrationActivity.this, getResources().getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+            }
+        }
+    };
 
     private WorkWeek populateWorkWeek(WorkWeek workWeek, int itemNumber) {
         CheckboxModel checkboxModel = (CheckboxModel) mWorkDaysInWeeklistView.getAdapter().getItem(itemNumber);
@@ -307,12 +368,7 @@ public class RegistrationActivity extends Activity {
             mFlexibleTypeWorkRadioButton.setError(getString(R.string.work_type_not_selected));
             mStandardTypeWorkRadioButton.setError(getString(R.string.work_type_not_selected));
         }else{
-            if(mFlexibleTypeWorkRadioButton.isChecked()){
-                Toast.makeText(RegistrationActivity.this, "FLEXIBLE CHOSEN", Toast.LENGTH_SHORT).show();
-
-            }else if(mStandardTypeWorkRadioButton.isChecked()){
-                Toast.makeText(RegistrationActivity.this, "STANDARD CHOSEN", Toast.LENGTH_SHORT).show();
-
+            if(mStandardTypeWorkRadioButton.isChecked()){
                 if(!Validation.hasSetStartWorkTime(mStartStandardWorkTimeRegisterButton, getString(R.string.start_work_time_empty), getString(R.string.start_work_time))){
                     validationResult = false;
                 }
@@ -326,5 +382,48 @@ public class RegistrationActivity extends Activity {
 
         return validationResult;
     }
+
+     public boolean isUserNameExistInExternalDatabase(TextView textView) {
+         Boolean isUserNameExistInExternalDatabase = null;
+
+        if(EthernetConnectivity.isEthernetOnline(RegistrationActivity.this)){
+            MytwayWebserviceCheckUserNameIsExist webService = new MytwayWebserviceCheckUserNameIsExist();
+            try {
+                isUserNameExistInExternalDatabase = webService.execute(textView.getText().toString()).get();
+            } catch (InterruptedException | ExecutionException e) {
+                Log.i(TAG, "Problem with obtaining isUserNameExistInExternalDatabase ", e);
+                e.printStackTrace();
+            }
+        }else{
+            Toast.makeText(RegistrationActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
+            //Nima neta, dodac do kolejki do wyslania jak tylko net zostanie wlaczony
+        }
+        Toast.makeText(RegistrationActivity.this, "Resyklt: " + isUserNameExistInExternalDatabase, Toast.LENGTH_SHORT).show();
+
+        return isUserNameExistInExternalDatabase;
+    }
+
+    private class MytwayWebserviceCheckUserNameIsExist extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... arg0) {
+            Boolean webServiceResult = null;
+            String userName = arg0[0];
+            MytwayWebservice mytwayWebservice = new MytwayWebservice();
+            if(userName != null){
+                try {
+                    webServiceResult  = mytwayWebservice.checkIsUserNameExistInExternalDatabaseByMytwayWebservice(userName);
+                } catch (JSONException e) {
+                    Log.i(TAG, "Problem with checking user name in external database", e);
+                    e.printStackTrace();
+                }
+            }else{
+                Log.i(TAG, "UserName is empty, mytway can't check duplicate in external database");
+            }
+            return webServiceResult;
+        }
+    }
+
+
 
 }

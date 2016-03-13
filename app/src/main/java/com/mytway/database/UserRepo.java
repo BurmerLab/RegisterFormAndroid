@@ -33,7 +33,7 @@ public class UserRepo {
 
         // Inserting Row
         long user_Id = db.insert(UserTable.TABLE, null, values);
-        db.close(); // Closing database connection
+        db.close();
         return (int) user_Id;
     }
 
@@ -196,4 +196,55 @@ public class UserRepo {
         db.close();
         return userTable;
     }
+
+    public boolean isUserExistInLocalDatabase(String userName){
+        UserTable userTable = getUserByUserName(userName);
+        return userTable.userName != null;
+
+//        return userTable.userName != null ? true : false;
+    }
+
+    public boolean isUserNameAndPasswordIsCorrect(String userName, String password){
+
+        boolean isUserNameAndPasswordIsCorrect = false;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String selectQuery =  "SELECT * FROM " + UserTable.TABLE
+                + " WHERE "
+                + UserTable.KEY_USER_NAME + " =? "
+                + " AND "
+                + UserTable.PASSWORD + " =? ";
+
+        UserTable userTable = new UserTable();
+
+//        Cursor cursor = db.rawQuery(selectQuery, new String[] { userName } );
+        Cursor cursor = db.rawQuery(selectQuery, new String[] { userName, password } );
+
+        if (cursor.moveToFirst()) {
+            do {
+//                userTable.userId = cursor.getInt(cursor.getColumnIndex(UserTable.KEY_ID));
+//                userTable.userName = cursor.getString(cursor.getColumnIndex(UserTable.KEY_USER_NAME));
+//                userTable.password  =cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
+//                userTable.typeWork  =cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
+//
+//                userTable.lengthTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
+//                userTable.startStandardTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
+//                userTable.workPlaceLatitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LATITUDE));
+//                userTable.workPlaceLongitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LONGITUDE));
+//                userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
+//                userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
+//                userTable.workWeek  =cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+                isUserNameAndPasswordIsCorrect = true;
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+//        if(userTable != null){
+//            isUserNameAndPasswordIsCorrect = true;
+//        }
+
+        return isUserNameAndPasswordIsCorrect;
+    }
+
 }

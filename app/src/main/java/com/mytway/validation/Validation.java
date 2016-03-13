@@ -1,13 +1,16 @@
 package com.mytway.validation;
 
+import android.content.Context;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mytway.pojo.Position;
 import com.mytway.pojo.registration.CheckboxModel;
 import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.EthernetConnectivity;
 
 import java.util.regex.Pattern;
 
@@ -33,7 +36,7 @@ public class Validation {
         if (required && !Pattern.matches(regex, text)) {
             textView.setError(errMsg);
             return false;
-        };
+        }
         return true;
     }
 
