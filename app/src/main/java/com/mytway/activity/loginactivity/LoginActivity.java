@@ -133,16 +133,12 @@ public class LoginActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_activity_login, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -169,8 +165,9 @@ public class LoginActivity extends Activity {
                 e.printStackTrace();
             }
 
-            if(isExternalPasswordCorrect){
-                return true;
+            if(!isExternalPasswordCorrect){
+                Log.i(TAG, "External Password is not correct, returned false");
+                return false;
             }
 
             isLocalPasswordCorrect =
@@ -180,6 +177,7 @@ public class LoginActivity extends Activity {
                 //user exist in local database and in external database
                 isPasswordsCorrect = true;
             }else{
+                Log.i(TAG,"External and Local Password is not equals, I will insert external user parameters to local user database");
                 //It needed to add user in local database because exist only in external database
                 UserTable userTable = new UserTable();
                 MytwayWebserviceGetUserFromExternalDatabase webServiceGetUser = new MytwayWebserviceGetUserFromExternalDatabase();
@@ -194,15 +192,13 @@ public class LoginActivity extends Activity {
                 Toast.makeText(LoginActivity.this, "Dodalem uzytkownika do lokalnej DB bo nie istnial, dane pobralem z external DB", Toast.LENGTH_SHORT).show();
 
                 if(insertResult > 0) {
-                    //todo: przetestowac co zwraca insert
-                    Toast.makeText(LoginActivity.this, "Zwrocilem Wiecej niz zero", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG , "After adding to local database new user, insert result return value grater than zero");
                     isPasswordsCorrect = true;
                 }else{
-                    Toast.makeText(LoginActivity.this, "Zwrocilem mniejsze lub rowne zeru", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG , "After adding to local database new user, insert result return value lesser than zero- it seems to be problem");
                 }
             }
         }
-
         return isPasswordsCorrect;
     }
 

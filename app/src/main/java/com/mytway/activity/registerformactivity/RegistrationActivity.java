@@ -98,7 +98,6 @@ public class RegistrationActivity extends Activity {
         checkboxModelItems[5] = new CheckboxModel(daysInWeek[5], 0);
         checkboxModelItems[6] = new CheckboxModel(daysInWeek[6], 0);
 
-// --------------------------------------------------------------------------
         formRegisterAutoValidation();
 
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
