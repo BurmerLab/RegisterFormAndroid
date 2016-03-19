@@ -141,7 +141,6 @@
     <string name="title_activity_slide_pagger">slidePaggerActivity</string>
 
 
-
     <!-- Titles -->
     <string name="title_crossfade">Simple Crossfade</string>
     <string name="title_card_flip">Card Flip</string>
@@ -176,7 +175,25 @@
     <string name="no_internet_connection">No internet connection, maybe turn on?</string>
     <string name="user_name_occupied">Sorry, user name occupied</string>
     <string name="password_is_not_correct">Sorry, password not correct</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
+    <string-array name="news_headlines">
+        <item>Two brooms are getting married. Before the ceremony, the bride broom says to the groom broom, "I think I'm going to have a whisk."
+                The groom broom says, How can that be possible? We havent even swept together!"</item>
+            <item>A man cheats on his girlfriend named Lorraine with a girl named Clearly.
+                Suddenly, Lorraine died.
+                At the funeral, the man stands up and sings, I can see Clearly now, Lorraine is gone.</item>
+            <item>Q: What is the difference between a girlfriend and a wife?
 
+        A: 45 lbs.
 
+        Q: What is the difference between a boyfriend and a husband?
+
+        A: 45 minutes.</item>
+                <item>            Q: What is the difference between a divorce and a circumcision?
+
+        A: In a divorce, you get rid of the whole schmuck.
+    </item>
+    </string-array>
 </resources>
