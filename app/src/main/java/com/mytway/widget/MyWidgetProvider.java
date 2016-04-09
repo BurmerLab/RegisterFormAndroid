@@ -17,11 +17,10 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		// initializing widget layout
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				R.layout.widget_layout);
+				R.layout.mytway_middle_widget_layout);
 
 		// register for button event
-		remoteViews.setOnClickPendingIntent(R.id.sync_button,
-				buildButtonPendingIntent(context));
+		remoteViews.setOnClickPendingIntent(R.id.sync_button, buildButtonPendingIntent(context));
 
 		// updating view with initial data
 		remoteViews.setTextViewText(R.id.title, getTitle());
@@ -37,8 +36,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// initiate widget update request
 		Intent intent = new Intent();
 		intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
-		return PendingIntent.getBroadcast(context, 0, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	private static CharSequence getDesc() {

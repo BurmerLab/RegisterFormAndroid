@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="160dp"
     android:layout_margin="5sp"
-    android:background="@drawable/appwidget_dark_bg"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+    <!--android:background="#B3FF2FFF">-->
+    <!--android:background="@drawable/appwidget_dark_bg_pressed"-->
+    <!--android:background="@drawable/appwidget_dark_bg"-->
+    <!--android:background="@android:color/transparent">-->
 
     <RelativeLayout
         android:id="@+id/buttonContainer"
@@ -28,7 +33,15 @@
         android:layout_above="@id/buttonContainer"
         android:layout_alignParentTop="true"
         android:orientation="vertical"
-        android:padding="8dp" >
+        android:padding="8dp"
+        android:background="#66FF0000">
+        <!--android:background="#e5bb00">-->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="firstTime"
+            android:id="@+id/firstTimeTextView" />
 
         <TextView
             android:id="@+id/title"
@@ -39,7 +52,8 @@
             android:text=""
             android:textColor="#fcfcfc"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:background="#d21212" />
 
         <TextView
             android:id="@+id/desc"
@@ -49,7 +63,8 @@
             android:text=""
             android:textColor="#fcfcfc"
             android:textSize="13sp"
-            android:textStyle="normal" />
+            android:textStyle="normal"
+            android:background="#2ca543" />
     </LinearLayout>
 
 </RelativeLayout>
