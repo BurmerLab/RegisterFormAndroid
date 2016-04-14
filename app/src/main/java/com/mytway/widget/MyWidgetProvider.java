@@ -24,7 +24,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		// updating view with initial data
 		remoteViews.setTextViewText(R.id.title, getTitle());
-		remoteViews.setTextViewText(R.id.desc, getDesc());
+//		remoteViews.setTextViewText(R.id.desc, getDesc());
 
 		// request for widget update
 		pushWidgetUpdate(context, remoteViews);

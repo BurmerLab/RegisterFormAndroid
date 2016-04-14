@@ -8,16 +8,11 @@
     android:background="#5c134bb3"
     android:paddingTop="0dp"
     >
-    <!--android:background="#B3FF2FFF">-->
-    <!--android:background="@drawable/appwidget_dark_bg_pressed"-->
-    <!--android:background="@drawable/appwidget_dark_bg"-->
-    <!--android:background="@android:color/transparent">-->
 
     <LinearLayout
         android:id="@+id/contentContainer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:orientation="vertical"
         android:padding="6dp"
         android:paddingTop="32dp"
@@ -43,9 +38,9 @@
 
             <GridLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:rowCount="4"
-                android:columnCount="4"
+                android:layout_height="93dp"
+                android:rowCount="3"
+                android:columnCount="5"
                 android:id="@+id/gridTable"
                 android:backgroundTintMode="src_over"
                 android:background="#a8134bb3">
@@ -53,9 +48,22 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="first Message"
+                    android:layout_column="1"
+                    android:layout_row="1"
+                    android:textColor="@color/widgetTextColor"
+                    android:id="@+id/firstMessageTextView"
+                    android:layout_gravity="center" />
+                <!--==============================================-->
+
+                <TextView
+                    android:layout_width="67dp"
+                    android:layout_height="44dp"
                     android:text="02:34"
                     android:layout_column="0"
                     android:layout_row="0"
+                    android:background="#a30000"
+                    android:textColor="@color/widgetTextColor"
                     android:id="@+id/firstTimeTextView"
                     android:layout_gravity="center" />
 
@@ -71,19 +79,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="first Message"
+                    android:text="26 min"
                     android:layout_column="2"
                     android:layout_row="0"
-                    android:id="@+id/firstMessageTextView"
-                    android:layout_gravity="center" />
-                <!--==============================================-->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="26 min"
-                    android:layout_column="0"
-                    android:layout_row="1"
+                    android:textColor="@color/widgetTextColor"
                     android:id="@+id/secondTimeTextView"
                     android:layout_gravity="center" />
 
@@ -91,59 +90,61 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/secondImageView"
-                    android:layout_column="1"
-                    android:layout_row="1"
+                    android:layout_column="3"
+                    android:layout_row="0"
                     android:src="@drawable/ic_action_photo"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:23"
+                    android:layout_column="2"
+                    android:layout_row="1"
+                    android:textColor="@color/widgetTextColor"
+                    android:id="@+id/thirdTimeTextView"
                     android:layout_gravity="center" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="second message"
-                    android:layout_column="2"
+                    android:layout_column="3"
                     android:layout_row="1"
+                    android:textColor="@color/widgetTextColor"
                     android:id="@+id/secondMessageTextView"
                     android:layout_gravity="center" />
                 <!--===================================================-->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12:23"
-                    android:layout_column="0"
-                    android:layout_row="2"
-                    android:id="@+id/thirdTimeTextView"
-                    android:layout_gravity="center" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/thirdImageView"
-                    android:layout_column="1"
-                    android:layout_row="2"
+                    android:layout_column="4"
+                    android:layout_row="0"
                     android:src="@drawable/ic_action_photo"
                     android:layout_gravity="center" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="12:43"
-                    android:layout_column="2"
-                    android:layout_row="2"
+                    android:text="blablblal"
+                    android:layout_column="4"
+                    android:layout_row="1"
+                    android:textColor="@color/widgetTextColor"
                     android:id="@+id/thirdMessageTextView"
                     android:layout_gravity="center" />
 
 
-                <Button
-                    android:id="@+id/sync_button"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/ic_sync_button"
-                    android:layout_column="3"
-                    android:layout_row="1"
-                    android:text="" />
 
             </GridLayout>
+            <!--<Button-->
+                <!--android:id="@+id/sync_button"-->
+                <!--android:layout_width="30dp"-->
+                <!--android:layout_height="30dp"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:background="@drawable/ic_sync_button"-->
+                <!--android:text="" />-->
 
         </FrameLayout>
 
@@ -176,5 +177,13 @@
         <!--</RelativeLayout>-->
 
     </LinearLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="106dp"
+        android:layout_marginTop="74dp"></TableLayout>
 
 </RelativeLayout>

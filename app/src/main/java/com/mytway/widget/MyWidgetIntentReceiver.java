@@ -24,7 +24,7 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 		// updating view
 		remoteViews.setTextViewText(R.id.title, getTitle());
-		remoteViews.setTextViewText(R.id.desc, getDesc(context));
+//		remoteViews.setTextViewText(R.id.desc, getDesc(context));
 
 		// re-registering for click listener
 		remoteViews.setOnClickPendingIntent(R.id.sync_button,
