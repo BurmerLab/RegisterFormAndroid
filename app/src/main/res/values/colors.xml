@@ -5,4 +5,5 @@
     <color name="application_background_color">#ffb163</color>
     <color name="application_button_color">#ff9107</color>
     <color name="widgetTextColor">#ffffff</color>
+    <color name="widgetIconColor">#ffffff</color>
 </resources>
