@@ -20,7 +20,7 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 	private void updateWidgetPictureAndButtonListener(Context context) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				R.layout.mytway3_table_middle_widget_layout);
+				R.layout.mytway4_linear_middle_widget_layout);
 
 		// updating view
 		remoteViews.setTextViewText(R.id.title, getTitle());

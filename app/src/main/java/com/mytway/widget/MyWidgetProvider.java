@@ -17,7 +17,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		// initializing widget layout
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				R.layout.mytway3_table_middle_widget_layout);
+				R.layout.mytway4_linear_middle_widget_layout);
 
 		// register for button event
 		remoteViews.setOnClickPendingIntent(R.id.sync_button, buildButtonPendingIntent(context));

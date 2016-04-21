@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="130dp"
+    android:layout_margin="5dp"
+    android:orientation="vertical"
+    android:background="#5c134bb3"
+    android:paddingTop="0dp">
+
+    <LinearLayout
+        android:id="@+id/contentContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="6dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="12dp"
+        android:background="#98134bb3"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="1">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/headerTable"
+            android:layout_below="@+id/contentContainer"
+            android:layout_alignParentStart="true"
+            android:background="#98111ac9">
+
+<!--981142c9-->
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_localization"
+                    android:id="@+id/imageView"
+                    android:layout_column="0" />
+
+                <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tarnów"
+                android:layout_weight="1"
+                    android:textColor="@color/widgetTextColor"
+                android:textSize="16sp"
+                android:layout_column="1"
+                    android:layout_gravity="left|center" />
+
+        </GridLayout>
+
+
+
+
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="85dp"
+                    android:layout_height="wrap_content"
+                    android:text="02:34"
+                    android:layout_column="0"
+                    android:textColor="@color/widgetTextColor"
+                    android:id="@+id/firstTimeTextView"
+                    android:layout_gravity="center"
+                    android:textSize="30dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/firstWidgetImageView"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_car" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1.3"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20 MIN"
+                    android:textColor="@color/widgetTextColor"
+                    android:id="@+id/textView2"
+                    android:layout_gravity="center"
+                    android:textSize="30dp" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/secondWidgetImageView"
+                    android:src="@drawable/ic_go_work"
+                    android:layout_gravity="center"
+                    />
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:30"
+                    android:textColor="@color/widgetTextColor"
+                    android:id="@+id/textView3"
+                    android:layout_gravity="center"
+                    android:layout_column="4"
+                    android:textSize="30dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/widgetThirdImageView"
+                    android:src="@drawable/ic_home"
+                    android:layout_gravity="center"
+                    android:layout_column="5" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contentContainer"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp">
+
+            <ImageView
+                android:id="@+id/image32"
+                android:layout_height="fill_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_email"
+                android:layout_width="fill_parent"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="fill_parent">
+
+            <ImageView
+                android:id="@+id/image3"
+                android:layout_height="fill_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_sync_button"
+                android:layout_width="fill_parent"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="fill_parent">
+
+            <ImageView
+                android:id="@+id/image4"
+                android:layout_height="fill_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_settings"
+                android:layout_width="fill_parent"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
