@@ -23,7 +23,7 @@
 
         <GridLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:id="@+id/headerTable"
             android:layout_below="@+id/contentContainer"
             android:layout_alignParentStart="true"
@@ -38,9 +38,9 @@
 
                 <TextView
                 android:id="@+id/title"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Tarnów"
+                android:text="TarnÃ³w"
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:textColor="@color/widgetTextColor"
@@ -54,7 +54,7 @@
 
             <GridLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="fill_parent"
                 android:rowCount="4"
                 android:columnCount="6"
                 android:id="@+id/timeGrid"
@@ -127,22 +127,22 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_weight="1"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent">
+                android:layout_height="fill_parent">
 
                 <ImageView
                     android:id="@+id/image32"
-                    android:layout_height="match_parent"
+                    android:layout_height="fill_parent"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_email"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_gravity="center" />
             </LinearLayout>
 
@@ -150,15 +150,15 @@
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent">
+                android:layout_height="fill_parent">
 
                 <ImageView
                     android:id="@+id/image3"
-                    android:layout_height="match_parent"
+                    android:layout_height="fill_parent"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_sync_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_gravity="center" />
             </LinearLayout>
 
@@ -166,15 +166,15 @@
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent">
+                android:layout_height="fill_parent">
 
                 <ImageView
                     android:id="@+id/image4"
-                    android:layout_height="match_parent"
+                    android:layout_height="fill_parent"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_settings"
-                    android:layout_width="match_parent"
+                    android:layout_width="fill_parent"
                     android:layout_gravity="center" />
             </LinearLayout>
         </LinearLayout>

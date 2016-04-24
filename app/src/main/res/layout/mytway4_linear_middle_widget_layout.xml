@@ -64,24 +64,32 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="0.73"
                 android:layout_height="fill_parent">
 
                 <TextView
-                    android:layout_width="85dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="02:34"
                     android:layout_column="0"
                     android:textColor="@color/widgetTextColor"
                     android:id="@+id/firstTimeTextView"
                     android:layout_gravity="center"
-                    android:textSize="30dp" />
+                    android:textSize="35dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:layout_weight="0.29">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/humanToCarWidgetImageView"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_to_car" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -91,10 +99,18 @@
                     android:src="@drawable/ic_car" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_weight="1.3"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.30">
+
+                </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent">
 
                 <TextView
@@ -104,13 +120,14 @@
                     android:textColor="@color/widgetTextColor"
                     android:id="@+id/textView2"
                     android:layout_gravity="center"
-                    android:textSize="30dp" />
+                    android:textSize="35dp" />
 
             </LinearLayout>
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:layout_weight="0.16">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -121,40 +138,53 @@
                     />
 
             </LinearLayout>
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="fill_parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12:30"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/textView3"
-                    android:layout_gravity="center"
-                    android:layout_column="4"
-                    android:textSize="30dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/widgetThirdImageView"
-                    android:src="@drawable/ic_home"
-                    android:layout_gravity="center"
-                    android:layout_column="5" />
-
-            </LinearLayout>
 
         </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.11">
+
+            <TextView
+            android:layout_width="86dp"
+            android:layout_height="wrap_content"
+            android:text="+12:30"
+            android:textColor="@color/widgetTextColor"
+            android:id="@+id/textView3"
+            android:layout_gravity="center"
+            android:layout_column="4"
+            android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent">
+
+            <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/widgetThirdImageView"
+            android:src="@drawable/ic_business"
+            android:layout_gravity="center"
+            android:layout_column="5" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
 
     </LinearLayout>
 
