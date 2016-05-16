@@ -22,7 +22,7 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <!--2.0  - xhdpi (xLarge)  //mdpi dimens *2.0-->
 
     <!--MDPI NORMAL-->
-    <dimen name = "main_relative_layout_height_medium">130dp</dimen>
+    <dimen name = "main_relative_layout_height_medium">110dp</dimen>
     <dimen name = "main_relative_layout_margin_medium">2dp</dimen>
     <dimen name = "main_relative_padding_top_medium">0dp</dimen>
 

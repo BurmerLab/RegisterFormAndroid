@@ -87,7 +87,8 @@
                         android:textColor="@color/widgetTextColor"
                         android:id="@+id/firstTimeTextView"
                         android:layout_gravity="center"
-                        android:textSize="@dimen/first_time_text_size_medium" />
+                        android:textSize="@dimen/first_time_text_size_medium"
+                        android:fontFamily="@a" />
                 </LinearLayout>
 
                 <LinearLayout

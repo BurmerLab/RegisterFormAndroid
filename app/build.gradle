@@ -20,6 +20,7 @@ android {
     dexOptions {
         preDexLibraries = false;
     }
+    sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/res/assets/fonts'] } }
 }
 
 dependencies {
