@@ -79,16 +79,16 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="02:44"
+                        android:text="02:41"
                         android:layout_column="0"
                         android:textColor="@color/widgetTextColor"
                         android:id="@+id/firstTimeTextView"
                         android:layout_gravity="center"
-                        android:textSize="@dimen/first_time_text_size_medium"
-                        android:fontFamily="@a" />
+                        android:textSize="@dimen/first_time_text_size_medium"/>
                 </LinearLayout>
 
                 <LinearLayout

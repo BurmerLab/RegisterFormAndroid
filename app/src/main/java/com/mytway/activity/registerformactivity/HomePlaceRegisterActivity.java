@@ -79,13 +79,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         Intent intent = getIntent();
         final User user = intent.getParcelableExtra("user");
 
-//        Toast.makeText(HomePlaceRegisterActivity.this, "UserTable: "
-//                + user.getUserName() +
-//                " email:" + user.getEmail() +
-//                " start:" + user.getStartStandardTimeWork() +
-//                " Work: " + user.getWorkPlace()
-//                , Toast.LENGTH_LONG).show();
-
         registerHomeLocalizationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

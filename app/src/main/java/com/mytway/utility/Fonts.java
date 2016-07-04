@@ -19,15 +19,15 @@ public class Fonts extends TextView{
 
     public void setTypeface(Typeface tf, int style) {
         if (style == Typeface.BOLD) {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(),    "fonts/Roboto-Bold.ttf"));
+            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(),    "/fonts/agoestoesan.ttf"));
         }
         else if(style == Typeface.ITALIC)
         {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Roboto-Italic.ttf"));
+            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/ChristmasSeason.ttf"));
         }
         else
         {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Roboto-Regular.ttf"));
+            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/CubicCoreMono.ttf"));
         }
     }
 

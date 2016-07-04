@@ -2,8 +2,10 @@ package com.mytway.geolocalization;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,8 +15,11 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+import com.mytway.widget.WidgetUtils;
+
 public class MytwayGeolocalization extends Service implements LocationListener {
-    private final Context mContext;
+
+    private Context mContext;
 
     boolean isGPSEnabled = false;
 
@@ -38,6 +43,9 @@ public class MytwayGeolocalization extends Service implements LocationListener {
     public MytwayGeolocalization(Context context) {
         this.mContext = context;
         getLocation();
+    }
+
+    public MytwayGeolocalization() {
     }
 
     public android.location.Location getLocation() {
@@ -112,6 +120,34 @@ public class MytwayGeolocalization extends Service implements LocationListener {
 
     }
 
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals("DUPKA")){
+                //action for sms received
+                WidgetUtils.location = getLocation();
+            }
+            else if(action.equals(android.telephony.TelephonyManager.ACTION_PHONE_STATE_CHANGED)){
+                //action for phone state changed
+            }
+        }
+    };
+
+    @Override
+    public void onCreate(){
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("DUPKA");
+        filter.addAction("your_action_strings"); //further more
+        filter.addAction("your_action_strings"); //further more
+
+        registerReceiver(receiver, filter);
+    }
+
+    public void onDestroy(){
+        unregisterReceiver(receiver);
+    }
+
     public void onProviderDisabled(String provider) {
     }
 
@@ -137,4 +173,11 @@ public class MytwayGeolocalization extends Service implements LocationListener {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public void myTwayMessage(){
+        Intent intent = new Intent(WidgetUtils.WIDGET_UPDATE_ACTION);
+        intent.putExtra("newItemArrived", "Neue Frage erschienen");
+        sendBroadcast(intent);
+    }
+
 }

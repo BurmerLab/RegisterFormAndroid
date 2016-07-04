@@ -12,11 +12,12 @@
     <uses-permission android:name="package.name.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
-    <supports-screens android:smallScreens="true"
-        android:normalScreens="true"
+    <supports-screens
+        android:anyDensity="true"
         android:largeScreens="true"
-        android:xlargeScreens="true"
-        android:anyDensity="true" />
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
 
     <application
         android:allowBackup="true"
@@ -36,14 +37,14 @@
         <activity
             android:name=".registerformactivity.RegistrationActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".registerformactivity.WorkPlaceRegisterActivity"
             android:label="@string/title_activity_work_map_register" />
         <activity
             android:name=".loginactivity.LoginActivity"
             android:label="@string/title_activity_activity_login"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".registerformactivity.HomePlaceRegisterActivity"
             android:label="@string/title_activity_mytway" />
@@ -63,8 +64,8 @@
             android:name=".pagger.ScreenSlideActivity"
             android:label="@string/title_activity_mytway" />
 
-<!--Widget definition-->
-        <receiver android:name="com.mytway.widget.MyWidgetProvider" >
+        <!-- Widget definition -->
+        <receiver android:name="com.mytway.widget.MyWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -73,10 +74,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/demo_widget_provider" />
         </receiver>
-
         <receiver
             android:name="com.mytway.widget.MyWidgetIntentReceiver"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="com.mytway.intent.action.UPDATE_WIDGET" />
             </intent-filter>
@@ -86,8 +86,11 @@
                 android:resource="@xml/demo_widget_provider" />
         </receiver>
 
+        <service android:name="com.mytway.geolocalization.MytwayGeolocalization" />
 
-
+        <activity
+            android:name=".utils.NoPermissionsActivity"
+            android:label="@string/title_activity_no_permissions" />
 
     </application>
 

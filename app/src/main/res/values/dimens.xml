@@ -22,64 +22,64 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <!--2.0  - xhdpi (xLarge)  //mdpi dimens *2.0-->
 
     <!--MDPI NORMAL-->
-    <dimen name = "main_relative_layout_height_medium">110dp</dimen>
-    <dimen name = "main_relative_layout_margin_medium">2dp</dimen>
-    <dimen name = "main_relative_padding_top_medium">0dp</dimen>
+    <dimen name="main_relative_layout_height_medium">110dp</dimen>
+    <dimen name="main_relative_layout_margin_medium">2dp</dimen>
+    <dimen name="main_relative_padding_top_medium">0dp</dimen>
 
-    <dimen name = "main_linear_layout_padding_medium">4dp</dimen>
-    <dimen name = "main_linear_layout_padding_top_medium">32dp</dimen>
-    <dimen name = "main_linear_layout_padding_bottom_medium">12dp</dimen>
+    <dimen name="main_linear_layout_padding_medium">4dp</dimen>
+    <dimen name="main_linear_layout_padding_top_medium">32dp</dimen>
+    <dimen name="main_linear_layout_padding_bottom_medium">12dp</dimen>
 
-    <dimen name = "header_localization_place_text_size_medium">16sp</dimen>
-    <dimen name = "first_time_text_size_medium">29dp</dimen>
-    <dimen name = "second_time_text_size_medium">29dp</dimen>
-    <dimen name = "third_time_text_size_medium">29dp</dimen>
+    <dimen name="header_localization_place_text_size_medium">16sp</dimen>
+    <dimen name="first_time_text_size_medium">29dp</dimen>
+    <dimen name="second_time_text_size_medium">29dp</dimen>
+    <dimen name="third_time_text_size_medium">29dp</dimen>
 
     <!-- LDPI SMALL-->
     <!--small = NORMAL DIMENSIONS * 0.75; 130dp * 0.75 = 97.5-->
-    <dimen name = "main_relative_layout_height_small">97.5dp</dimen>
-    <dimen name = "main_relative_layout_margin_small">3.75dp</dimen>
-    <dimen name = "main_relative_padding_top_small">0dp</dimen>
+    <dimen name="main_relative_layout_height_small">97.5dp</dimen>
+    <dimen name="main_relative_layout_margin_small">3.75dp</dimen>
+    <dimen name="main_relative_padding_top_small">0dp</dimen>
 
-    <dimen name = "main_linear_layout_padding_small">4.5dp</dimen>
-    <dimen name = "main_linear_layout_padding_top_small">24dp</dimen>
-    <dimen name = "main_linear_layout_padding_bottom_small">9dp</dimen>
+    <dimen name="main_linear_layout_padding_small">4.5dp</dimen>
+    <dimen name="main_linear_layout_padding_top_small">24dp</dimen>
+    <dimen name="main_linear_layout_padding_bottom_small">9dp</dimen>
 
-    <dimen name = "header_localization_place_text_size_small">12sp</dimen>
-    <dimen name = "first_time_text_size_small">26.25dp</dimen>
-    <dimen name = "second_time_text_size_small">26.25dp</dimen>
-    <dimen name = "third_time_text_size_small">26.25dp</dimen>
+    <dimen name="header_localization_place_text_size_small">12sp</dimen>
+    <dimen name="first_time_text_size_small">26.25dp</dimen>
+    <dimen name="second_time_text_size_small">26.25dp</dimen>
+    <dimen name="third_time_text_size_small">26.25dp</dimen>
 
     <!-- HDPI LARGE-->
     <!-- NORMAL DIMENSIONS * 1.5-->
-    <dimen name = "main_relative_layout_height_large">195dp</dimen>
-    <dimen name = "main_relative_layout_margin_large">7.5dp</dimen>
-    <dimen name = "main_relative_padding_top_large">0dp</dimen>
+    <dimen name="main_relative_layout_height_large">195dp</dimen>
+    <dimen name="main_relative_layout_margin_large">7.5dp</dimen>
+    <dimen name="main_relative_padding_top_large">0dp</dimen>
 
-    <dimen name = "main_linear_layout_padding_large">9dp</dimen>
-    <dimen name = "main_linear_layout_padding_top_large">48dp</dimen>
-    <dimen name = "main_linear_layout_padding_bottom_large">18dp</dimen>
+    <dimen name="main_linear_layout_padding_large">9dp</dimen>
+    <dimen name="main_linear_layout_padding_top_large">48dp</dimen>
+    <dimen name="main_linear_layout_padding_bottom_large">18dp</dimen>
 
-    <dimen name = "header_localization_place_text_size_large">24sp</dimen>
-    <dimen name = "first_time_text_size_large">52.5dp</dimen>
-    <dimen name = "second_time_text_size_large">52.5dp</dimen>
-    <dimen name = "third_time_text_size_large">52.5dp</dimen>
+    <dimen name="header_localization_place_text_size_large">24sp</dimen>
+    <dimen name="first_time_text_size_large">52.5dp</dimen>
+    <dimen name="second_time_text_size_large">52.5dp</dimen>
+    <dimen name="third_time_text_size_large">52.5dp</dimen>
 
 
     <!-- XHDPI LARGE-->
     <!-- LARGE = NORMAL DIMENSIONS * 2-->
-    <dimen name = "main_relative_layout_height_xlarge">260dp</dimen>
-    <dimen name = "main_relative_layout_margin_xlarge">10dp</dimen>
-    <dimen name = "main_relative_padding_top_xlarge">0dp</dimen>
+    <dimen name="main_relative_layout_height_xlarge">260dp</dimen>
+    <dimen name="main_relative_layout_margin_xlarge">10dp</dimen>
+    <dimen name="main_relative_padding_top_xlarge">0dp</dimen>
 
-    <dimen name = "main_linear_layout_padding_xlarge">12dp</dimen>
-    <dimen name = "main_linear_layout_padding_top_xlarge">64dp</dimen>
-    <dimen name = "main_linear_layout_padding_bottom_xlarge">24dp</dimen>
+    <dimen name="main_linear_layout_padding_xlarge">12dp</dimen>
+    <dimen name="main_linear_layout_padding_top_xlarge">64dp</dimen>
+    <dimen name="main_linear_layout_padding_bottom_xlarge">24dp</dimen>
 
-    <dimen name = "header_localization_place_text_size_xlarge">32sp</dimen>
-    <dimen name = "first_time_text_size_xlarge">60dp</dimen>
-    <dimen name = "second_time_text_size_xlarge">60dp</dimen>
-    <dimen name = "third_time_text_size_xlarge">60dp</dimen>
+    <dimen name="header_localization_place_text_size_xlarge">32sp</dimen>
+    <dimen name="first_time_text_size_xlarge">60dp</dimen>
+    <dimen name="second_time_text_size_xlarge">60dp</dimen>
+    <dimen name="third_time_text_size_xlarge">60dp</dimen>
 
 
 </resources>

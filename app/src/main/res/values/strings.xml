@@ -196,4 +196,6 @@
         A: In a divorce, you get rid of the whole schmuck.
     </item>
     </string-array>
+    <string name="title_activity_no_permissions">NoPermissionsActivity</string>
+    <string name="title_activity_tested_localization">TestedLocalizationActivity</string>
 </resources>
