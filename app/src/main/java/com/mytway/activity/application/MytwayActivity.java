@@ -1,10 +1,17 @@
 package com.mytway.activity.application;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetHostView;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
@@ -12,39 +19,26 @@ import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
 import com.mytway.pojo.User;
 
-public class MytwayActivity extends Activity {
+import java.util.ArrayList;
 
-    private int userId = 0;
+public class MytwayActivity extends Activity {
+    final int APPWIDGET_HOST_ID = 2048;
+    final int REQUEST_PICK_APPWIDGET = 0;
+
+    LinearLayout myLayout;
+
+    AppWidgetManager appWidgetManager;
+    AppWidgetHost appWidgetHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_mytway);
-        Intent intent = getIntent();
-        final User user = intent.getParcelableExtra("user");
+        myLayout = (LinearLayout) findViewById(R.id.mainLayout);
+
+        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
+        startActivity(intent);
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_mytway, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

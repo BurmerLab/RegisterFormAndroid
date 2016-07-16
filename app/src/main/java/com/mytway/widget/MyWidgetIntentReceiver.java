@@ -1,31 +1,18 @@
 package com.mytway.widget;
 
-import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.location.LocationManager;
-import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import com.mytway.activity.R;
 import com.mytway.activity.utils.NoPermissionsActivity;
 import com.mytway.geolocalization.MytwayGeolocalization;
 
-import org.w3c.dom.Text;
-
 public class MyWidgetIntentReceiver extends BroadcastReceiver {
 	public static int clickCount = 0;
 	private String msg[] = null;
-
-	private static final String TAG = "Message recieved";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -33,16 +20,13 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 			String text = intent.getStringExtra("DUPA");
 
 			//dziala jesli user ma uprawnienia:
-//			MytwayGeolocalization geolocalization = new MytwayGeolocalization(context);
-//			double latitudeLocalization = geolocalization.getLatitude();
-//			double longitudeLocalization = geolocalization.getLongitude();
-//			text = "" +latitudeLocalization;
+			MytwayGeolocalization geolocalization = new MytwayGeolocalization(context);
+			double latitudeLocalization = geolocalization.getLatitude();
+			double longitudeLocalization = geolocalization.getLongitude();
+			text = "" +latitudeLocalization + ", " + longitudeLocalization;
 			//------------------------------------------
 
 			updateWidgetPictureAndButtonListener(context, text);
-
-			//http://stackoverflow.com/questions/13491143/get-location-broadcastreceiver-locationlistener/13491407
-
 		}
 
 		if(intent.getAction().equals("PERMISSION")){
@@ -51,11 +35,11 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 			context.startActivity(intent);
 		}
 
-		if (intent.getAction().equals("DUPKA")) {
-			// Start your Location IntentService here
-			Intent i = new Intent(context, MytwayGeolocalization.class);
-			context.startService(i);
-		}
+//		if (intent.getAction().equals("DUPKA")) {
+//			// Start your Location IntentService here
+//			Intent i = new Intent(context, MytwayGeolocalization.class);
+//			context.startService(i);
+//		}
 	}
 
 	private void updateWidgetPictureAndButtonListener(Context context, String messageText) {
@@ -66,9 +50,9 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 //		remoteViews.setTextViewText(R.id.desc, getDesc(context));
 
 
-		// re-registering for click listener, remoteViews, R.id.image32
+		// re-registering for click listener, remoteViews, R.id.envelopeimage
 		remoteViews.setOnClickPendingIntent(R.id.sync_button, MyWidgetProvider.buildButtonPendingIntent(context, AppWidgetManager.getInstance(context),
-				new int[]{0}, remoteViews, R.id.image32));
+				new int[]{0}, remoteViews, R.id.envelopeImage));
 
 		MyWidgetProvider.pushWidgetUpdate(context.getApplicationContext(),	remoteViews);
 	}

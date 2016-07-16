@@ -23,7 +23,9 @@ public class NoPermissionsActivity extends Activity {
 //        String[] permissions = intent.getStringArrayExtra("MissingPermissions");
 //        String permission = intent.getStringExtra("MissingPermissions");
 
-        ActivityCompat.requestPermissions(NoPermissionsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_CODE_LOCATION);
+        ActivityCompat.requestPermissions(NoPermissionsActivity.this, new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                PERMISSION_REQUEST_CODE_LOCATION);
 
 //        PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_REQUEST_CODE_LOCATION,
 //                getApplicationContext(),
