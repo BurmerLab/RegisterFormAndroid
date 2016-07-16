@@ -28,7 +28,7 @@ import com.mytway.activity.application.MytwayActivity;
 import com.mytway.database.DBHelper;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
-import com.mytway.geolocalization.MytwayGeolocalization;
+import com.mytway.geolocalization.MytwayGeolocalizationService;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
@@ -181,7 +181,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        MytwayGeolocalization geolocalization = new MytwayGeolocalization(HomePlaceRegisterActivity.this);
+        MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(HomePlaceRegisterActivity.this);
         latitudeLocalization = geolocalization.getLatitude();
         longitudeLocalization = geolocalization.getLongitude();
 

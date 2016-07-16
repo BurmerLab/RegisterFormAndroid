@@ -2,7 +2,9 @@ package com.mytway.geolocalization;
 
 import android.Manifest;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,13 +15,20 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
+import android.text.format.DateFormat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
+import com.mytway.activity.R;
+import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
-public class MytwayGeolocalization extends Service implements LocationListener {
+import java.util.Date;
+
+public class MytwayGeolocalizationService extends Service implements LocationListener {
 
     private Context mContext;
+    int a = 0;
 
     boolean isGPSEnabled = false;
 
@@ -40,12 +49,12 @@ public class MytwayGeolocalization extends Service implements LocationListener {
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
-    public MytwayGeolocalization(Context context) {
+    public MytwayGeolocalizationService(Context context) {
         this.mContext = context;
         getLocation();
     }
 
-    public MytwayGeolocalization() {
+    public MytwayGeolocalizationService() {
     }
 
     public android.location.Location getLocation() {
@@ -142,6 +151,30 @@ public class MytwayGeolocalization extends Service implements LocationListener {
         filter.addAction("your_action_strings"); //further more
 
         registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        updateGeolocalization();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void updateGeolocalization(){
+        mContext = getApplicationContext();
+        getLocation();
+        String lastUpdated = DateFormat.format("h:mm:ssaa", new Date()).toString();
+        RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
+
+        double latitudeLocalization = this.getLatitude();
+        double longitudeLocalization = this.getLongitude();
+        lastUpdated = lastUpdated + " " + latitudeLocalization;
+
+        view.setTextViewText(R.id.title, lastUpdated);
+
+        // Push update for this widget to the home screen
+        ComponentName thisWidget = new ComponentName(this, MyWidgetProvider.class);
+        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        manager.updateAppWidget(thisWidget, view);
     }
 
     public void onDestroy(){

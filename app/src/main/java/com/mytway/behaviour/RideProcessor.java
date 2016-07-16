@@ -8,7 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.mytway.geolocalization.MytwayGeolocalization;
+import com.mytway.geolocalization.MytwayGeolocalizationService;
 import com.mytway.utility.permission.PermissionUtil;
 
 public class RideProcessor extends FragmentActivity {
@@ -45,7 +45,7 @@ public class RideProcessor extends FragmentActivity {
 
     private String setUpMap(Context contex) {
 
-        MytwayGeolocalization geolocalization = new MytwayGeolocalization(contex);
+        MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(contex);
         Double latitudeLocalization = geolocalization.getLatitude();
         Double longitudeLocalization = geolocalization.getLongitude();
 

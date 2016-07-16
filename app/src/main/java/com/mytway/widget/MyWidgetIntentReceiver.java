@@ -8,7 +8,7 @@ import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.activity.utils.NoPermissionsActivity;
-import com.mytway.geolocalization.MytwayGeolocalization;
+import com.mytway.geolocalization.MytwayGeolocalizationService;
 
 public class MyWidgetIntentReceiver extends BroadcastReceiver {
 	public static int clickCount = 0;
@@ -20,7 +20,7 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 			String text = intent.getStringExtra("DUPA");
 
 			//dziala jesli user ma uprawnienia:
-			MytwayGeolocalization geolocalization = new MytwayGeolocalization(context);
+			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
 			double latitudeLocalization = geolocalization.getLatitude();
 			double longitudeLocalization = geolocalization.getLongitude();
 			text = "" +latitudeLocalization + ", " + longitudeLocalization;
@@ -37,7 +37,7 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 //		if (intent.getAction().equals("DUPKA")) {
 //			// Start your Location IntentService here
-//			Intent i = new Intent(context, MytwayGeolocalization.class);
+//			Intent i = new Intent(context, MytwayGeolocalizationService.class);
 //			context.startService(i);
 //		}
 	}

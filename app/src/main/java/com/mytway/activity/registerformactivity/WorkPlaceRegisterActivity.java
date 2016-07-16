@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
-import com.mytway.geolocalization.MytwayGeolocalization;
+import com.mytway.geolocalization.MytwayGeolocalizationService;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -106,7 +106,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        MytwayGeolocalization geolocalization = new MytwayGeolocalization(WorkPlaceRegisterActivity.this);
+        MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(WorkPlaceRegisterActivity.this);
         latitudeLocalization = geolocalization.getLatitude();
         longitudeLocalization = geolocalization.getLongitude();
 
