@@ -113,7 +113,7 @@
                         android:layout_height="fill_parent">
 
                         <ImageView
-                            android:id="@+id/image3"
+                            android:id="@+id/refreshImage"
                             android:layout_height="fill_parent"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"

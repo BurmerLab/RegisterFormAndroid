@@ -147,4 +147,33 @@ public class WorkWeek implements Parcelable {
         result = 31 * result + sunday.hashCode();
         return result;
     }
+
+    public static WorkWeek createWorkWeekFromString(String workWeekText) {
+        WorkWeek workWeek = new WorkWeek();
+
+        for(int x = 0 ; x<= workWeekText.length() -1 ; x++){
+
+            String checked = Character.toString(workWeekText.charAt(x));
+            int eachDayNumber = Integer.parseInt(checked);
+
+            if(x == 0 && eachDayNumber == 1){
+                workWeek.setMonday(true);
+            }else  if(x == 1 && eachDayNumber == 1){
+                workWeek.setTuesday(true);
+            }else  if(x == 2 && eachDayNumber == 1){
+                workWeek.setWednesday(true);
+            }else  if(x == 3 && eachDayNumber == 1){
+                workWeek.setThursday(true);
+            }else  if(x == 4 && eachDayNumber == 1){
+                workWeek.setFriday(true);
+            }else  if(x == 5 && eachDayNumber == 1){
+                workWeek.setSaturday(true);
+            }else  if(x == 6 && eachDayNumber == 1) {
+                workWeek.setSunday(true);
+            }
+
+        }
+
+        return workWeek;
+    }
 }

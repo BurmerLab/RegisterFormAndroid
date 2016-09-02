@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -22,13 +21,12 @@ import android.widget.Toast;
 
 import com.mytway.activity.R;
 import com.mytway.activity.application.MytwayActivity;
-import com.mytway.activity.registerformactivity.RegistrationActivity;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
 import com.mytway.pojo.User;
-import com.mytway.properties.SharedPreferencesNames;
 import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.MytwayWebservice;
+import com.mytway.utility.Session;
 import com.mytway.validation.Validation;
 
 import org.json.JSONException;
@@ -39,6 +37,8 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
 
+    private Session session;
+
     private EditText mLoginUserName;
     private EditText mLoginPassword;
     private Button mLoginButton;
@@ -48,6 +48,8 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_login);
+
+        session = new Session(getApplicationContext());
 
         //initialize
         mLoginUserName = (EditText) findViewById(R.id.loginUserName);
@@ -71,18 +73,27 @@ public class LoginActivity extends Activity {
 
                         UserRepo userRepo = new UserRepo(LoginActivity.this);
                         UserTable userTable = userRepo.getUserByUserName(loginUser.getUserName());
+
+                        Toast.makeText(LoginActivity.this, "Uzytlkownik: " + userTable.workPlaceLongitude , Toast.LENGTH_SHORT).show();
+
                         if(userTable != null && userTable.userName !=null){
                             if(loginUser.getUserName().equals(userTable.userName) &&  loginUser.getPassword().equals(userTable.password))
                                 Toast.makeText(LoginActivity.this, "Znaleziono uzytkownika: " + userTable.userName, Toast.LENGTH_SHORT).show();
 
-                            SharedPreferences.Editor editor = getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, MODE_PRIVATE).edit();
-                            editor.putBoolean("isUserLogged", true);
-                            editor.putString("userName", userTable.userName);
-                            editor.putInt("typeWork", userTable.typeWork);
-                            editor.putString("lengthTimeWork", userTable.lengthTimeWork);
-                            editor.putString("startStandardTimeWork", userTable.startStandardTimeWork);
-                            editor.putString("workWeek", userTable.workWeek);
-                            editor.commit();
+                            session.setIsUserLogged(true);
+                            session.setUserName(userTable.userName);
+                            session.setTypeWork(userTable.typeWork);
+                            session.setLengthTimeWork(userTable.lengthTimeWork);
+                            session.setStartStandardTimeWork(userTable.startStandardTimeWork);
+                            session.setWorkWeek(userTable.workWeek);
+                            session.setHomeLatitude("" + userTable.homePlaceLatitude);
+                            session.setHomeLongitude("" + userTable.homePlaceLongitude);
+                            session.setWorkLatitude("" + userTable.workPlaceLatitude);
+                            session.setWorkLongitude("" + userTable.workPlaceLongitude);
+
+                            Session sessionTwo = new Session(LoginActivity.this);
+
+                            Toast.makeText(LoginActivity.this, "Shared WorkLat: " + userTable.workPlaceLatitude, Toast.LENGTH_SHORT).show();
 
                             Intent intent = new Intent(LoginActivity.this, MytwayActivity.class);
                             if (intent.resolveActivity(getPackageManager()) != null) {

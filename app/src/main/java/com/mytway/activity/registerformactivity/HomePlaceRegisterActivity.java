@@ -34,6 +34,7 @@ import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.MytwayWebservice;
+import com.mytway.utility.Session;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
 
@@ -61,8 +62,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home_place_form_registration);
-
-//        isEthernetConnectAvailable = EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this);
 
         if(!EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
             Toast.makeText(HomePlaceRegisterActivity.this,
@@ -105,6 +104,18 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
                     userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
 
+                    Session session = new Session(getApplicationContext());
+                    session.setUserName(user.getUserName());
+                    session.setLengthTimeWork(user.getLengthTimeWork());
+                    session.setStartStandardTimeWork(user.getStartStandardTimeWork());
+                    session.setWorkWeek(user.decodeWorkWeekToString(user.getWorkWeek()));
+                    session.setHomeLatitude("" + user.getHomePlace().getLatitude().floatValue());
+                    session.setHomeLongitude("" + user.getHomePlace().getLongitude().floatValue());
+                    session.setWorkLatitude("" + user.getWorkPlace().getLatitude().floatValue());
+                    session.setWorkLongitude("" + user.getWorkPlace().getLongitude().floatValue());
+
+                    Toast.makeText(HomePlaceRegisterActivity.this, "Shared WorkLat: " + user.getWorkPlace().getLatitude().floatValue(), Toast.LENGTH_SHORT).show();
+
                     if (userId == 0) {
                         if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
                             userId = userRepo.insert(userTable);
@@ -114,33 +125,14 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                             if(EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
                                 Toast.makeText(HomePlaceRegisterActivity.this, "Insert to External DB", Toast.LENGTH_SHORT).show();
                                 new MytwayWebserviceInsertUser().execute();
-                            }else{
-                                Toast.makeText(HomePlaceRegisterActivity.this, "Nie zainsertowalem do external DB", Toast.LENGTH_SHORT).show();
-                                //Nima neta, dodac do kolejki do wyslania jak tylko net zostanie wlaczony
                             }
-
-                            DBHelper.copyDatabaseToSdCard(HomePlaceRegisterActivity.this);
-
-                            try {
-                                String destinationPath = Environment.getExternalStorageDirectory().toString();
-                                File file = new File(destinationPath);
-                                if (!file.exists()) {
-                                    file.mkdirs();
-                                    file.createNewFile();
-                                    // ---copy the db from the /data/data/ folder into
-                                    // the sdcard databases folder--- here MyDB is database name
-                                    DBHelper.CopyDB(new FileInputStream("/data/data/" + getPackageName()
-                                            + "/databases"), new FileOutputStream(destinationPath + "/MyDB"));
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            Toast.makeText(HomePlaceRegisterActivity.this, "New User Insert", Toast.LENGTH_SHORT).show();
+//                            else{
+//                                Toast.makeText(HomePlaceRegisterActivity.this, "Nie zainsertowalem do external DB", Toast.LENGTH_SHORT).show();
+//                            }
                         }
                     } else {
                         userRepo.update(userTable);
-                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
                     }
 
                     Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);

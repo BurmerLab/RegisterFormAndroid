@@ -32,7 +32,7 @@ public class StartActivity extends Activity {
             startActivity(intent);
         }
         else{
-            // call Login or register Activity
+            // call Login or Register Activity
             Intent intent = new Intent(getApplicationContext(), HandShakeActivity.class);
             startActivity(intent);
         }

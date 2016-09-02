@@ -16,30 +16,12 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (intent.getAction().equals(WidgetUtils.WIDGET_UPDATE_ACTION)) {
-			String text = intent.getStringExtra("DUPA");
-
-			//dziala jesli user ma uprawnienia:
-			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
-			double latitudeLocalization = geolocalization.getLatitude();
-			double longitudeLocalization = geolocalization.getLongitude();
-			text = "" +latitudeLocalization + ", " + longitudeLocalization;
-			//------------------------------------------
-
-			updateWidgetPictureAndButtonListener(context, text);
-		}
-
-		if(intent.getAction().equals("PERMISSION")){
-			intent = new Intent(context, NoPermissionsActivity.class);
-			intent.putExtra("Permissions", "No");
-			context.startActivity(intent);
-		}
-
-//		if (intent.getAction().equals("DUPKA")) {
-//			// Start your Location IntentService here
-//			Intent i = new Intent(context, MytwayGeolocalizationService.class);
-//			context.startService(i);
+//		if(intent.getAction().equals("PERMISSION")){
+//			intent = new Intent(context, NoPermissionsActivity.class);
+//			intent.putExtra("Permissions", "No");
+//			context.startActivity(intent);
 //		}
+
 	}
 
 	private void updateWidgetPictureAndButtonListener(Context context, String messageText) {
@@ -53,6 +35,9 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 		// re-registering for click listener, remoteViews, R.id.envelopeimage
 		remoteViews.setOnClickPendingIntent(R.id.sync_button, MyWidgetProvider.buildButtonPendingIntent(context, AppWidgetManager.getInstance(context),
 				new int[]{0}, remoteViews, R.id.envelopeImage));
+
+		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context, AppWidgetManager.getInstance(context),
+				new int[]{0}, remoteViews, R.id.image4));
 
 		MyWidgetProvider.pushWidgetUpdate(context.getApplicationContext(),	remoteViews);
 	}

@@ -86,12 +86,12 @@
                 android:resource="@xml/demo_widget_provider" />
         </receiver>
 
-        <service android:name="com.mytway.geolocalization.MytwayGeolocalization" />
+        <service android:name="com.mytway.geolocalization.MytwayGeolocalizationService" />
 
         <activity
             android:name=".utils.NoPermissionsActivity"
             android:label="@string/title_activity_no_permissions" />
-
+        <activity android:name=".utils.SettingsActivity"></activity>
     </application>
 
 </manifest>

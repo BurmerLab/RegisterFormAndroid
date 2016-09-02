@@ -5,12 +5,25 @@ public enum TypeWork {
 
     private int statusCode;
 
-    private TypeWork(int status){
+    TypeWork(int status){
         statusCode = status;
+    }
+
+    TypeWork() {
     }
 
     public int getStatusCode() {
         return statusCode;
+    }
+
+    public static TypeWork obtainTypeWork(int status){
+        if(status==1){
+            return TypeWork.FLEXIBLE_TYPE;
+        }else if(status == 2){
+            return TypeWork.STANDARD_TYPE;
+        }else{
+            return TypeWork.ERROR_TYPE;
+        }
     }
 
     public void setStatusCode(int statusCode) {

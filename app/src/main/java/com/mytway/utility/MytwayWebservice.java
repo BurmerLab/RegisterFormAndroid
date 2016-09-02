@@ -1,10 +1,16 @@
 package com.mytway.utility;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.mytway.database.UserTable;
+import com.mytway.pojo.Distance;
+import com.mytway.pojo.Duration;
+import com.mytway.pojo.GoogleMapsDirectionJson;
+import com.mytway.pojo.Legs;
+import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +23,7 @@ import java.net.URLConnection;
 public class MytwayWebservice {
     private static final String TAG = "MytwayWebservice";
     private final static String MYTWAY_WEBSERVICE_ADDRESS = "http://michalburmz5.nazwa.pl/MytwayWebServiceApplication/rest/";
+    private final static String GOOGLE_MAPS_DIRECTION_WEB_SERVICE = "http://maps.googleapis.com/maps/api/directions/json?";
 
     public void insertUserToMytwayWebservice(String jsonMessage){
         try {
@@ -30,8 +37,8 @@ public class MytwayWebservice {
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
 
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(jsonObject.toString());
@@ -69,8 +76,8 @@ public class MytwayWebservice {
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
 
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(jsonObject.toString());
@@ -114,14 +121,13 @@ public class MytwayWebservice {
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
 
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(jsonObject.toString());
                 out.close();
 
-                //Poprawny sposob odbierania Response od web Servicu
                 BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String output;
 
@@ -146,7 +152,6 @@ public class MytwayWebservice {
         return isUserNameAndPasswordCorrect;
     }
 
-
     public UserTable getUserFromExternalDatabaseByMytwayWebservice(String userName, String userPassword) throws JSONException {
         String result = "";
         UserTable userTable = new UserTable();
@@ -161,8 +166,8 @@ public class MytwayWebservice {
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
 
                 OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
                 out.write(jsonObject.toString());
@@ -192,14 +197,88 @@ public class MytwayWebservice {
         userTable.email = jsonResult.getString("email");
         userTable.typeWork = jsonResult.getInt("typeWork");
         userTable.lengthTimeWork = jsonResult.getString("lengthTimeWork");
-        userTable.startStandardTimeWork = jsonResult.getString("startStandardTimeWork");
-        userTable.workPlaceLongitude = jsonResult.getDouble("workPlaceLatitude");
-        userTable.workPlaceLatitude = jsonResult.getDouble("workPlaceLongitude");
+        if(jsonResult.length() >= 10){
+            userTable.startStandardTimeWork = jsonResult.getString("startStandardTimeWork");
+        }
+        userTable.workPlaceLongitude = jsonResult.getDouble("workPlaceLongitude");
+        userTable.workPlaceLatitude = jsonResult.getDouble("workPlaceLatitude");
         userTable.homePlaceLatitude = jsonResult.getDouble("homePlaceLatitude");
         userTable.homePlaceLongitude = jsonResult.getDouble("homePlaceLongitude");
         userTable.workWeek = jsonResult.getString("workWeek");
 
         return userTable;
+    }
+
+    //Webservice to get travel time between two points( i.e home - work)
+    public GoogleMapsDirectionJson getTravelTimeBetweenPlaces(Position startPosition, Position endPosition) throws JSONException {
+        String result = "";
+
+        GoogleMapsDirectionJson googleMapsDirection = new GoogleMapsDirectionJson();
+
+        try {
+            String jsonRequest = GOOGLE_MAPS_DIRECTION_WEB_SERVICE
+                    + "origin="
+                    + startPosition.getLatitude() + "," + startPosition.getLongitude()
+                    + "&destination="
+                    + endPosition.getLatitude() + "," + endPosition.getLongitude()
+                    + "&sensor=true&units=metric";
+
+            try {
+                URL url = new URL(jsonRequest);
+
+                URLConnection connection = url.openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String output;
+
+                while ((output = br.readLine()) != null) {
+                    System.out.println(output);
+                    result = result + output;
+                }
+                System.out.println("\n Mytway REST Service Invoked Successfully..");
+                br.close();
+            } catch (Exception e) {
+                System.out.println("\n Error while calling Mytway REST Service");
+                System.out.println(e);
+            }
+
+        } catch (Exception e) {
+            Log.i(TAG, "Problem with web service: ", e);
+            e.printStackTrace();
+        }
+
+        JSONObject jsonResult = new JSONObject(result);
+
+        JSONObject objRoute = jsonResult.getJSONArray(GoogleMapsDirectionJson.TAG_ROUTES).getJSONObject(0);
+        JSONObject legsJson = objRoute.getJSONArray(GoogleMapsDirectionJson.TAG_LEGS).getJSONObject(0);
+        JSONObject jsonDuration = legsJson.getJSONObject(GoogleMapsDirectionJson.TAG_DURATION);
+        String durationText = jsonDuration.getString(GoogleMapsDirectionJson.TAG_DURATION_TEXT);
+        int durationValue = jsonDuration.getInt(GoogleMapsDirectionJson.TAG_DURATION_VALUE);
+        Duration duration = new Duration(durationText, durationValue);
+
+        JSONObject jsonDistance = legsJson.getJSONObject(GoogleMapsDirectionJson.TAG_DISTANCE);
+        String distanceText = jsonDistance.getString(GoogleMapsDirectionJson.TAG_DISTANCE_TEXT);
+        int distanceValue = jsonDistance.getInt(GoogleMapsDirectionJson.TAG_DISTANCE_VALUE);
+        Distance distance = new Distance(distanceText, distanceValue);
+
+        Legs legs = new Legs();
+        legs.setDistance(distance);
+        legs.setDuration(duration);
+
+        googleMapsDirection.setLegs(legs);
+//        googleMapsDirection.setLatitude(jsonResult.getDouble(GoogleMapsDirectionJson.TAG_LAT));
+//        googleMapsDirection.setLongitude(jsonResult.getDouble(GoogleMapsDirectionJson.TAG_LNG));
+//        googleMapsDirection.setRoutes(jsonResult.getString(GoogleMapsDirectionJson.TAG_ROUTES));
+//        googleMapsDirection.setLegs(jsonResult.getString(GoogleMapsDirectionJson.TAG_LEGS));
+//        googleMapsDirection.setSteps(jsonResult.getString(GoogleMapsDirectionJson.TAG_LEGS));
+//        googleMapsDirection.setStartLocation(jsonResult.getString(GoogleMapsDirectionJson.TAG_START));
+//        googleMapsDirection.setEndLocation(jsonResult.getString(GoogleMapsDirectionJson.TAG_END));
+
+        return googleMapsDirection;
     }
 
 }

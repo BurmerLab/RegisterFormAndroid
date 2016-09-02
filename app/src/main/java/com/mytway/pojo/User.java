@@ -1,7 +1,11 @@
 package com.mytway.pojo;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.mytway.database.UserRepo;
+import com.mytway.database.UserTable;
 
 import junit.framework.Assert;
 
@@ -169,4 +173,15 @@ public class User implements Parcelable {
 
     }
 
+    public User(String userName, String email, String password, TypeWork typeWork, String lengthTimeWork, String startStandardTimeWork, Position workPlace, Position homePlace, WorkWeek workWeek) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.typeWork = typeWork;
+        this.lengthTimeWork = lengthTimeWork;
+        this.startStandardTimeWork = startStandardTimeWork;
+        this.workPlace = workPlace;
+        this.homePlace = homePlace;
+        this.workWeek = workWeek;
+    }
 }

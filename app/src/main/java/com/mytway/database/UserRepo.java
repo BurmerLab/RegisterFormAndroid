@@ -24,8 +24,11 @@ public class UserRepo {
         values.put(UserTable.PASSWORD, userTable.password);
         values.put(UserTable.TYPE_WORK, userTable.typeWork);
         values.put(UserTable.LENGTH_TIME_WORK, userTable.lengthTimeWork);
-        values.put(UserTable.START_STANDARD_TIME, userTable.startStandardTimeWork);
+        if(userTable.startStandardTimeWork != null){
+            values.put(UserTable.START_STANDARD_TIME, userTable.startStandardTimeWork);
+        }
         values.put(UserTable.WORK_PLACE_LATITUDE, userTable.workPlaceLatitude);
+        values.put(UserTable.WORK_PLACE_LONGITUDE, userTable.workPlaceLongitude);
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
 
@@ -44,6 +47,14 @@ public class UserRepo {
         db.delete(UserTable.TABLE, UserTable.KEY_ID + "= ?", new String[] { String.valueOf(user_Id) });
         db.close(); // Closing database connection
     }
+
+    public void deleteAllFromUser() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(UserTable.TABLE, null, null);
+        db.close(); // Closing database connection
+    }
+
+
 
     public void update(UserTable userTable) {
 
@@ -152,7 +163,7 @@ public class UserRepo {
 
     public UserTable getUserByUserName(String userName){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String selectQuery =  "SELECT  " +
+        String selectQuery =  "SELECT DISTINCT " +
                 UserTable.KEY_ID + "," +
                 UserTable.KEY_USER_NAME + "," +
                 UserTable.EMAIL + "," +
@@ -200,8 +211,6 @@ public class UserRepo {
     public boolean isUserExistInLocalDatabase(String userName){
         UserTable userTable = getUserByUserName(userName);
         return userTable.userName != null;
-
-//        return userTable.userName != null ? true : false;
     }
 
     public boolean isUserNameAndPasswordIsCorrect(String userName, String password){

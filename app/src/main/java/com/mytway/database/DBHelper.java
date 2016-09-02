@@ -33,7 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         String CREATE_TABLE_USER = "CREATE TABLE " + UserTable.TABLE  + "("
                 + UserTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + UserTable.KEY_USER_NAME + " TEXT, "
+                + UserTable.KEY_USER_NAME + " TEXT not null unique, "
                 + UserTable.EMAIL + " TEXT, "
                 + UserTable.PASSWORD + " TEXT, "
                 + UserTable.TYPE_WORK + " TEXT, "

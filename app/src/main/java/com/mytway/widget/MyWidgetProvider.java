@@ -10,18 +10,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
+import com.mytway.activity.R;
 import com.mytway.activity.utils.NoPermissionsActivity;
+import com.mytway.activity.utils.SettingsActivity;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
-import com.mytway.widget.repeat.RepeatResurces;
 
 import java.util.Calendar;
 
 public class MyWidgetProvider extends AppWidgetProvider {
 
 	private static final String TAG = MyWidgetProvider.class.getSimpleName();
-
-	private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
 
 	private PendingIntent service = null;
 
@@ -35,30 +35,30 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		TIME.set(Calendar.SECOND, 0);
 		TIME.set(Calendar.MILLISECOND, 0);
 
-		final Intent i = new Intent(context, MytwayGeolocalizationService.class);
+		final Intent intentToService = new Intent(context, MytwayGeolocalizationService.class);
 
 		if (service == null){
-			service = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+			service = PendingIntent.getService(context, 0, intentToService, PendingIntent.FLAG_CANCEL_CURRENT);
 		}
 
-		manager.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), RepeatResurces.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
-//http://www.parallelrealities.co.uk/2011/09/using-alarmmanager-for-updating-android.html
+		// initializing widget layout
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),	R.layout.mytway5_table_middle_widget_layout);
 
-//
-//		// initializing widget layout
-//		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),	R.layout.mytway5_table_middle_widget_layout);
-//
-//		RideProcessor rideProcessor = new RideProcessor();
-//
-////		MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
-//
-////		android.location.Location location = geolocalization.getLocation();
-//
+		//http://www.parallelrealities.co.uk/2011/09/using-alarmmanager-for-updating-android.html
+		manager.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(),
+				PropertiesValues.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
+
+
+
+
+
+
+
 ////		remoteViews.setTextViewText(R.id.firstTimeTextView, rideProcessor.rideProcess(context));
 //		// register for button event
 //		remoteViews.setOnClickPendingIntent(R.id.envelopeImage, buildButtonPendingIntent(context, appWidgetManager, appWidgetIds, remoteViews, R.id.envelopeImage));
-////		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
-//
+		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
+
 ////Dziala, updejtuje pierwszy text
 ////		String text = "LOL";
 ////		if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context)
@@ -92,10 +92,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 ////		Intent intent = new Intent("APPWIDGET_UPDATE");
 ////		intent.putExtra("newItemArrived", "Neue Frage erschienen");
 ////		sendBroadcast(intent);
-//
-//
 //		// request for widget update
-//		pushWidgetUpdate(context, remoteViews);
+		pushWidgetUpdate(context, remoteViews);
 	}
 
 	@Override
@@ -106,7 +104,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		m.cancel(service);
 	}
 
-	private static void openNewActivity(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, RemoteViews remoteViews, int viewId, String[] missingPermissions) {
+	public static void openNewActivity(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, RemoteViews remoteViews, int viewId, String[] missingPermissions) {
 		Intent configIntent = new Intent(context, NoPermissionsActivity.class);
 		configIntent.putExtra("MissingPermissions", missingPermissions);
 
@@ -144,15 +142,45 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			context.startActivity(intent);
 			context.sendBroadcast(intent);
-//			PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
-//					PERMISSION_REQUEST_CODE_LOCATION,
-//					context,
-//					(Activity) context,
-//					context.getString(R.string.localization_will_help_with_choose_your_work_place));//Localization will help with choose your work place
 		}
 
 		return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
+
+	public static PendingIntent buildButtonSettingsPendingIntent(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, RemoteViews remoteViews, int viewId) {
+		++MyWidgetIntentReceiver.clickCount;
+
+		Intent intent;
+
+		if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context)
+				&& PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context)) {
+
+			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
+			double latitudeLocalization = geolocalization.getLatitude();
+			double longitudeLocalization = geolocalization.getLongitude();
+
+			intent = new Intent();
+			intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
+			intent.putExtra("DUPA", "Lat:" + latitudeLocalization + " Lon: " + longitudeLocalization);
+		}else{
+			String[] missingPermissions =
+					obtainMissingPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, context);
+
+			openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, viewId, missingPermissions);
+
+			//Nie ma permissions, wyswietl activity!!
+			intent = new Intent(context, SettingsActivity.class);
+			intent.setAction("PERMISSIONS");
+			intent.putExtra("MissingPermissions", missingPermissions);
+
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			context.startActivity(intent);
+			context.sendBroadcast(intent);
+		}
+
+		return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
 
 	public static String[] obtainMissingPermissions(String[] permissions, Context context) {
 		String[] missingPermissions = new String[permissions.length];

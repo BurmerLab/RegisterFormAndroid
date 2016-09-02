@@ -182,7 +182,7 @@
                 android:weightSum="1">
 
                 <ImageView
-                    android:id="@+id/image32"
+                    android:id="@+id/envelopeImage"
                     android:layout_height="47dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
@@ -198,7 +198,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/image3"
+                    android:id="@+id/refreshImage"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
