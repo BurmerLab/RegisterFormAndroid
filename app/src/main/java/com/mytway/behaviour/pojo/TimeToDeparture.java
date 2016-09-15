@@ -23,6 +23,7 @@ import java.util.Locale;
 public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
 
     private static final String TAG = "TimeToDeparture";
+    private static final String EMPTY_STRING = "";
     private String displayTimeMessage;
     private Session session;
     private CurrentTime currentTime = new CurrentTime();
@@ -46,10 +47,14 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
         int userTypeWork = session.getTypeWork();
         if(userTypeWork == TypeWork.STANDARD_TYPE.getStatusCode()){
             System.out.println("Standard type");
-            Calendar startStandardTimeWork = prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());
-            timeToDepartureInLong =
-                    (startStandardTimeWork.getTimeInMillis() - travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue())
-                            - currentTime.getCurrentTime().getTimeInMillis();
+            if(!session.getStartStandardTimeWork().equals(EMPTY_STRING)){
+                Calendar startStandardTimeWork = prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());
+                timeToDepartureInLong =
+                        (startStandardTimeWork.getTimeInMillis() - travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue())
+                                - currentTime.getCurrentTime().getTimeInMillis();
+            }else{
+                Log.i(TAG, "User Standard Type doesn't have startStandardTimeWork");
+            }
         }else if(userTypeWork == TypeWork.FLEXIBLE_TYPE.getStatusCode()){
             System.out.println("Flexible type");
             timeToDepartureInLong =

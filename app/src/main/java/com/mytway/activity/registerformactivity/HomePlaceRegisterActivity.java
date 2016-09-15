@@ -105,6 +105,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
 
                     Session session = new Session(getApplicationContext());
+                    session.setIsUserLogged(true);
                     session.setUserName(user.getUserName());
                     session.setLengthTimeWork(user.getLengthTimeWork());
                     session.setStartStandardTimeWork(user.getStartStandardTimeWork());
@@ -132,7 +133,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                         }
                     } else {
                         userRepo.update(userTable);
-//                        Toast.makeText(HomePlaceRegisterActivity.this, "User Record updated", Toast.LENGTH_SHORT).show();
                     }
 
                     Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);

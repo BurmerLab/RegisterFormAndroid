@@ -115,7 +115,7 @@ public class Session {
     }
 
     public String getHomeLatitude() {
-        String homeLatitude = sharedPreferences.getString("homeLatitude", "");
+        String homeLatitude = sharedPreferences.getString("homeLatitude", "0.0");
         this.homeLatitude = homeLatitude;
         return homeLatitude;
     }
@@ -126,7 +126,7 @@ public class Session {
     }
 
     public String getHomeLongitude() {
-        String homeLongitude = sharedPreferences.getString("homeLongitude", "");
+        String homeLongitude = sharedPreferences.getString("homeLongitude", "0.0");
         this.homeLongitude = homeLongitude;
         return homeLongitude;
     }
@@ -137,7 +137,7 @@ public class Session {
     }
 
     public String getWorkLatitude() {
-        String workLatitude = sharedPreferences.getString("workLatitude", "");
+        String workLatitude = sharedPreferences.getString("workLatitude", "0.0");
         this.workLatitude = workLatitude;
         return workLatitude;
     }
@@ -148,7 +148,7 @@ public class Session {
     }
 
     public String getWorkLongitude() {
-        String workLongitude = sharedPreferences.getString("workLongitude", "");
+        String workLongitude = sharedPreferences.getString("workLongitude", "0.0");
         this.workLongitude = workLongitude;
         return workLongitude;
     }

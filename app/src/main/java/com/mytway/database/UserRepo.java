@@ -191,14 +191,14 @@ public class UserRepo {
                 userTable.userName = cursor.getString(cursor.getColumnIndex(UserTable.KEY_USER_NAME));
                 userTable.password  =cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
                 userTable.typeWork  =cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
-
+                String passwordTest = cursor.getString(3);
                 userTable.lengthTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
                 userTable.startStandardTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
                 userTable.workPlaceLatitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LATITUDE));
                 userTable.workPlaceLongitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LONGITUDE));
                 userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
                 userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
-                userTable.workWeek  =cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+                userTable.workWeek  = cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
 
             } while (cursor.moveToNext());
         }

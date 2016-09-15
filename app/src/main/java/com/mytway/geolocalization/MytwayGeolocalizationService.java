@@ -8,7 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,26 +18,18 @@ import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeToDeparture;
-import com.mytway.database.UserRepo;
-import com.mytway.database.UserTable;
-import com.mytway.pojo.GoogleMapsDirectionJson;
-import com.mytway.pojo.Legs;
 import com.mytway.pojo.Position;
-import com.mytway.pojo.TypeWork;
-import com.mytway.pojo.User;
-import com.mytway.pojo.WorkWeek;
-import com.mytway.properties.SharedPreferencesNames;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
+import java.lang.annotation.Target;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,7 +37,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     private Context mContext;
     private Session session;
-
+    private static final String TAG = "MytwayGeolocalizationService";
     private static final int RED_COLOR =  -65536;
 
     boolean isGPSEnabled = false;
@@ -70,13 +61,13 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public MytwayGeolocalizationService(Context context) {
         this.mContext = context;
-        getLocation();
+        getLocalization();
     }
 
     public MytwayGeolocalizationService() {
     }
 
-    public android.location.Location getLocation() {
+    public android.location.Location getLocalization() {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
@@ -108,6 +99,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 if (isNetworkEnabled) {
                     if (location == null) {
+
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                         Log.d("Network", "Network");
@@ -154,7 +146,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             String action = intent.getAction();
             if(action.equals("DUPKA")){
                 //action for sms received
-                WidgetUtils.location = getLocation();
+                WidgetUtils.location = getLocalization();
             }
             else if(action.equals(android.telephony.TelephonyManager.ACTION_PHONE_STATE_CHANGED)){
                 //action for phone state changed
@@ -179,48 +171,57 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     }
 
     private void updateGeolocalization(){
+
         mContext = getApplicationContext();
         session = new Session(mContext);
-        getLocation();
-        String lastUpdated = DateFormat.format("h:mm:ssaa", new Date()).toString();
         RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
-
-        double latitudeLocalization = this.getLatitude();
-        double longitudeLocalization = this.getLongitude();
-
-        Position currentPosition = new Position();
-        currentPosition.setLatitude(latitudeLocalization);
-        currentPosition.setLongitude(longitudeLocalization);
-
-        TravelTime travelTime = new TravelTime();
-        travelTime.setGoogleMapsDirectionJson(mContext, currentPosition, session.getWorkPlace());
-
-//        GoogleMapsDirectionJson gMapsDirectionJson =  travelTime.getTravelTimeBetweenTwoPositions(mContext, currentPosition, session.getWorkPlace());
-
-        lastUpdated = lastUpdated + " " + latitudeLocalization + ", " + travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText();
-        view.setTextViewText(R.id.title, lastUpdated);
-
-        Session session = new Session(getApplicationContext());
-//        Toast.makeText(MytwayGeolocalizationService.this, "session:" + session.getWorkLongitude(), Toast.LENGTH_SHORT).show();
-
         TimeToDeparture timeToDeparture = new TimeToDeparture();
-        DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
-        timeToDeparture.setDirectionWay(directionWay);
-        Calendar timeToDepartureCalendar = timeToDeparture.processTime(getApplicationContext(), currentPosition);
 
-        timeToDeparture.setDisplayTimeMessage(timeToDepartureCalendar.getTime().toString());
         // Push update for this widget to the home screen
         ComponentName thisWidget = new ComponentName(this, MyWidgetProvider.class);
         AppWidgetManager manager = AppWidgetManager.getInstance(this);
 
         if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
                 && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
+
             view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
+
+            if(session.isUserLogged()){
+                getLocalization();
+                String lastUpdated = DateFormat.format("h:mm:ssaa", new Date()).toString();
+
+                double latitudeLocalization = this.getLatitude();
+                double longitudeLocalization = this.getLongitude();
+
+                Position currentPosition = new Position();
+                currentPosition.setLatitude(latitudeLocalization);
+                currentPosition.setLongitude(longitudeLocalization);
+
+                TravelTime travelTime = new TravelTime();
+                travelTime.setGoogleMapsDirectionJson(mContext, currentPosition, session.getWorkPlace());
+
+//        GoogleMapsDirectionJson gMapsDirectionJson =  travelTime.getTravelTimeBetweenTwoPositions(mContext, currentPosition, session.getWorkPlace());
+                DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
+                timeToDeparture.setDirectionWay(directionWay);
+                Calendar timeToDepartureCalendar = timeToDeparture.processTime(getApplicationContext(), currentPosition);
+
+                timeToDeparture.setDisplayTimeMessage(timeToDepartureCalendar.getTime().toString());
+
+                lastUpdated = lastUpdated + " " + latitudeLocalization + ", " + travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText();
+                view.setTextViewText(R.id.title, lastUpdated);
+
+//        Toast.makeText(MytwayGeolocalizationService.this, "session:" + session.getWorkLongitude(), Toast.LENGTH_SHORT).show();
+
+            }else{
+                Log.i(TAG, "User is not logged");
+            }
+
+
+
         }else{
             view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
             MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
         }
-
 
         manager.updateAppWidget(thisWidget, view);
     }

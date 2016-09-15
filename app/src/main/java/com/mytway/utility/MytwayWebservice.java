@@ -222,7 +222,8 @@ public class MytwayWebservice {
                     + "&destination="
                     + endPosition.getLatitude() + "," + endPosition.getLongitude()
                     + "&sensor=true&units=metric";
-
+            System.out.println("Address: " + jsonRequest);
+            Log.i(TAG, "Address TAG: " + jsonRequest);
             try {
                 URL url = new URL(jsonRequest);
 

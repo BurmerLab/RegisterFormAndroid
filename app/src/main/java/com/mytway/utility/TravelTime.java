@@ -37,7 +37,7 @@ public class TravelTime {
                 travelTime = webServiceGetTravelTime.execute(startPosition, endPosition).get();
 
             }catch(InterruptedException | ExecutionException e) {
-                Log.i(TAG, "Problem with obtaining isPasswordCorrectInExternalDatabase ", e);
+                Log.i(TAG, "Problem with obtaining travel time from web service ", e);
                 e.printStackTrace();
             }
 
@@ -67,7 +67,7 @@ public class TravelTime {
         protected GoogleMapsDirectionJson doInBackground(Position... arg0) {
             GoogleMapsDirectionJson webServiceResult = null;
             Position startPosition = arg0[0];
-            Position endPosition = arg0[0];
+            Position endPosition = arg0[1];
 
 
             MytwayWebservice mytwayWebservice = new MytwayWebservice();

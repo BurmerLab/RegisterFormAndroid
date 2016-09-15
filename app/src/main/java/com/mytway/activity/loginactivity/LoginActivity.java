@@ -1,5 +1,6 @@
 package com.mytway.activity.loginactivity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,10 +28,13 @@ import com.mytway.pojo.User;
 import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.MytwayWebservice;
 import com.mytway.utility.Session;
+import com.mytway.utility.WriteDbToExternal;
+import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class LoginActivity extends Activity {
@@ -46,6 +50,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        Stetho.initializeWithDefaults(this);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_login);
 
@@ -164,13 +169,26 @@ public class LoginActivity extends Activity {
         Boolean isExternalPasswordCorrect = false;
         Boolean isLocalPasswordCorrect = false;
         Boolean isPasswordsCorrect = false;
-
+        UserTable userTable = new UserTable();
         UserRepo userRepository = new UserRepo(LoginActivity.this);
+
+        String userName = textViewUserName.getText().toString();
+        String userPassword = textViewPassword.getText().toString();
+
 
         if(EthernetConnectivity.isEthernetOnline(LoginActivity.this)){
             MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase webServiceCheckIsPasswordIsCorrect = new MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase();
+            MytwayWebserviceGetUserFromExternalDatabase webServiceGetUser = new MytwayWebserviceGetUserFromExternalDatabase();
             try {
-                isExternalPasswordCorrect = webServiceCheckIsPasswordIsCorrect.execute(textViewUserName.getText().toString(), textViewPassword.getText().toString()).get();
+                userTable = webServiceGetUser.execute(userName, userPassword).get();
+                userTable.password = userPassword;
+            } catch (InterruptedException | ExecutionException e) {
+                Log.i(TAG, "Problem with getting user paramters from external databases ", e);
+                e.printStackTrace();
+            }
+
+            try {
+                isExternalPasswordCorrect = webServiceCheckIsPasswordIsCorrect.execute(userName, userPassword).get();
             } catch (InterruptedException | ExecutionException e) {
                 Log.i(TAG, "Problem with obtaining isPasswordCorrectInExternalDatabase ", e);
                 e.printStackTrace();
@@ -181,37 +199,57 @@ public class LoginActivity extends Activity {
                 return false;
             }
 
-            isLocalPasswordCorrect =
-                    userRepository.isUserNameAndPasswordIsCorrect(textViewUserName.getText().toString(),textViewPassword.getText().toString());
+            if(userRepository.isUserExistInLocalDatabase(userName)){
+                isLocalPasswordCorrect = userRepository.isUserNameAndPasswordIsCorrect(userName, userPassword);
 
-            if(isExternalPasswordCorrect && isLocalPasswordCorrect){
-                //user exist in local database and in external database
-                isPasswordsCorrect = true;
-            }else{
-                Log.i(TAG,"External and Local Password is not equals, I will insert external user parameters to local user database");
-                //It needed to add user in local database because exist only in external database
-                UserTable userTable = new UserTable();
-                MytwayWebserviceGetUserFromExternalDatabase webServiceGetUser = new MytwayWebserviceGetUserFromExternalDatabase();
-                try {
-                    userTable = webServiceGetUser.execute(textViewUserName.getText().toString(), textViewPassword.getText().toString()).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    Log.i(TAG, "Problem with getting user paramters from external databases ", e);
-                    e.printStackTrace();
+                if(isExternalPasswordCorrect && isLocalPasswordCorrect){
+                    //user exist in local database and in external database
+                    isPasswordsCorrect = true;
+                }else{
+                    //override local user
+                    userRepository.update(userTable);
+                    isPasswordsCorrect = true;
                 }
 
+            }else{
+                Log.i(TAG,"External and Local Password is not equals, I will insert external user parameters to local user database");
+
+
                 int insertResult = userRepository.insert(userTable);
+                Log.i(TAG, "Added user to local DataBase because not existed, datas I got from external Database");
                 Toast.makeText(LoginActivity.this, "Dodalem uzytkownika do lokalnej DB bo nie istnial, dane pobralem z external DB", Toast.LENGTH_SHORT).show();
 
                 if(insertResult > 0) {
                     Log.i(TAG , "After adding to local database new user, insert result return value grater than zero");
                     isPasswordsCorrect = true;
                 }else{
-                    Log.i(TAG , "After adding to local database new user, insert result return value lesser than zero- it seems to be problem");
+                    Log.i(TAG, "After adding to local database new user, insert result return value lesser than zero- it seems to be problem");
                 }
             }
         }
+
+        try {
+            writeToExternal(getApplicationContext());
+        } catch (IOException e) {
+            Log.i(TAG, " Problem with saving DB to sd card: ", e);
+            e.printStackTrace();
+        }
+
         return isPasswordsCorrect;
     }
+
+    public void writeToExternal(Context context) throws IOException {
+        if (PermissionUtil.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context)) {
+            WriteDbToExternal.writeToSD(context);
+        } else{
+            PermissionUtil.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    1,
+                    context,
+                    LoginActivity.this,
+                    "write_external_storage");
+        }
+    }
+
 
     private class MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase extends AsyncTask<String, Void, Boolean> {
 

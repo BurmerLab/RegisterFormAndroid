@@ -18,14 +18,10 @@ public class PermissionUtil {
         }
     }
 
-    public static boolean checkPermission(String strPermission ,Context _c){
-        int result = ContextCompat.checkSelfPermission(_c, strPermission);
+    public static boolean checkPermission(String strPermission ,Context context){
+        int result = ContextCompat.checkSelfPermission(context, strPermission);
 
-        if (result == PackageManager.PERMISSION_GRANTED){
-            return true;
-        } else {
-            return false;
-        }
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
 }
