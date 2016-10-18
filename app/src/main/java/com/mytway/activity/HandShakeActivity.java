@@ -1,5 +1,6 @@
 package com.mytway.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -23,6 +24,7 @@ import com.mytway.activity.loginactivity.LoginActivity;
 import com.mytway.activity.pagger.SlidePageActivity;
 import com.mytway.activity.pagger.ScreenSlidePageFragment;
 import com.mytway.activity.registerformactivity.RegistrationActivity;
+import com.mytway.utility.permission.PermissionUtil;
 
 public class HandShakeActivity extends Activity {
 
@@ -45,6 +47,12 @@ public class HandShakeActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handshake);
+
+        PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                1,
+                getApplicationContext(),
+                HandShakeActivity.this,
+                getString(R.string.application_basing_on_your_localization));
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);

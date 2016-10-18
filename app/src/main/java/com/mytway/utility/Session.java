@@ -2,45 +2,88 @@ package com.mytway.utility;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.properties.SharedPreferencesNames;
 
 public class Session {
 
-    private String userName;
-    private Boolean isUserLogged;
-    private int typeWork;
-    private String lengthTimeWork;
-    private String startStandardTimeWork;
-    private String workWeek;
-    private String homeLatitude;
-    private String homeLongitude;
-    private String workLatitude;
-    private String workLongitude;
+    public String userName;
+    public Boolean isUserLogged;
+    public int typeWork;
+    public String lengthTimeWork;
+    public String startStandardTimeWork;
+    public String workWeek;
+    public String homeLatitude;
+    public String homeLongitude;
+    public String workLatitude;
+    public String workLongitude;
 
-    private Position homePlace;
-    private Position workPlace;
-
-
+    public Position homePlace;
+    public Position workPlace;
     private SharedPreferences sharedPreferences;
 
     public Session() {
     }
 
+    public Session createMockedSession(String userName){
+        Session session = null;
+        if(userName.equals("standard")){
+            session = sessionStandardUserMock();
+
+        }else if (userName.equals("flexible")) {
+            session = sessionFlexibleUserMock();
+        }
+
+        return session;
+    }
+
+    public Session sessionStandardUserMock() {
+        Session session = new Session();
+        session.userName = "mike";
+        session.isUserLogged = Boolean.TRUE;
+        session.typeWork = 2;
+        session.lengthTimeWork = "8:0";
+        session.startStandardTimeWork = "8:0";
+        session.workWeek = "1111100";
+        session.workLatitude = "50.047441199625069";
+        session.workLongitude = "19.962572269141674";
+        session.homeLatitude = "50.056408699999999";
+        session.homeLongitude = "20.8951514";
+        return session;
+    }
+
+    public Session sessionFlexibleUserMock() {
+        Session session = new Session();
+        session.userName = "mike";
+        session.isUserLogged = Boolean.TRUE;
+        session.typeWork = 1;
+        session.lengthTimeWork = "8:0";
+        session.workWeek = "1111100";
+        session.workLatitude = "50.047441199625069";
+        session.workLongitude = "19.962572269141674";
+        session.homeLatitude = "50.056408699999999";
+        session.homeLongitude = "20.8951514";
+        return session;
+    }
+
     public Session(Context context) {
-        sharedPreferences = context.getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, 1);
-        getUserName();
-        isUserLogged();
-        getTypeWork();
-        getLengthTimeWork();
-        getStartStandardTimeWork();
-        getWorkWeek();
-        getHomeLatitude();
-        getHomeLongitude();
-        getWorkLatitude();
-        getWorkLongitude();
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            //do nothing
+        }else{
+            sharedPreferences = context.getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, 1);
+            getUserName();
+            isUserLogged();
+            getTypeWork();
+            getLengthTimeWork();
+            getStartStandardTimeWork();
+            getWorkWeek();
+            getHomeLatitude();
+            getHomeLongitude();
+            getWorkLatitude();
+            getWorkLongitude();
+        }
     }
 
     //------- UserName ---------------
@@ -49,8 +92,13 @@ public class Session {
     }
 
     public String getUserName() {
-        String userName = sharedPreferences.getString("userName","");
-        this.userName = userName;
+        String userName;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            userName = "mike";
+        }else{
+            userName = sharedPreferences.getString("userName","");
+            this.userName = userName;
+        }
         return userName;
     }
 
@@ -60,8 +108,13 @@ public class Session {
     }
 
     public Boolean isUserLogged() {
-        Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
-        this.isUserLogged = isUserLogged;
+        Boolean isUserLogged;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            isUserLogged = true;
+        }else{
+            isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
+            this.isUserLogged = isUserLogged;
+        }
         return isUserLogged;
     }
 
@@ -71,8 +124,14 @@ public class Session {
     }
 
     public int getTypeWork() {
-        int typeWork = sharedPreferences.getInt("typeWork", 0);
-        this.typeWork = typeWork;
+        int typeWork;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            typeWork = this.typeWork;
+        }else{
+            typeWork = sharedPreferences.getInt("typeWork", 0);
+            this.typeWork = typeWork;
+        }
+
         return typeWork;
     }
 
@@ -82,8 +141,13 @@ public class Session {
     }
 
     public String getLengthTimeWork() {
-        String lengthTimeWork = sharedPreferences.getString("lengthTimeWork", "");
-        this.lengthTimeWork = lengthTimeWork;
+        String lengthTimeWork;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            lengthTimeWork = "8:0";
+        }else{
+            lengthTimeWork = sharedPreferences.getString("lengthTimeWork", "");
+            this.lengthTimeWork = lengthTimeWork;
+        }
         return lengthTimeWork;
     }
 
@@ -93,8 +157,14 @@ public class Session {
     }
 
     public String getStartStandardTimeWork() {
-        String startStandardTimeWork = sharedPreferences.getString("startStandardTimeWork", "");
-        this.startStandardTimeWork = startStandardTimeWork;
+        String startStandardTimeWork;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            startStandardTimeWork = "8:0";
+        }else{
+            startStandardTimeWork = sharedPreferences.getString("startStandardTimeWork", "");
+            this.startStandardTimeWork = startStandardTimeWork;
+        }
+
         return startStandardTimeWork;
     }
 
@@ -104,8 +174,13 @@ public class Session {
     }
 
     public String getWorkWeek() {
-        String workWeek = sharedPreferences.getString("workWeek", "");
-        this.workWeek = workWeek;
+        String workWeek;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            workWeek = "1111100";
+        }else{
+            workWeek = sharedPreferences.getString("workWeek", "");
+            this.workWeek = workWeek;
+        }
         return workWeek;
     }
 
@@ -115,8 +190,14 @@ public class Session {
     }
 
     public String getHomeLatitude() {
-        String homeLatitude = sharedPreferences.getString("homeLatitude", "0.0");
-        this.homeLatitude = homeLatitude;
+        String homeLatitude;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            homeLatitude = "50.056408699999999";
+        }else{
+            homeLatitude = sharedPreferences.getString("homeLatitude", "0.0");
+            this.homeLatitude = homeLatitude;
+        }
+
         return homeLatitude;
     }
 
@@ -126,8 +207,13 @@ public class Session {
     }
 
     public String getHomeLongitude() {
-        String homeLongitude = sharedPreferences.getString("homeLongitude", "0.0");
-        this.homeLongitude = homeLongitude;
+        String homeLongitude;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            homeLongitude = "20.8951514";
+        }else{
+            homeLongitude = sharedPreferences.getString("homeLongitude", "0.0");
+            this.homeLongitude = homeLongitude;
+        }
         return homeLongitude;
     }
 
@@ -137,8 +223,14 @@ public class Session {
     }
 
     public String getWorkLatitude() {
-        String workLatitude = sharedPreferences.getString("workLatitude", "0.0");
-        this.workLatitude = workLatitude;
+        String workLatitude;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            workLatitude = "50.047441199625069";
+        }else{
+            workLatitude = sharedPreferences.getString("workLatitude", "0.0");
+            this.workLatitude = workLatitude;
+        }
+
         return workLatitude;
     }
 
@@ -148,8 +240,14 @@ public class Session {
     }
 
     public String getWorkLongitude() {
-        String workLongitude = sharedPreferences.getString("workLongitude", "0.0");
-        this.workLongitude = workLongitude;
+        String workLongitude;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            workLongitude = "19.962572269141674";
+        }else{
+            workLongitude = sharedPreferences.getString("workLongitude", "0.0");
+            this.workLongitude = workLongitude;
+        }
+
         return workLongitude;
     }
 
@@ -191,14 +289,16 @@ public class Session {
         this.workPlace = workPlace;
     }
 
+
+
 }
 
 /*How to use:
 *
-* private Session session;//global variable
-session = new Session(cntx); //in oncreate
+* private Session createMockedSession;//global variable
+createMockedSession = new Session(cntx); //in oncreate
 //and now we set sharedpreference then use this like
 
-session.setUserName("USERNAME");
+createMockedSession.setUserName("USERNAME");
 more: http://stackoverflow.com/questions/20678669/how-to-maintain-session-in-android
 */

@@ -200,8 +200,8 @@ public class MytwayWebservice {
         if(jsonResult.length() >= 10){
             userTable.startStandardTimeWork = jsonResult.getString("startStandardTimeWork");
         }
-        userTable.workPlaceLongitude = jsonResult.getDouble("workPlaceLongitude");
         userTable.workPlaceLatitude = jsonResult.getDouble("workPlaceLatitude");
+        userTable.workPlaceLongitude = jsonResult.getDouble("workPlaceLongitude");
         userTable.homePlaceLatitude = jsonResult.getDouble("homePlaceLatitude");
         userTable.homePlaceLongitude = jsonResult.getDouble("homePlaceLongitude");
         userTable.workWeek = jsonResult.getString("workWeek");
@@ -237,7 +237,7 @@ public class MytwayWebservice {
                 String output;
 
                 while ((output = br.readLine()) != null) {
-                    System.out.println(output);
+//                    System.out.println(output);
                     result = result + output;
                 }
                 System.out.println("\n Mytway REST Service Invoked Successfully..");

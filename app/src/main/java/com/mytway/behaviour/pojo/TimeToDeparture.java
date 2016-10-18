@@ -1,24 +1,15 @@
 package com.mytway.behaviour.pojo;
 
 import android.content.Context;
-import android.content.SyncStatusObserver;
-import android.nfc.Tag;
 import android.util.Log;
 
 import com.mytway.pojo.Position;
 import com.mytway.pojo.TypeWork;
-import com.mytway.pojo.User;
 import com.mytway.utility.CurrentTime;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import org.joda.time.LocalDateTime;
 
 public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
 
@@ -28,77 +19,64 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     private Session session;
     private CurrentTime currentTime = new CurrentTime();
     private TravelTime travelTime;
-    private DirectionWay directionWay;
+//    private DirectionWay directionWay;
 
     @Override
     public String displayMessage() {
-
-        return null;
+        return displayTimeMessage;
     }
 
     @Override
-    public Calendar processTime(Context context, Position currentPosition) {
-        long timeToDepartureInLong = 0;
-        session = new Session(context);
-        TimeToDeparture timeToDeparture = new TimeToDeparture();
+    public void processTime(Context context, Position currentPosition, Session session) {
+        if(session.isUserLogged()){
+            LocalDateTime timeToDepartureLocalDateTime = new LocalDateTime();
+            TimeToDeparture timeToDeparture = new TimeToDeparture();
 
-        TravelTime travelTime = obtainTravelTimeBasedOnDirectonWay(context, currentPosition);
+            int userTypeWork = session.getTypeWork();
 
-        int userTypeWork = session.getTypeWork();
-        if(userTypeWork == TypeWork.STANDARD_TYPE.getStatusCode()){
-            System.out.println("Standard type");
-            if(!session.getStartStandardTimeWork().equals(EMPTY_STRING)){
-                Calendar startStandardTimeWork = prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());
-                timeToDepartureInLong =
-                        (startStandardTimeWork.getTimeInMillis() - travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue())
-                                - currentTime.getCurrentTime().getTimeInMillis();
+            if(userTypeWork == TypeWork.STANDARD_TYPE.getStatusCode()){
+                Log.i(TAG, "Standard type work");
+                if(!session.getStartStandardTimeWork().equals(EMPTY_STRING)){
+                    LocalDateTime startStandardTimeWork = prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());
+
+                    // timeToDeparture = (startWorkTime - travelTime) - currentTime
+                    LocalDateTime startStandardWorkTimeMinusTravelTime =
+                            subtractTimeTo(startStandardTimeWork,
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getSeconds());
+
+                    timeToDepartureLocalDateTime = subtractTimeTo(startStandardWorkTimeMinusTravelTime,
+                            currentTime.getCurrentTime().getHourOfDay(),
+                            currentTime.getCurrentTime().getMinuteOfHour(),
+                            currentTime.getCurrentTime().getSecondOfMinute());
+
+                }else{
+                    Log.i(TAG, "User Standard Type doesn't have startStandardTimeWork");
+                }
+            }else if(userTypeWork == TypeWork.FLEXIBLE_TYPE.getStatusCode()){
+                System.out.println("Flexible type user");
+
+                //timeToDeparture = currentTime + travelTime
+                timeToDepartureLocalDateTime =
+                        addTimeTo(currentTime.getCurrentTime(),
+                                travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),
+                                travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
+                                travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getHour());
+
+                Log.i(TAG, "time To Departure Flexible User is: " + timeToDeparture);
             }else{
-                Log.i(TAG, "User Standard Type doesn't have startStandardTimeWork");
+                Log.i(TAG, "User TypeWork not defined, not handled problem");
             }
-        }else if(userTypeWork == TypeWork.FLEXIBLE_TYPE.getStatusCode()){
-            System.out.println("Flexible type");
-            timeToDepartureInLong =
-                    currentTime.getCurrentTime().getTimeInMillis() + travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue();
+
+            String displayMessage = prepareTimeFromLocalDateTimeToString(timeToDepartureLocalDateTime);
+            Log.i(TAG, "Time to departure: " + displayMessage);
+
+            setDisplayTimeMessage(displayMessage);
+
         }else{
-            Log.i(TAG, "User TypeWork not defined, problem");
+            Log.i(TAG, "User is not logged");
         }
-
-        Calendar calendarMessage = Calendar.getInstance();
-        calendarMessage.setTimeInMillis(timeToDepartureInLong);
-
-        return calendarMessage;
-    }
-
-    public Calendar prepareTimeFromStringToCalendar(String startStandardTimeWork) {
-
-        Calendar calendar = dateToCalendar(startStandardTimeWork);
-        return calendar;
-    }
-
-    public Calendar dateToCalendar(String timeString){
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-        Date date = null;
-        try {
-            date = sdf.parse(timeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return  calendar;
-    }
-
-
-    public TravelTime obtainTravelTimeBasedOnDirectonWay(Context context, Position currentPosition) {
-        TravelTime travelTime = new TravelTime();
-        if(directionWay.isWayToHome()){
-            travelTime.setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
-        }else if( directionWay.isWayToWork()){
-            travelTime.setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
-        }else{
-            Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
-        }
-        return travelTime;
     }
 
     public String getDisplayTimeMessage() {
@@ -123,14 +101,6 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
 
     public void setTravelTime(TravelTime travelTime) {
         this.travelTime = travelTime;
-    }
-
-    public DirectionWay getDirectionWay() {
-        return directionWay;
-    }
-
-    public void setDirectionWay(DirectionWay directionWay) {
-        this.directionWay = directionWay;
     }
 
     public Session getSession() {

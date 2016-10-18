@@ -34,7 +34,6 @@ import com.mytway.validation.Validation;
 
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class LoginActivity extends Activity {
@@ -157,7 +156,6 @@ public class LoginActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -228,28 +226,8 @@ public class LoginActivity extends Activity {
             }
         }
 
-        try {
-            writeToExternal(getApplicationContext());
-        } catch (IOException e) {
-            Log.i(TAG, " Problem with saving DB to sd card: ", e);
-            e.printStackTrace();
-        }
-
         return isPasswordsCorrect;
     }
-
-    public void writeToExternal(Context context) throws IOException {
-        if (PermissionUtil.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context)) {
-            WriteDbToExternal.writeToSD(context);
-        } else{
-            PermissionUtil.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    1,
-                    context,
-                    LoginActivity.this,
-                    "write_external_storage");
-        }
-    }
-
 
     private class MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase extends AsyncTask<String, Void, Boolean> {
 

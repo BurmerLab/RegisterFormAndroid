@@ -29,6 +29,8 @@ import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
+import org.joda.time.LocalDateTime;
+
 import java.lang.annotation.Target;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,6 +70,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     }
 
     public android.location.Location getLocalization() {
+
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
@@ -170,60 +173,60 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void updateGeolocalization(){
-
+    private void updateGeolocalization() {
         mContext = getApplicationContext();
         session = new Session(mContext);
         RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
-        TimeToDeparture timeToDeparture = new TimeToDeparture();
 
-        // Push update for this widget to the home screen
-        ComponentName thisWidget = new ComponentName(this, MyWidgetProvider.class);
-        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        if(session.isUserLogged()){
+            // Push update for this widget to the home screen
+            ComponentName thisWidget = new ComponentName(this, MyWidgetProvider.class);
+            AppWidgetManager manager = AppWidgetManager.getInstance(this);
 
-        if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
-                && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
+            if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
+                    && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
 
-            view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
+                Location currentLocation = getLocalization();
+                Position currentPosition = new Position(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-            if(session.isUserLogged()){
-                getLocalization();
-                String lastUpdated = DateFormat.format("h:mm:ssaa", new Date()).toString();
-
-                double latitudeLocalization = this.getLatitude();
-                double longitudeLocalization = this.getLongitude();
-
-                Position currentPosition = new Position();
-                currentPosition.setLatitude(latitudeLocalization);
-                currentPosition.setLongitude(longitudeLocalization);
-
-                TravelTime travelTime = new TravelTime();
-                travelTime.setGoogleMapsDirectionJson(mContext, currentPosition, session.getWorkPlace());
-
-//        GoogleMapsDirectionJson gMapsDirectionJson =  travelTime.getTravelTimeBetweenTwoPositions(mContext, currentPosition, session.getWorkPlace());
+                //Direction, is user is going to work or home??
                 DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
-                timeToDeparture.setDirectionWay(directionWay);
-                Calendar timeToDepartureCalendar = timeToDeparture.processTime(getApplicationContext(), currentPosition);
 
-                timeToDeparture.setDisplayTimeMessage(timeToDepartureCalendar.getTime().toString());
+                //Travel time
+                TravelTime travelTime = new TravelTime();
+                travelTime.setDirectionWay(directionWay);
+                travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
 
-                lastUpdated = lastUpdated + " " + latitudeLocalization + ", " + travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText();
-                view.setTextViewText(R.id.title, lastUpdated);
+                //1st Time- time to departure
+                TimeToDeparture timeToDeparture = new TimeToDeparture();
+                timeToDeparture.setSession(session);
+                timeToDeparture.setTravelTime(travelTime);
+                timeToDeparture.processTime(mContext, currentPosition, session);
 
-//        Toast.makeText(MytwayGeolocalizationService.this, "session:" + session.getWorkLongitude(), Toast.LENGTH_SHORT).show();
+                //2th Time - Time in road
+                LocalDateTime timeInRoad = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
+                String timeInRoadString = timeInRoad.toString();
+
+                //3rd Time Arrive Time (When We will come back)
+                //ArriveTime = CurrentTime + TravelTime (toWork) + workLength + travelTime (back)
+                String arriveTime =
+                view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
+
+                String messageToDisplay = "" + timeToDeparture.getDisplayTimeMessage();
+
+                view.setTextViewText(R.id.firstTimeTextView, messageToDisplay);
 
             }else{
-                Log.i(TAG, "User is not logged");
+                view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
+                MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
             }
 
-
-
+            manager.updateAppWidget(thisWidget, view);
         }else{
-            view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
-            MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
+            Log.i(TAG, "User is not logged");
         }
 
-        manager.updateAppWidget(thisWidget, view);
+
     }
 
     public void onDestroy(){

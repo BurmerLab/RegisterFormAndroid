@@ -76,6 +76,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="localization_will_help_with_choose_your_work_place">Localization will help with choose your work place</string>
     <string name="localization_will_help_with_choose_your_home_place">Localization will help with choose your home place</string>
+    <string name="application_basing_on_your_localization">Localization basing on your localization</string>
+
     <string name="title_activity_scrolling">ScrollingActivity</string>
 
     <string name="large_text">

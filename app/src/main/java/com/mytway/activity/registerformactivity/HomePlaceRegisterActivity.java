@@ -83,7 +83,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onClick(View v) {
                 Toast.makeText(HomePlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
                 Position workPosition = user.getWorkPlace();
-                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
+                Position homePosition = new Position(latitudeLocalization, longitudeLocalization);
 
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
@@ -127,9 +127,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                                 Toast.makeText(HomePlaceRegisterActivity.this, "Insert to External DB", Toast.LENGTH_SHORT).show();
                                 new MytwayWebserviceInsertUser().execute();
                             }
-//                            else{
-//                                Toast.makeText(HomePlaceRegisterActivity.this, "Nie zainsertowalem do external DB", Toast.LENGTH_SHORT).show();
-//                            }
                         }
                     } else {
                         userRepo.update(userTable);

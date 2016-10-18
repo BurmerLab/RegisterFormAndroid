@@ -31,7 +31,6 @@ public class UserRepo {
         values.put(UserTable.WORK_PLACE_LONGITUDE, userTable.workPlaceLongitude);
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
-
         values.put(UserTable.WORK_WEEK, userTable.workWeek);
 
         // Inserting Row

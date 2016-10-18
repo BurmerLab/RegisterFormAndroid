@@ -13,4 +13,6 @@ public class PropertiesValues {
     public static int WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL = 16;
 
     public static final int INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS = 1000 * 3;//1000 * 30 = 30sek
+
+    public static final boolean MOCK_APP_TO_TESTS = true;
 }

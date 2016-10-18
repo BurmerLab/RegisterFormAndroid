@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
+import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Duration;
 import com.mytway.pojo.GoogleMapsDirectionJson;
@@ -21,7 +22,7 @@ public class TravelTime {
     private final String TAG = "TravelTime";
 
     private GoogleMapsDirectionJson googleMapsDirectionJson;
-
+    private DirectionWay directionWay;
 //Example:
 //    https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=AIzaSyBLPJAGAe4Ypmb70IHMVh5WWz1OsEjGTMw
 //    http://stackoverflow.com/questions/16756955/travel-time-between-two-locations-in-google-map-android-api-v2
@@ -29,6 +30,7 @@ public class TravelTime {
     public GoogleMapsDirectionJson getTravelTimeBetweenTwoPositions(Context context, Position startPosition, Position endPosition) {
 
         GoogleMapsDirectionJson travelTime = null;
+
 
         if(EthernetConnectivity.isEthernetOnline(context)) {
             MytwayWebserviceGetTravelTimeBetweenTwoPositions webServiceGetTravelTime = new MytwayWebserviceGetTravelTimeBetweenTwoPositions();
@@ -87,6 +89,17 @@ public class TravelTime {
         }
     }
 
+    public void obtainTravelTimeBasedOnDirectonWay(Context context, Position currentPosition, Session session) {
+        if(directionWay.isWayToHome()){
+            setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
+
+        }else if( directionWay.isWayToWork()){
+            setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
+
+        }else{
+            Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
+        }
+    }
 
     public GoogleMapsDirectionJson getGoogleMapsDirectionJson() {
         return googleMapsDirectionJson;
@@ -99,6 +112,11 @@ public class TravelTime {
         this.googleMapsDirectionJson =  getTravelTimeBetweenTwoPositions(context, currentPosition, endPosition);
     }
 
+    public DirectionWay getDirectionWay() {
+        return directionWay;
+    }
 
-
+    public void setDirectionWay(DirectionWay directionWay) {
+        this.directionWay = directionWay;
+    }
 }
