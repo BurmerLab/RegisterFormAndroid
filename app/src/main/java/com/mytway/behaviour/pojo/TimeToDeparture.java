@@ -28,9 +28,11 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
 
     @Override
     public void processTime(Context context, Position currentPosition, Session session) {
+        Log.i(TAG, "Starting processing of TimeToDeparture");
+        Log.i(TAG, "Current time: " + getCurrentTime());
+
         if(session.isUserLogged()){
             LocalDateTime timeToDepartureLocalDateTime = new LocalDateTime();
-            TimeToDeparture timeToDeparture = new TimeToDeparture();
 
             int userTypeWork = session.getTypeWork();
 
@@ -64,7 +66,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
                                 travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
                                 travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getHour());
 
-                Log.i(TAG, "time To Departure Flexible User is: " + timeToDeparture);
+                Log.i(TAG, "time To Departure of Flexible User is: " + timeToDepartureLocalDateTime);
             }else{
                 Log.i(TAG, "User TypeWork not defined, not handled problem");
             }
@@ -77,6 +79,11 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
         }else{
             Log.i(TAG, "User is not logged");
         }
+    }
+
+    @Override
+    public void processTime() throws Exception {
+        throw new Exception("Not supported processTime here, in TimeToDeparture");
     }
 
     public String getDisplayTimeMessage() {

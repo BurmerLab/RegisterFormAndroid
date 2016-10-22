@@ -12,15 +12,17 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
+import com.mytway.behaviour.pojo.TimeArrive;
+import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
@@ -30,10 +32,6 @@ import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
 import org.joda.time.LocalDateTime;
-
-import java.lang.annotation.Target;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
 
@@ -169,11 +167,16 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        updateGeolocalization();
+        try {
+            updateGeolocalization();
+        } catch (Exception e) {
+            Log.i(TAG, "Problem with method updateGeolocalization in service", e);
+            e.printStackTrace();
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void updateGeolocalization() {
+    private void updateGeolocalization() throws Exception {
         mContext = getApplicationContext();
         session = new Session(mContext);
         RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
@@ -204,17 +207,27 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 timeToDeparture.processTime(mContext, currentPosition, session);
 
                 //2th Time - Time in road
-                LocalDateTime timeInRoad = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
+                TimeInRoad timeInRoad = new TimeInRoad();
+                timeInRoad.setTimeInRoad(timeToDeparture);
+                LocalDateTime timeInRoadDateTime = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
                 String timeInRoadString = timeInRoad.toString();
 
                 //3rd Time Arrive Time (When We will come back)
-                //ArriveTime = CurrentTime + TravelTime (toWork) + workLength + travelTime (back)
-                String arriveTime =
+                //ArriveTime = CurrentTime + TravelTime (toWork) + workLength(from session) + travelTime(back)
+                TimeArrive timeArrive = new TimeArrive();
+                timeArrive.setTravelTimeToWork(travelTime);//travel time To work
+                timeArrive.setSession(session);
+                timeArrive.setTravelTimeToWork(travelTime);//travel time to home
+                timeArrive.processTime(mContext, currentPosition, session);
+                String timeArriveMessage = timeArrive.displayMessage();
+
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
 
                 String messageToDisplay = "" + timeToDeparture.getDisplayTimeMessage();
 
                 view.setTextViewText(R.id.firstTimeTextView, messageToDisplay);
+                view.setTextViewText(R.id.secondTimeTextView, messageToDisplay);
+                view.setTextViewText(R.id.thirdTimeTextView, messageToDisplay);
 
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);

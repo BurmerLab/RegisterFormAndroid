@@ -115,7 +115,7 @@
                         android:layout_height="wrap_content"
                         android:text="12min"
                         android:textColor="@color/widgetTextColor"
-                        android:id="@+id/textView2"
+                        android:id="@+id/secondTimeTextView"
                         android:layout_gravity="center"
                         android:layout_column="2"
                         android:textSize="@dimen/second_time_text_size_medium" />
@@ -145,7 +145,7 @@
                         android:layout_height="wrap_content"
                         android:text="12:30"
                         android:textColor="@color/widgetTextColor"
-                        android:id="@+id/textView3"
+                        android:id="@+id/thirdTimeTextView"
                         android:layout_gravity="center"
                         android:layout_column="4"
                         android:textSize="@dimen/third_time_text_size_medium" />

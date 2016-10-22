@@ -16,7 +16,7 @@ public class DurationTest extends TestCase {
         LocalDateTime localDateTime = duration.prepareDurationValueToLocalDateTime(duration.getValue());
 
         assertEquals(5, localDateTime.getHourOfDay());
-        assertEquals(17, localDateTime.getMinuteOfHour());
+        assertEquals(16, localDateTime.getMinuteOfHour());
         assertEquals(17, localDateTime.getSecondOfMinute());
 
         System.out.println(localDateTime.getHourOfDay());

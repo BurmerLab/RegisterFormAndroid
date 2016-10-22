@@ -11,6 +11,7 @@ public interface IDisplayedTime {
 
     String displayMessage();
 
-    void processTime(Context context, Position currentPosition, Session session);
+    void processTime(Context context, Position currentPosition, Session session) throws Exception;
+    void processTime() throws Exception;
 
 }
