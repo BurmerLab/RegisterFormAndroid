@@ -20,6 +20,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     private CurrentTime currentTime = new CurrentTime();
     private TravelTime travelTime;
 //    private DirectionWay directionWay;
+    private LocalDateTime timeToDeparture;
 
     @Override
     public String displayMessage() {
@@ -74,6 +75,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
             String displayMessage = prepareTimeFromLocalDateTimeToString(timeToDepartureLocalDateTime);
             Log.i(TAG, "Time to departure: " + displayMessage);
 
+            setTimeToDeparture(timeToDepartureLocalDateTime);
             setDisplayTimeMessage(displayMessage);
 
         }else{
@@ -116,5 +118,13 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
 
     public void setSession(Session session) {
         this.session = session;
+    }
+
+    public LocalDateTime getTimeToDeparture() {
+        return timeToDeparture;
+    }
+
+    public void setTimeToDeparture(LocalDateTime timeToDeparture) {
+        this.timeToDeparture = timeToDeparture;
     }
 }

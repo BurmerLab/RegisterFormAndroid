@@ -206,11 +206,14 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 timeToDeparture.setTravelTime(travelTime);
                 timeToDeparture.processTime(mContext, currentPosition, session);
 
+                Log.i(TAG, "Time to departure: " + timeToDeparture.displayMessage());
+
                 //2th Time - Time in road
                 TimeInRoad timeInRoad = new TimeInRoad();
                 timeInRoad.setTimeInRoad(timeToDeparture);
                 LocalDateTime timeInRoadDateTime = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
-                String timeInRoadString = timeInRoad.toString();
+
+                Log.i(TAG, "timeInRoad: " + timeInRoad.displayMessage());
 
                 //3rd Time Arrive Time (When We will come back)
                 //ArriveTime = CurrentTime + TravelTime (toWork) + workLength(from session) + travelTime(back)
@@ -219,15 +222,15 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 timeArrive.setSession(session);
                 timeArrive.setTravelTimeToWork(travelTime);//travel time to home
                 timeArrive.processTime(mContext, currentPosition, session);
-                String timeArriveMessage = timeArrive.displayMessage();
+
+                Log.i(TAG, "timeArrive: " + timeArrive.displayMessage());
 
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
 
-                String messageToDisplay = "" + timeToDeparture.getDisplayTimeMessage();
 
-                view.setTextViewText(R.id.firstTimeTextView, messageToDisplay);
-                view.setTextViewText(R.id.secondTimeTextView, messageToDisplay);
-                view.setTextViewText(R.id.thirdTimeTextView, messageToDisplay);
+                view.setTextViewText(R.id.firstTimeTextView, timeToDeparture.displayMessage());
+                view.setTextViewText(R.id.secondTimeTextView, timeInRoad.displayMessage());
+                view.setTextViewText(R.id.thirdTimeTextView, timeArrive.displayMessage());
 
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);

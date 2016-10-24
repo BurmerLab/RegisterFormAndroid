@@ -29,6 +29,7 @@ public class TimeInRoad extends AProcessingTime implements IDisplayedTime{
         if(timeInRoad != null){
             String displayMessage = prepareTimeFromLocalDateTimeToString(timeInRoad);
             Log.i(TAG, "Time in road: " + displayMessage);
+            setTimeInRoad(timeInRoad);
             setDisplayTimeMessage(displayMessage);
         }else{
             Log.i(TAG, "time in road is null, firstly add time in road before start processing");

@@ -21,6 +21,7 @@ public class TimeArrive extends AProcessingTime implements IDisplayedTime{
     private TravelTime travelTimeToWork;
     private TravelTime travelTimeToHome;
     private DirectionWay directionWay;
+    private LocalDateTime timeArrive;
 
     @Override
     public void processTime() throws Exception{
@@ -50,6 +51,8 @@ public class TimeArrive extends AProcessingTime implements IDisplayedTime{
 
             String displayMessage = prepareTimeFromLocalDateTimeToString(timeArriveDateTime);
             Log.i(TAG, "Time arrive: " + displayMessage);
+
+            setTimeArrive(timeArriveDateTime);
             setDisplayTimeMessage(displayMessage);
         }
     }
@@ -110,5 +113,13 @@ public class TimeArrive extends AProcessingTime implements IDisplayedTime{
 
     public void setTravelTimeToHome(TravelTime travelTimeToHome) {
         this.travelTimeToHome = travelTimeToHome;
+    }
+
+    public LocalDateTime getTimeArrive() {
+        return timeArrive;
+    }
+
+    public void setTimeArrive(LocalDateTime timeArrive) {
+        this.timeArrive = timeArrive;
     }
 }
