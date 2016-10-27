@@ -24,6 +24,7 @@ import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArrive;
 import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
+import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
@@ -195,42 +196,14 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 //Direction, is user is going to work or home??
                 DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
 
-                //Travel time
-                TravelTime travelTime = new TravelTime();
-                travelTime.setDirectionWay(directionWay);
-                travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
-
-                //1st Time- time to departure
-                TimeToDeparture timeToDeparture = new TimeToDeparture();
-                timeToDeparture.setSession(session);
-                timeToDeparture.setTravelTime(travelTime);
-                timeToDeparture.processTime(mContext, currentPosition, session);
-
-                Log.i(TAG, "Time to departure: " + timeToDeparture.displayMessage());
-
-                //2th Time - Time in road
-                TimeInRoad timeInRoad = new TimeInRoad();
-                timeInRoad.setTimeInRoad(timeToDeparture);
-                LocalDateTime timeInRoadDateTime = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
-
-                Log.i(TAG, "timeInRoad: " + timeInRoad.displayMessage());
-
-                //3rd Time Arrive Time (When We will come back)
-                //ArriveTime = CurrentTime + TravelTime (toWork) + workLength(from session) + travelTime(back)
-                TimeArrive timeArrive = new TimeArrive();
-                timeArrive.setTravelTimeToWork(travelTime);//travel time To work
-                timeArrive.setSession(session);
-                timeArrive.setTravelTimeToWork(travelTime);//travel time to home
-                timeArrive.processTime(mContext, currentPosition, session);
-
-                Log.i(TAG, "timeArrive: " + timeArrive.displayMessage());
+                //Morning screen
+                MorningScreen morningScreen = new MorningScreen();
+                morningScreen.prepareMorningScreen(directionWay, session, mContext, currentPosition);
 
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
-
-
-                view.setTextViewText(R.id.firstTimeTextView, timeToDeparture.displayMessage());
-                view.setTextViewText(R.id.secondTimeTextView, timeInRoad.displayMessage());
-                view.setTextViewText(R.id.thirdTimeTextView, timeArrive.displayMessage());
+                view.setTextViewText(R.id.firstTimeTextView, morningScreen.getTimeToDeparture().displayMessage());
+                view.setTextViewText(R.id.secondTimeTextView, morningScreen.getTimeInRoad().displayMessage());
+                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArrive().displayMessage());
 
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
