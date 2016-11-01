@@ -22,6 +22,10 @@ public class Session {
 
     public Position homePlace;
     public Position workPlace;
+
+    public int wayDistance;
+    public int wayDuration;
+
     private SharedPreferences sharedPreferences;
 
     public Session() {
@@ -287,6 +291,38 @@ public class Session {
 
     public void setWorkPlace(Position workPlace) {
         this.workPlace = workPlace;
+    }
+
+    //------- WayDistance ---------------
+    public void setWayDistance(int wayDistance) {
+        sharedPreferences.edit().putInt("wayDistance", wayDistance).commit();
+    }
+
+    public int getWayDistance() {
+        int wayDistance;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            wayDistance = this.wayDistance;
+        }else{
+            wayDistance = sharedPreferences.getInt("wayDistance", 0);
+            this.wayDistance = wayDistance;
+        }
+        return wayDistance;
+    }
+
+    //------- WayDuration ---------------
+    public void setWayDuration(int wayDuration) {
+        sharedPreferences.edit().putInt("wayDuration", wayDuration).commit();
+    }
+
+    public int getWayDuration() {
+        int wayDuration;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            wayDuration = this.wayDuration;
+        }else{
+            wayDuration = sharedPreferences.getInt("wayDuration", 0);
+            this.wayDuration = wayDuration;
+        }
+        return wayDuration;
     }
 
 
