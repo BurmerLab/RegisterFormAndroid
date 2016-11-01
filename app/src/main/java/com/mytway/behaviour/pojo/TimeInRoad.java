@@ -25,6 +25,11 @@ public class TimeInRoad extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+        throw new Exception("Not supported processTime here, in TimeInRoad");
+    }
+
+    @Override
     public void processTime() {
         if(timeInRoad != null){
             String displayMessage = prepareTimeFromLocalDateTimeToString(timeInRoad);

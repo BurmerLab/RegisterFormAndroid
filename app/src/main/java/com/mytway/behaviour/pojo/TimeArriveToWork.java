@@ -4,16 +4,15 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mytway.pojo.Position;
-import com.mytway.pojo.TypeWork;
 import com.mytway.utility.CurrentTime;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 
-public class TimeArrive extends AProcessingTime implements IDisplayedTime{
+public class TimeArriveToWork extends AProcessingTime implements IDisplayedTime{
 
-    private static final String TAG = "TimeArrive";
+    private static final String TAG = "TimeArriveToWork";
     private static final String EMPTY_STRING = "";
     private String displayTimeMessage;
     private Session session;
@@ -24,47 +23,39 @@ public class TimeArrive extends AProcessingTime implements IDisplayedTime{
     private LocalDateTime timeArrive;
 
     @Override
-    public void processTime() throws Exception{
-
-        Log.i(TAG, "Starting processing of TimeToDeparture");
-        Log.i(TAG, "Current time: " + getCurrentTime());
-        if(session.isUserLogged()){
-            LocalDateTime timeArriveDateTime;
-            LocalDateTime lenghtWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
-            //TimeArrive = CurrentTime + TravelTime (toWork) + workLength + travelTimeToWork (back)
-
-            LocalDateTime currentTimePlusTravelTime = addTimeTo(currentTime.getCurrentTime(),
-                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),
-                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
-                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getSeconds());
-
-            LocalDateTime currentPlusTravelPlusWorkLenghtTime =
-                    addTimeTo(currentTimePlusTravelTime,
-                            lenghtWorkTime.getHourOfDay(),
-                            lenghtWorkTime.getMinuteOfHour(),
-                            lenghtWorkTime.getSecondOfMinute());
-
-            timeArriveDateTime = addTimeTo(currentPlusTravelPlusWorkLenghtTime,
-                    travelTimeToHome.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),
-                    travelTimeToHome.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
-                    travelTimeToHome.getGoogleMapsDirectionJson().getLegs().getDuration().getSeconds());
-
-            String displayMessage = prepareTimeFromLocalDateTimeToString(timeArriveDateTime);
-            Log.i(TAG, "Time arrive: " + displayMessage);
-
-            setTimeArrive(timeArriveDateTime);
-            setDisplayTimeMessage(displayMessage);
-        }
-    }
-
-    @Override
     public String displayMessage() {
         return displayTimeMessage;
     }
 
     @Override
     public void processTime(Context context, Position currentPosition, Session session) throws Exception {
-        throw new Exception("Not supported processTime here, in TimeArrive");
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public void processTime() throws Exception {
+        Log.i(TAG, "starting processing, current time: " + getCurrentTime());
+        if(session.isUserLogged()){
+            LocalDateTime timeArriveDateTime;
+            LocalDateTime lengthWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
+            //TimeArriveToWork = currentTime + travelTime
+
+            LocalDateTime timeArriveToWork = addTimeTo(currentTime.getCurrentTime(),
+                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),
+                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getMinutes(),
+                    travelTimeToWork.getGoogleMapsDirectionJson().getLegs().getDuration().getSeconds());
+
+            String displayMessage = prepareTimeFromLocalDateTimeToString(timeArriveToWork);
+            Log.i(TAG, "Time arrive to work: " + displayMessage);
+
+            setTimeArrive(timeArriveToWork);
+            setDisplayTimeMessage(displayMessage);
+        }
     }
 
     public String getDisplayTimeMessage() {
@@ -99,20 +90,20 @@ public class TimeArrive extends AProcessingTime implements IDisplayedTime{
         this.travelTimeToWork = travelTimeToWork;
     }
 
-    public DirectionWay getDirectionWay() {
-        return directionWay;
-    }
-
-    public void setDirectionWay(DirectionWay directionWay) {
-        this.directionWay = directionWay;
-    }
-
     public TravelTime getTravelTimeToHome() {
         return travelTimeToHome;
     }
 
     public void setTravelTimeToHome(TravelTime travelTimeToHome) {
         this.travelTimeToHome = travelTimeToHome;
+    }
+
+    public DirectionWay getDirectionWay() {
+        return directionWay;
+    }
+
+    public void setDirectionWay(DirectionWay directionWay) {
+        this.directionWay = directionWay;
     }
 
     public LocalDateTime getTimeArrive() {

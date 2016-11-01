@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mytway.behaviour.pojo.DirectionWay;
-import com.mytway.behaviour.pojo.TimeArrive;
+import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
 import com.mytway.pojo.Position;
@@ -13,17 +13,18 @@ import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 
-public class MorningScreen {
+public class MorningScreen implements Screen {
 
     private static final String TAG = "MorningScreen";
 
     private TimeToDeparture timeToDeparture;
     private TimeInRoad timeInRoad;
-    private TimeArrive timeArrive;
+    private TimeArriveToHome timeArriveToHome;
 
-    public void prepareMorningScreen(DirectionWay directionWay, Session session,
-                                     Context mContext, Position currentPosition)
-                                     throws Exception {
+    @Override
+    public void prepareScreen(DirectionWay directionWay, Session session,
+                              Context mContext, Position currentPosition)
+                              throws Exception {
         //Travel time
         TravelTime travelTime = new TravelTime();
         travelTime.setDirectionWay(directionWay);
@@ -37,7 +38,7 @@ public class MorningScreen {
         setTimeToDeparture(timeToDeparture);
         Log.i(TAG, "Time to departure: " + timeToDeparture.displayMessage());
 
-        //2th Time - Time in road
+        //2nd Time - Time in road
         TimeInRoad timeInRoad = new TimeInRoad();
         timeInRoad.setTimeInRoad(timeToDeparture);
         LocalDateTime timeInRoadDateTime = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
@@ -46,13 +47,18 @@ public class MorningScreen {
 
         //3rd Time Arrive Time (When We will come back)
         //ArriveTime = CurrentTime + TravelTime (toWork) + workLength(from session) + travelTime(back)
-        TimeArrive timeArrive = new TimeArrive();
-        timeArrive.setTravelTimeToWork(travelTime);//travel time To work
-        timeArrive.setSession(session);
-        timeArrive.setTravelTimeToWork(travelTime);//travel time to home
-        timeArrive.processTime(mContext, currentPosition, session);
-        setTimeArrive(timeArrive);
-        Log.i(TAG, "timeArrive: " + timeArrive.displayMessage());
+        TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
+        timeArriveToHome.setTravelTimeToWork(travelTime);//travel time To work
+        timeArriveToHome.setSession(session);
+        timeArriveToHome.setTravelTimeToWork(travelTime);//travel time to home
+        timeArriveToHome.processTime(mContext, currentPosition, session);
+        setTimeArriveToHome(timeArriveToHome);
+        Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
+    }
+
+    @Override
+    public void prepareScreen(DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime) throws Exception {
+
     }
 
     public TimeToDeparture getTimeToDeparture() {
@@ -71,11 +77,11 @@ public class MorningScreen {
         this.timeInRoad = timeInRoad;
     }
 
-    public TimeArrive getTimeArrive() {
-        return timeArrive;
+    public TimeArriveToHome getTimeArriveToHome() {
+        return timeArriveToHome;
     }
 
-    public void setTimeArrive(TimeArrive timeArrive) {
-        this.timeArrive = timeArrive;
+    public void setTimeArriveToHome(TimeArriveToHome timeArriveToHome) {
+        this.timeArriveToHome = timeArriveToHome;
     }
 }

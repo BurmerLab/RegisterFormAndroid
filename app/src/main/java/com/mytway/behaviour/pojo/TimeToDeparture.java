@@ -84,8 +84,13 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
     public void processTime() throws Exception {
-        throw new Exception("Not supported processTime here, in TimeToDeparture");
+        throw new Exception("Not supported processTime here, in " + TAG);
     }
 
     public String getDisplayTimeMessage() {

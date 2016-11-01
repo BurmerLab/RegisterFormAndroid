@@ -43,7 +43,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 + UserTable.WORK_PLACE_LONGITUDE + " INTEGER, "
                 + UserTable.HOME_PLACE_LATITUDE + " INTEGER, "
                 + UserTable.HOME_PLACE_LONGITUDE + " INTEGER, "
-                + UserTable.WORK_WEEK + " TEXT )";
+                + UserTable.WORK_WEEK + " TEXT, "
+                + UserTable.WAY_DISTANCE + " TEXT, "
+                + UserTable.WAY_DURATION + " TEXT )";
 
         db.execSQL(CREATE_TABLE_USER);
     }
@@ -67,6 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
         outputStream.close();
     }
 
+    //todo: remove it!
     public static void copyDatabaseToSdCard(Context context) {
         try {
             String destinationPath = Environment.getExternalStorageDirectory().toString();

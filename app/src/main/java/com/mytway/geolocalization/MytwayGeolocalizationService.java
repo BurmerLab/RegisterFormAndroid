@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -21,17 +20,17 @@ import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
-import com.mytway.behaviour.pojo.TimeArrive;
-import com.mytway.behaviour.pojo.TimeInRoad;
-import com.mytway.behaviour.pojo.TimeToDeparture;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
+import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
+import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
+import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
-import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
@@ -196,14 +195,39 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 //Direction, is user is going to work or home??
                 DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
 
+                //todo: make method to decide direction
+
+
+                //todo: define times
+                LocalDateTime startWorkTime = new LocalDateTime();
+                LocalDateTime whenUserLeaveHome = new LocalDateTime();
+
+
+
                 //Morning screen
                 MorningScreen morningScreen = new MorningScreen();
-                morningScreen.prepareMorningScreen(directionWay, session, mContext, currentPosition);
+                morningScreen.prepareScreen(directionWay, session, mContext, currentPosition);
+
+                //TravelToWorkScreen
+                TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
+                travelToWorkScreen.prepareScreen(directionWay, session, mContext, currentPosition);
+
+                //WorkScreen
+                WorkScreen workScreen = new WorkScreen();
+                workScreen.prepareScreen(directionWay, session, mContext, currentPosition, startWorkTime);
+
+                //TravelToHomeScreen
+                TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
+                travelToHomeScreen.prepareScreen(directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+
+
+
+
 
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
                 view.setTextViewText(R.id.firstTimeTextView, morningScreen.getTimeToDeparture().displayMessage());
                 view.setTextViewText(R.id.secondTimeTextView, morningScreen.getTimeInRoad().displayMessage());
-                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArrive().displayMessage());
+                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArriveToHome().displayMessage());
 
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
@@ -214,8 +238,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }else{
             Log.i(TAG, "User is not logged");
         }
-
-
     }
 
     public void onDestroy(){

@@ -26,41 +26,40 @@ public class TravelTime {
 //Example:
 //    https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=AIzaSyBLPJAGAe4Ypmb70IHMVh5WWz1OsEjGTMw
 //    http://stackoverflow.com/questions/16756955/travel-time-between-two-locations-in-google-map-android-api-v2
-
+//    http://maps.googleapis.com/maps/api/directions/json?origin=50.03260440260576,19.939129762351513&destination=50.0564951,20.8950155&sensor=true&units=metric
     public GoogleMapsDirectionJson getTravelTimeBetweenTwoPositions(Context context, Position startPosition, Position endPosition) {
 
-        GoogleMapsDirectionJson travelTime = null;
-
+        GoogleMapsDirectionJson googleMapsDirectionJson = null;
 
         if(EthernetConnectivity.isEthernetOnline(context)) {
             MytwayWebserviceGetTravelTimeBetweenTwoPositions webServiceGetTravelTime = new MytwayWebserviceGetTravelTimeBetweenTwoPositions();
 
             try {
-                travelTime = webServiceGetTravelTime.execute(startPosition, endPosition).get();
+                googleMapsDirectionJson = webServiceGetTravelTime.execute(startPosition, endPosition).get();
 
             }catch(InterruptedException | ExecutionException e) {
                 Log.i(TAG, "Problem with obtaining travel time from web service ", e);
                 e.printStackTrace();
             }
 
-            if (travelTime == null) {
+            if (googleMapsDirectionJson == null) {
                 Log.i(TAG, "travelTime is null");
-                travelTime = new GoogleMapsDirectionJson();
+                googleMapsDirectionJson = new GoogleMapsDirectionJson();
                 Legs legs = new Legs();
                 legs.setDistance(new Distance());
                 legs.setDuration(new Duration());
-                travelTime.setLegs(legs);
+                googleMapsDirectionJson.setLegs(legs);
             }
         }else{
             //no internet, set on widget icon that time travel is static not from internet
             Toast.makeText(context, context.getResources().getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
-            travelTime = new GoogleMapsDirectionJson();
+            googleMapsDirectionJson = new GoogleMapsDirectionJson();
             Legs legs = new Legs();
             legs.setDistance(new Distance());
             legs.setDuration(new Duration());
-            travelTime.setLegs(legs);
+            googleMapsDirectionJson.setLegs(legs);
         }
-        return travelTime;
+        return googleMapsDirectionJson;
     }
 
     private class MytwayWebserviceGetTravelTimeBetweenTwoPositions extends AsyncTask<Position, Void, GoogleMapsDirectionJson> {

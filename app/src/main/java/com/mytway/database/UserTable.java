@@ -17,8 +17,9 @@ public class UserTable {
     public static final String HOME_PLACE_LATITUDE = "home_place_latitude";
     public static final String HOME_PLACE_LONGITUDE = "home_place_longitude";
     public static final String WORK_WEEK = "work_week";
+    public static final String WAY_DISTANCE = "way_distance";
+    public static final String WAY_DURATION = "way_duration";
 
-    // property help us to keep data
     public int userId;
     public String userName;
     public String email;
@@ -31,6 +32,8 @@ public class UserTable {
     public double homePlaceLatitude;
     public double homePlaceLongitude;
     public String workWeek;
+    public int way_distance;
+    public int way_duration;
 
     public String createJson(){
         StringBuilder json = new StringBuilder();
@@ -46,6 +49,8 @@ public class UserTable {
         json.append("\"homePlaceLatitude\" : ").append("\"").append(homePlaceLatitude).append("\", ");
         json.append("\"homePlaceLongitude\" : ").append("\"").append(homePlaceLongitude).append("\", ");
         json.append("\"workWeek\" : ").append("\"").append(workWeek).append("\"");
+        json.append("\"way_distance\" : ").append("\"").append(way_distance).append("\"");
+        json.append("\"way_duration\" : ").append("\"").append(way_duration).append("\"");
         json.append("}");
         return json.toString();
     }

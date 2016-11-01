@@ -32,6 +32,8 @@ public class UserRepo {
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
         values.put(UserTable.WORK_WEEK, userTable.workWeek);
+        values.put(UserTable.WAY_DISTANCE, userTable.way_distance);
+        values.put(UserTable.WAY_DURATION, userTable.way_duration);
 
         // Inserting Row
         long user_Id = db.insert(UserTable.TABLE, null, values);
@@ -70,6 +72,8 @@ public class UserRepo {
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
         values.put(UserTable.WORK_WEEK, userTable.workWeek);
+        values.put(UserTable.WAY_DISTANCE, userTable.way_distance);
+        values.put(UserTable.WAY_DURATION, userTable.way_duration);
 
         // It's a good practice to use parameter ?, instead of concatenate string
         db.update(UserTable.TABLE, values, UserTable.KEY_ID + "= ?", new String[] { String.valueOf(userTable.userId) });
@@ -90,6 +94,8 @@ public class UserRepo {
                 UserTable.WORK_PLACE_LATITUDE + "," +
                 UserTable.HOME_PLACE_LATITUDE + "," +
                 UserTable.WORK_WEEK + "," +
+                UserTable.WAY_DISTANCE + "," +
+                UserTable.WAY_DURATION + "," +
                 " FROM " + UserTable.TABLE;
 
         //Student student = new Student();
@@ -128,6 +134,8 @@ public class UserRepo {
                 UserTable.HOME_PLACE_LATITUDE + "," +
                 UserTable.HOME_PLACE_LONGITUDE + "," +
                 UserTable.WORK_WEEK + "" +
+                UserTable.WAY_DISTANCE + "" +
+                UserTable.WAY_DURATION + "" +
                 " FROM " + UserTable.TABLE
                 + " WHERE " +
                 UserTable.KEY_ID + "=?";// It's a good practice to use parameter ?, instead of concatenate string
@@ -141,16 +149,18 @@ public class UserRepo {
             do {
                 userTable.userId = cursor.getInt(cursor.getColumnIndex(UserTable.KEY_ID));
                 userTable.userName = cursor.getString(cursor.getColumnIndex(UserTable.KEY_USER_NAME));
-                userTable.password  =cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
-                userTable.typeWork  =cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
+                userTable.password = cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
+                userTable.typeWork = cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
 
-                userTable.lengthTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
-                userTable.startStandardTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
+                userTable.lengthTimeWork = cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
+                userTable.startStandardTimeWork = cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
                 userTable.workPlaceLatitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LATITUDE));
                 userTable.workPlaceLongitude = cursor.getDouble(cursor.getColumnIndex(UserTable.WORK_PLACE_LONGITUDE));
                 userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
                 userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
-                userTable.workWeek  =cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+                userTable.workWeek = cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+                userTable.way_distance = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
+                userTable.way_duration = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
 
             } while (cursor.moveToNext());
         }
@@ -174,7 +184,9 @@ public class UserRepo {
                 UserTable.WORK_PLACE_LONGITUDE + "," +
                 UserTable.HOME_PLACE_LATITUDE + "," +
                 UserTable.HOME_PLACE_LONGITUDE + "," +
-                UserTable.WORK_WEEK + "" +
+                UserTable.WORK_WEEK + "," +
+                UserTable.WAY_DISTANCE + "," +
+                UserTable.WAY_DURATION + "" +
                 " FROM " + UserTable.TABLE
                 + " WHERE " +
                 UserTable.KEY_USER_NAME + "=?";// It's a good practice to use parameter ?, instead of concatenate string
@@ -188,8 +200,8 @@ public class UserRepo {
             do {
                 userTable.userId = cursor.getInt(cursor.getColumnIndex(UserTable.KEY_ID));
                 userTable.userName = cursor.getString(cursor.getColumnIndex(UserTable.KEY_USER_NAME));
-                userTable.password  =cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
-                userTable.typeWork  =cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
+                userTable.password = cursor.getString(cursor.getColumnIndex(UserTable.PASSWORD));
+                userTable.typeWork = cursor.getInt(cursor.getColumnIndex(UserTable.TYPE_WORK));
                 String passwordTest = cursor.getString(3);
                 userTable.lengthTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.LENGTH_TIME_WORK));
                 userTable.startStandardTimeWork  =cursor.getString(cursor.getColumnIndex(UserTable.START_STANDARD_TIME));
@@ -198,6 +210,8 @@ public class UserRepo {
                 userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
                 userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
                 userTable.workWeek  = cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
+                userTable.way_distance  = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
+                userTable.way_duration  = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
 
             } while (cursor.moveToNext());
         }

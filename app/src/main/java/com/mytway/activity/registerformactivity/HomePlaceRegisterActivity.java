@@ -29,12 +29,14 @@ import com.mytway.database.DBHelper;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
+import com.mytway.pojo.GoogleMapsDirectionJson;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.MytwayWebservice;
 import com.mytway.utility.Session;
+import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
 
@@ -88,6 +90,22 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
 
+                    //todo: add way_distance and way_duration parameter into DB
+                    TravelTime travelTime = new TravelTime();
+                    GoogleMapsDirectionJson gMapsDirection =
+                            travelTime.getTravelTimeBetweenTwoPositions(getApplicationContext(), homePosition, workPosition);
+                    int travelToWorkDuration;
+                    int travelToWorkDistance;
+
+                    if(gMapsDirection != null){
+                        travelToWorkDuration = gMapsDirection.getLegs().getDuration().getValue();
+                        travelToWorkDistance = gMapsDirection.getLegs().getDistance().getValue();
+
+                    }else{
+                        travelToWorkDuration = 0;
+                        travelToWorkDistance = 0;
+                    }
+
                     UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
                     UserTable userTable = new UserTable();
 
@@ -103,6 +121,10 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.homePlaceLatitude = user.getHomePlace().getLatitude();
                     userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
                     userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
+                    userTable.way_distance = travelToWorkDistance;
+                    userTable.way_duration = travelToWorkDuration;
+
+                    Toast.makeText(HomePlaceRegisterActivity.this, "Added distance: " + travelToWorkDistance + ", duration: " + travelToWorkDuration, Toast.LENGTH_SHORT).show();
 
                     Session session = new Session(getApplicationContext());
                     session.setIsUserLogged(true);
@@ -119,6 +141,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 
                     if (userId == 0) {
                         if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
+
                             userId = userRepo.insert(userTable);
 
                             setJsonMessage(userTable.createJson());
