@@ -14,6 +14,10 @@ public interface IDisplayedTime {
     void processTime(Context context, Position currentPosition, Session session) throws Exception;
     void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception;
     void processTime() throws Exception;
+
+    //Full time, from current by travelToWork by WorkLength to travelBackToHome
+    void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception;
+
     String displayMessage();
 
 }

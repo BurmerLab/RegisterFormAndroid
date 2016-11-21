@@ -25,13 +25,14 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
-                PERMISSION_REQUEST_CODE_LOCATION,
-                getApplicationContext(),
-                StartActivity.this,
-                getString(R.string.application_basing_on_your_localization));
-
-
+        if (!PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
+                && !PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
+            PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                    PERMISSION_REQUEST_CODE_LOCATION,
+                    getApplicationContext(),
+                    StartActivity.this,
+                    getString(R.string.application_basing_on_your_localization));
+        }
 //        Retrieve sharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, MODE_PRIVATE);
         Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);

@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -25,10 +24,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.activity.application.MytwayActivity;
+import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.database.DBHelper;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
+import com.mytway.pojo.Distance;
 import com.mytway.pojo.GoogleMapsDirectionJson;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
@@ -39,11 +40,6 @@ import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -64,6 +60,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_home_place_form_registration);
+
+        DBHelper databaseHelper = new DBHelper(getApplicationContext());
 
         if(!EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
             Toast.makeText(HomePlaceRegisterActivity.this,
@@ -90,20 +88,19 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
 
-                    //todo: add way_distance and way_duration parameter into DB
+                    //todo: add wayDistance and wayDuration parameter into DB
                     TravelTime travelTime = new TravelTime();
                     GoogleMapsDirectionJson gMapsDirection =
                             travelTime.getTravelTimeBetweenTwoPositions(getApplicationContext(), homePosition, workPosition);
                     int travelToWorkDuration;
-                    int travelToWorkDistance;
+                    double travelToWorkDistance;
 
                     if(gMapsDirection != null){
                         travelToWorkDuration = gMapsDirection.getLegs().getDuration().getValue();
-                        travelToWorkDistance = gMapsDirection.getLegs().getDistance().getValue();
-
+                        travelToWorkDistance = Distance.designateDistanceBetween(homePosition, workPosition);
                     }else{
                         travelToWorkDuration = 0;
-                        travelToWorkDistance = 0;
+                        travelToWorkDistance = Distance.designateDistanceBetween(homePosition, workPosition);
                     }
 
                     UserRepo userRepo = new UserRepo(HomePlaceRegisterActivity.this);
@@ -121,8 +118,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     userTable.homePlaceLatitude = user.getHomePlace().getLatitude();
                     userTable.homePlaceLongitude = user.getHomePlace().getLongitude();
                     userTable.workWeek = user.decodeWorkWeekToString(user.getWorkWeek());
-                    userTable.way_distance = travelToWorkDistance;
-                    userTable.way_duration = travelToWorkDuration;
+                    userTable.wayDistance = travelToWorkDistance;
+                    userTable.wayDuration = travelToWorkDuration;
 
                     Toast.makeText(HomePlaceRegisterActivity.this, "Added distance: " + travelToWorkDistance + ", duration: " + travelToWorkDuration, Toast.LENGTH_SHORT).show();
 
@@ -136,6 +133,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     session.setHomeLongitude("" + user.getHomePlace().getLongitude().floatValue());
                     session.setWorkLatitude("" + user.getWorkPlace().getLatitude().floatValue());
                     session.setWorkLongitude("" + user.getWorkPlace().getLongitude().floatValue());
+                    session.setWayDistance(travelToWorkDistance);
+                    session.setWayDuration(travelToWorkDuration);
 
                     Toast.makeText(HomePlaceRegisterActivity.this, "Shared WorkLat: " + user.getWorkPlace().getLatitude().floatValue(), Toast.LENGTH_SHORT).show();
 

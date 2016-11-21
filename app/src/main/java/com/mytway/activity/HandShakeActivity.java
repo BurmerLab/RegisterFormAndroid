@@ -48,11 +48,17 @@ public class HandShakeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handshake);
 
-        PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
-                1,
-                getApplicationContext(),
-                HandShakeActivity.this,
-                getString(R.string.application_basing_on_your_localization));
+        if (!PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
+                && !PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
+            PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                    1,
+                    getApplicationContext(),
+                    HandShakeActivity.this,
+                    getString(R.string.application_basing_on_your_localization));
+        }
+
+
+
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);

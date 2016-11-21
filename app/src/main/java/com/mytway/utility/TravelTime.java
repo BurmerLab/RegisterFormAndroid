@@ -91,13 +91,22 @@ public class TravelTime {
     public void obtainTravelTimeBasedOnDirectonWay(Context context, Position currentPosition, Session session) {
         if(directionWay.isWayToHome()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
-
         }else if( directionWay.isWayToWork()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
 
         }else{
             Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
         }
+    }
+
+    public GoogleMapsDirectionJson obtainCurrentTravelTimeToHome(Context context, Position currentPosition, Session session) {
+        GoogleMapsDirectionJson currentTravelTimeToHome = getTravelTimeBetweenTwoPositions(context, currentPosition, session.getHomePlace());
+        return currentTravelTimeToHome;
+    }
+
+    public GoogleMapsDirectionJson obtainCurrentTravelTimeToWork(Context context, Position currentPosition, Session session) {
+        GoogleMapsDirectionJson currentTravelTimeToWork = getTravelTimeBetweenTwoPositions(context, currentPosition, session.getWorkPlace());
+        return currentTravelTimeToWork;
     }
 
     public GoogleMapsDirectionJson getGoogleMapsDirectionJson() {

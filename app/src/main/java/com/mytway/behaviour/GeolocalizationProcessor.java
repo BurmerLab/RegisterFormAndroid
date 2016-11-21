@@ -15,7 +15,7 @@ public class GeolocalizationProcessor {
         Position workPlace = user.getWorkPlace();
     }
 
-//    private double calcuateDistance(Point nodeFirst, Point nodeSecond){
+//    private double designateDistanceBetween(Point nodeFirst, Point nodeSecond){
 //        // HAVERSINE FORMULA- do wyznaczania odleglosci
 //        double R = 6371; // [km] promien od centrum do powierzchni ziemi
 //        double dLat = (nodeFirst.latitude - nodeSecond.latitude) * Math.PI / 180;

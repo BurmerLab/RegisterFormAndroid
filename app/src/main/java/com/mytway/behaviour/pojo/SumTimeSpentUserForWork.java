@@ -54,6 +54,11 @@ public class SumTimeSpentUserForWork extends AProcessingTime implements IDisplay
     }
 
     @Override
+    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
     public String displayMessage() {
         return displayTimeMessage;
     }

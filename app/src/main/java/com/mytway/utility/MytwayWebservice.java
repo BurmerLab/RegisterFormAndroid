@@ -263,7 +263,7 @@ public class MytwayWebservice {
 
         JSONObject jsonDistance = legsJson.getJSONObject(GoogleMapsDirectionJson.TAG_DISTANCE);
         String distanceText = jsonDistance.getString(GoogleMapsDirectionJson.TAG_DISTANCE_TEXT);
-        int distanceValue = jsonDistance.getInt(GoogleMapsDirectionJson.TAG_DISTANCE_VALUE);
+        double distanceValue = jsonDistance.getDouble(GoogleMapsDirectionJson.TAG_DISTANCE_VALUE);
         Distance distance = new Distance(distanceText, distanceValue);
 
         Legs legs = new Legs();

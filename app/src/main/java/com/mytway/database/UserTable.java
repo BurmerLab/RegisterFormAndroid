@@ -32,8 +32,8 @@ public class UserTable {
     public double homePlaceLatitude;
     public double homePlaceLongitude;
     public String workWeek;
-    public int way_distance;
-    public int way_duration;
+    public double wayDistance;
+    public int wayDuration;
 
     public String createJson(){
         StringBuilder json = new StringBuilder();
@@ -48,9 +48,9 @@ public class UserTable {
         json.append("\"workPlaceLongitude\" : ").append("\"").append(workPlaceLongitude).append("\", ");
         json.append("\"homePlaceLatitude\" : ").append("\"").append(homePlaceLatitude).append("\", ");
         json.append("\"homePlaceLongitude\" : ").append("\"").append(homePlaceLongitude).append("\", ");
-        json.append("\"workWeek\" : ").append("\"").append(workWeek).append("\"");
-        json.append("\"way_distance\" : ").append("\"").append(way_distance).append("\"");
-        json.append("\"way_duration\" : ").append("\"").append(way_duration).append("\"");
+        json.append("\"workWeek\" : ").append("\"").append(workWeek).append("\", ");
+        json.append("\"wayDistance\" : ").append("\"").append(wayDistance).append("\", ");
+        json.append("\"wayDuration\" : ").append("\"").append(wayDuration).append("\"");
         json.append("}");
         return json.toString();
     }

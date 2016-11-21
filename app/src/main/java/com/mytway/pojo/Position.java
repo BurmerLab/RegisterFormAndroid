@@ -3,11 +3,21 @@ package com.mytway.pojo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.mytway.behaviour.pojo.DirectionWay;
+import com.mytway.utility.Session;
+
 public class Position implements Parcelable {
 
+    private static final double HOME_OR_WORK_ZONE = 0;
     private Double latitude;
     private Double longitude;
 
+    public void decideIsHomeOrWorkPosition(Position currentPosition, Session session){
+        double travelToHomeDistance = Distance.designateDistanceBetween(currentPosition, session.getHomePlace());
+        double travelToWorkDistance = Distance.designateDistanceBetween(currentPosition, session.getWorkPlace());
+
+//        if(travelToHomeDistance <= HOME_OR_WORK_ZONE)
+    }
 
     public Double getLatitude() {
         return latitude;

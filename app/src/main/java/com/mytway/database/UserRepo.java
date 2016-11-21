@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,6 +15,12 @@ public class UserRepo {
 
     public UserRepo(Context context) {
         dbHelper = new DBHelper(context);
+        try {
+            dbHelper.open();
+        } catch (SQLException e) {
+            Log.i("Problem with dbHelper", String.valueOf(e));
+            e.printStackTrace();
+        }
     }
 
     public int insert(UserTable userTable) {
@@ -32,8 +40,8 @@ public class UserRepo {
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
         values.put(UserTable.WORK_WEEK, userTable.workWeek);
-        values.put(UserTable.WAY_DISTANCE, userTable.way_distance);
-        values.put(UserTable.WAY_DURATION, userTable.way_duration);
+        values.put(UserTable.WAY_DISTANCE, userTable.wayDistance);
+        values.put(UserTable.WAY_DURATION, userTable.wayDuration);
 
         // Inserting Row
         long user_Id = db.insert(UserTable.TABLE, null, values);
@@ -42,7 +50,6 @@ public class UserRepo {
     }
 
     public void delete(int user_Id) {
-
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
         db.delete(UserTable.TABLE, UserTable.KEY_ID + "= ?", new String[] { String.valueOf(user_Id) });
@@ -52,6 +59,12 @@ public class UserRepo {
     public void deleteAllFromUser() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(UserTable.TABLE, null, null);
+        db.close(); // Closing database connection
+    }
+
+    public void dropTableUser(String table) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + table);
         db.close(); // Closing database connection
     }
 
@@ -72,8 +85,8 @@ public class UserRepo {
         values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
         values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
         values.put(UserTable.WORK_WEEK, userTable.workWeek);
-        values.put(UserTable.WAY_DISTANCE, userTable.way_distance);
-        values.put(UserTable.WAY_DURATION, userTable.way_duration);
+        values.put(UserTable.WAY_DISTANCE, userTable.wayDistance);
+        values.put(UserTable.WAY_DURATION, userTable.wayDuration);
 
         // It's a good practice to use parameter ?, instead of concatenate string
         db.update(UserTable.TABLE, values, UserTable.KEY_ID + "= ?", new String[] { String.valueOf(userTable.userId) });
@@ -159,8 +172,8 @@ public class UserRepo {
                 userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
                 userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
                 userTable.workWeek = cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
-                userTable.way_distance = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
-                userTable.way_duration = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
+                userTable.wayDistance = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
+                userTable.wayDuration = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
 
             } while (cursor.moveToNext());
         }
@@ -189,7 +202,7 @@ public class UserRepo {
                 UserTable.WAY_DURATION + "" +
                 " FROM " + UserTable.TABLE
                 + " WHERE " +
-                UserTable.KEY_USER_NAME + "=?";// It's a good practice to use parameter ?, instead of concatenate string
+                UserTable.KEY_USER_NAME + "=?";
 
         UserTable userTable = new UserTable();
 
@@ -210,8 +223,8 @@ public class UserRepo {
                 userTable.homePlaceLatitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LATITUDE));
                 userTable.homePlaceLongitude  = cursor.getDouble(cursor.getColumnIndex(UserTable.HOME_PLACE_LONGITUDE));
                 userTable.workWeek  = cursor.getString(cursor.getColumnIndex(UserTable.WORK_WEEK));
-                userTable.way_distance  = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
-                userTable.way_duration  = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
+                userTable.wayDistance = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DISTANCE));
+                userTable.wayDuration = cursor.getInt(cursor.getColumnIndex(UserTable.WAY_DURATION));
 
             } while (cursor.moveToNext());
         }

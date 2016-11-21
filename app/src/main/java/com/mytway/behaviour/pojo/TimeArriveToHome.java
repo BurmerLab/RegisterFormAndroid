@@ -3,6 +3,7 @@ package com.mytway.behaviour.pojo;
 import android.content.Context;
 import android.util.Log;
 
+import com.mytway.pojo.GoogleMapsDirectionJson;
 import com.mytway.pojo.Position;
 import com.mytway.utility.CurrentTime;
 import com.mytway.utility.Session;
@@ -19,11 +20,20 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
     private CurrentTime currentTime = new CurrentTime();
     private TravelTime travelTimeToWork;
     private TravelTime travelTimeToHome;
+    private TravelTime travelTime;
     private DirectionWay directionWay;
     private LocalDateTime timeArrive;
 
+    public TimeArriveToHome() {
+    }
+
+    public TimeArriveToHome(TravelTime travelTime) {
+        this.travelTime = travelTime;
+    }
+
     @Override
-    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception{
+    public void processTime(Context context, Position currentPosition, Session session,
+                            LocalDateTime startWorkTime) throws Exception{
         Log.i(TAG, "Starting processing of TimeArriveToHome");
         Log.i(TAG, "Current time: " + getCurrentTime());
         if(session.isUserLogged()){
@@ -35,6 +45,7 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
             travelTime.setDirectionWay(directionWay);
             travelTime.obtainTravelTimeBasedOnDirectonWay(context, currentPosition, session);
 
+            //startWorkTime + lengthWorkTime + travelTime
             LocalDateTime timeToEndWork = addTimeTo(startWorkTime,
                     lenghtWorkTime.getHourOfDay(),
                     lenghtWorkTime.getMinuteOfHour(),
@@ -56,6 +67,42 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
     @Override
     public void processTime() throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    //Full time, from current by travelToWork by WorkLength to travelBackToHome
+    @Override
+    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+//      TimeArriveToHome = CurrentTime + TravelTimeToWork (toWork) + workLength + travelTimeToHome (back)
+        if(session.isUserLogged()){
+            LocalDateTime lenghtWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
+
+            GoogleMapsDirectionJson currentTravelTimeToWork =
+                    travelTime.obtainCurrentTravelTimeToWork(context, currentPosition, session);
+            GoogleMapsDirectionJson currentTravelTimeToHome =
+                    travelTime.obtainCurrentTravelTimeToHome(context, currentPosition, session);
+
+            LocalDateTime currentAndTravelTime = addTimeTo(currentTime.getCurrentTime(),
+                    currentTravelTimeToWork.getLegs().getDuration().getHour(),
+                    currentTravelTimeToWork.getLegs().getDuration().getMinutes(),
+                    currentTravelTimeToWork.getLegs().getDuration().getSeconds());
+
+            LocalDateTime currentAndTravelAndWorkLenghtTime = addTimeTo(currentAndTravelTime,
+                    lenghtWorkTime.getHourOfDay(),
+                    lenghtWorkTime.getMinuteOfHour(),
+                    lenghtWorkTime.getSecondOfMinute());
+
+            LocalDateTime timeArriveToHome = addTimeTo(currentAndTravelAndWorkLenghtTime,
+                    currentTravelTimeToHome.getLegs().getDuration().getHour(),
+                    currentTravelTimeToHome.getLegs().getDuration().getMinutes(),
+                    currentTravelTimeToHome.getLegs().getDuration().getSeconds());
+
+
+            String displayMessage = prepareTimeFromLocalDateTimeToString(timeArriveToHome);
+            Log.i(TAG, "TimeArriveToHome: " + timeArriveToHome);
+
+            setTimeArrive(timeArriveToHome);
+            setDisplayTimeMessage(displayMessage);
+        }
     }
 
     @Override
@@ -141,5 +188,13 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
 
     public void setTimeArrive(LocalDateTime timeArrive) {
         this.timeArrive = timeArrive;
+    }
+
+    public TravelTime getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(TravelTime travelTime) {
+        this.travelTime = travelTime;
     }
 }

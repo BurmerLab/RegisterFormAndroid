@@ -41,6 +41,11 @@ public class TimeInRoad extends AProcessingTime implements IDisplayedTime{
         }
     }
 
+    @Override
+    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
     public LocalDateTime getTimeInRoad() {
         return timeInRoad;
     }

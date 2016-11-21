@@ -24,13 +24,13 @@ import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
+import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
@@ -194,7 +194,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 //Direction, is user is going to work or home??
                 DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
-
+                Distance distanceBetweenHomeAndWork = new Distance("", session.getWayDistance());
+                directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
+                directionWay.decideWhichDirectionIs(currentPosition, session);
                 //todo: make method to decide direction
 
 

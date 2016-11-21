@@ -86,6 +86,22 @@
         android:layout_below="@+id/textView15"
         android:layout_alignParentStart="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/textView17"
+        android:layout_below="@+id/textView16"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/textView18"
+        android:layout_below="@+id/textView17"
+        android:layout_alignParentStart="true" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -108,5 +124,13 @@
         android:text="DeleteDB"
         android:id="@+id/deleteDbButton"
         android:layout_below="@+id/refreshButton"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drop table user"
+        android:id="@+id/dropTableDbButton"
+        android:layout_below="@+id/deleteDbButton"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

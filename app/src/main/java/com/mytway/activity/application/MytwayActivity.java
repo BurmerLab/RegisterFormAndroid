@@ -6,9 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mytway.activity.HandShakeActivity;
 import com.mytway.activity.R;
@@ -22,6 +20,7 @@ public class MytwayActivity extends Activity {
     private Button mSignOutButton;
     private Button mRefreshButton;
     private Button mDeleteDbButton;
+    private Button mDropTableDbButton;
     private Session session;
 
     @Override
@@ -33,6 +32,7 @@ public class MytwayActivity extends Activity {
         mSignOutButton = (Button) findViewById(R.id.signOutButton);
         mRefreshButton = (Button) findViewById(R.id.refreshButton);
         mDeleteDbButton = (Button) findViewById(R.id.deleteDbButton);
+        mDropTableDbButton = (Button) findViewById(R.id.dropTableDbButton);
 
         mSignOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,8 +61,15 @@ public class MytwayActivity extends Activity {
             @Override
               public void onClick(View view) {
                 UserRepo userRepo = new UserRepo(MytwayActivity.this);
-                UserTable userTable = new UserTable();
                 userRepo.deleteAllFromUser();
+              }
+        });
+
+        mDropTableDbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+              public void onClick(View view) {
+                UserRepo userRepo = new UserRepo(MytwayActivity.this);
+                userRepo.dropTableUser("User");
               }
         });
 
@@ -107,6 +114,12 @@ public class MytwayActivity extends Activity {
 
         TextView workLongitudeTextView = (TextView) findViewById(R.id.textView16);
         workLongitudeTextView.setText("workLongitudeTextView: " + session.getWorkLongitude());
+
+        TextView distanceToWork = (TextView) findViewById(R.id.textView17);
+        distanceToWork.setText("distance to work: " + session.getWayDistance());
+
+        TextView durationTimeToWork = (TextView) findViewById(R.id.textView18);
+        durationTimeToWork.setText("duration to work: " + session.getWayDuration());
 
         Session sessionLast = new Session(MytwayActivity.this);
 

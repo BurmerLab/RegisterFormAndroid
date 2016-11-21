@@ -3,14 +3,37 @@ package com.mytway.pojo;
 public class Distance {
 
     private String text = "";
-    private int value = 0;
+    private double valueInMeters = 0; //kilometers (double)
+    private final static int SEVEN_PERCENTAGE = 7;
 
-    public Distance(String text, int value) {
+    public Distance(String text, double valueInMeters) {
         this.text = text;
-        this.value = value;
+        this.valueInMeters = valueInMeters;
     }
 
     public Distance() {
+    }
+
+    public static double designateDistanceBetween(Position startPosition, Position endPosition){
+        // HAVERSINE FORMULA- to designate distanceBetweenHomeAndWork between points
+        double R = 6371; // [km] promien od centrum do powierzchni ziemi
+        double dLatitude = (startPosition.getLatitude() - endPosition.getLatitude()) * Math.PI / 180;
+        double dLongitude = (startPosition.getLongitude() - endPosition.getLongitude()) * Math.PI / 180;
+        double latitudeFirst = startPosition.getLatitude() * Math.PI / 180;
+        double latitudeSecond = endPosition.getLatitude() * Math.PI / 180;
+
+        double a = Math.sin(dLatitude / 2) * Math.sin(dLatitude / 2) +
+                Math.sin(dLongitude / 2) * Math.sin(dLongitude / 2) *
+                        Math.cos(latitudeFirst) * Math.cos(latitudeSecond);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c;
+        return distance;
+    }
+
+    public double obtainSevenPercentFromDistance(){
+        double sevenPercentageFromDistance = (SEVEN_PERCENTAGE * valueInMeters) / 100;
+        return sevenPercentageFromDistance;
     }
 
     public String getText() {
@@ -21,11 +44,11 @@ public class Distance {
         this.text = text;
     }
 
-    public int getValue() {
-        return value;
+    public double getValueInMeters() {
+        return valueInMeters;
     }
 
-    public void setValue(int value) {
-        this.value = value;
+    public void setValueInMeters(double valueInMeters) {
+        this.valueInMeters = valueInMeters;
     }
 }
