@@ -28,19 +28,17 @@ import org.powermock.api.mockito.PowerMockito;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Log.class)
 public class TimeArriveToHomeTest extends TestCase {
-    //definiowanie mocka (InjectMocks): http://www.vogella.com/tutorials/Mockito/article.html
 
     @InjectMocks private TimeArriveToHome timeArriveToHomeWithInjectMock;
 
     @Mock private TravelTime travelTime;
 
-    //Proba mockowania://http://stackoverflow.com/questions/2684630/how-can-i-make-a-method-return-an-argument-that-was-passed-to-it
     @Test
     public void testFullProcessTime() throws Exception {
         //TimeArriveToHome = CurrentTime + TravelTime (toWork) + workLength + travelTimeToWork (back)
-        //TimeArriveToHome = 05:30:26.497 + 00:59:00.410 (toWork) = 6:29:17  || 2016-03-15T06:29:17.086
-        //6:29:17 + 08:00:00.000 = 14:29:17 || 2016-03-15T14:29:17.700
-        //14:29:17  + 00:52:20.325 (back) = 15:21 || 2016-03-15T15:21:37.209
+        //TimeArriveToHome = 05:30:26.497 + 10min (toWork) = 5:40:00
+        //5:40:00 + 08:00:00.000 = 13:40:00
+        //13:40:00  + 00:20:00 (back) = 14:00
 
         //Given
         PowerMockito.mockStatic(Log.class);
@@ -57,24 +55,23 @@ public class TimeArriveToHomeTest extends TestCase {
 
         timeArriveToHomeWithInjectMock.setSession(session);
         timeArriveToHomeWithInjectMock.setCurrentTime(currentTime);
-        timeArriveToHomeWithInjectMock.setTravelTimeToWork(createTravelTime("59 min", 3540));
-        timeArriveToHomeWithInjectMock.setTravelTimeToHome(createTravelTime("50 min", 3140));
 
         //Context context, Position currentPosition, Session session, LocalDateTime startWorkTime
         Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
         Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
 
-        //todo: udalo sie zamockowac, teraz doprowadzic poprawne dane
-        GoogleMapsDirectionJson googleMapsDirectionJson = creategMapsDirectionJson("100km", 10);
-        Mockito.when(travelTime.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session)).thenReturn(googleMapsDirectionJson);
-        Mockito.when(travelTime.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session)).thenReturn(googleMapsDirectionJson);
+        GoogleMapsDirectionJson gMapsDirectionToWork = creategMapsDirectionJson("100km", 600);//600s - 10min
+        GoogleMapsDirectionJson gMapsDirectionToHome = creategMapsDirectionJson("100km", 1200);//1200s - 20min
+        Mockito.when(travelTime.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToWork);
+        Mockito.when(travelTime.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToHome);
 
         //When
         timeArriveToHomeWithInjectMock.fullProcessTime(contextMock, currentPosition, session);
 
         //Then
+        //05:30 + 10 min + 8h + 20min = 14.00?
         System.out.println(timeArriveToHomeWithInjectMock.getDisplayTimeMessage());
-        assertEquals("15:21", timeArriveToHomeWithInjectMock.getDisplayTimeMessage());
+        assertEquals("14:00", timeArriveToHomeWithInjectMock.getDisplayTimeMessage());
         //15:21
     }
 

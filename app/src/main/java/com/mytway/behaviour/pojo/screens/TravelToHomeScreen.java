@@ -1,6 +1,7 @@
 package com.mytway.behaviour.pojo.screens;
 
 import android.content.Context;
+import android.widget.RemoteViews;
 
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.SumTimeSpentUserForWork;
@@ -20,12 +21,12 @@ public class TravelToHomeScreen implements Screen{
     private SumTimeSpentUserForWork sumTimeSpentUserForWork;
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session, Context mContext, Position currentPosition) throws Exception {
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition) throws Exception {
         throw new Exception("Not implemented method prepareScreen in " + TAG);
     }
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session, Context context,
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context context,
                               Position currentPosition, LocalDateTime whenUserLeaveHome)
             throws Exception {
         //1st Travel time travelTimeToHome

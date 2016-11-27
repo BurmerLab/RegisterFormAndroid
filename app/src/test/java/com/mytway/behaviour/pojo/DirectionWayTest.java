@@ -7,6 +7,7 @@ import com.mytway.pojo.Position;
 
 import junit.framework.TestCase;
 
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -105,4 +106,39 @@ public class DirectionWayTest extends TestCase {
         System.out.println("_" + i++ + ", result:" + b);
         System.out.println("_" + i++ + ", result:" + c);
     }
+
+
+    @Test
+    public void testOfDecideIsNotInHome(){
+        //given
+        PowerMockito.mockStatic(Log.class);
+        DirectionWay directionWay = new DirectionWay();
+        Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
+        Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+
+        //when
+        directionWay.decideIsInHome(currentPosition, homePosition);
+
+        //then
+        assertEquals(Boolean.FALSE, directionWay.getIsInHome());
+    }
+
+    @Test
+    public void testOfDecideIsInHome(){
+        //given
+        PowerMockito.mockStatic(Log.class);
+        DirectionWay directionWay = new DirectionWay();
+        Position currentPosition = new Position(50.055475, 20.895955);// BobrownikiMale, crossroad near home
+        Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+
+        //0.1907162102378375km
+
+        //when
+        directionWay.decideIsInHome(currentPosition, homePosition);
+
+        //then
+        assertEquals(Boolean.TRUE, directionWay.getIsInHome());
+        assertEquals(Boolean.FALSE, directionWay.getIsInWork());
+    }
+
 }

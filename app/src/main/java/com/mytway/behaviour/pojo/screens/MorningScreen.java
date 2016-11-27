@@ -2,6 +2,7 @@ package com.mytway.behaviour.pojo.screens;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
@@ -22,10 +23,9 @@ public class MorningScreen implements Screen {
     private TimeArriveToHome timeArriveToHome;
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session,
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
                               Context mContext, Position currentPosition)
                               throws Exception {
-        //Travel time
         TravelTime travelTime = new TravelTime();
         travelTime.setDirectionWay(directionWay);
         travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
@@ -51,13 +51,13 @@ public class MorningScreen implements Screen {
         timeArriveToHome.setTravelTimeToWork(travelTime);//travel time To work
         timeArriveToHome.setSession(session);
         timeArriveToHome.setTravelTimeToWork(travelTime);//travel time to home
-        timeArriveToHome.processTime(mContext, currentPosition, session);
+        timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
     }
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime) throws Exception {
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime) throws Exception {
 
     }
 

@@ -1,10 +1,13 @@
 package com.mytway.behaviour.pojo;
 
+import android.nfc.Tag;
 import android.util.Log;
 
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
+
+import org.joda.time.LocalDateTime;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,11 +16,16 @@ public class DirectionWay {
 
     private static final String TAG = "DirectionWay";
     private static final int THREE_DISTANCES = 3;
+    private static final double HOME_OR_WORK_ZONE = 300.0;
     private Boolean wayToWork;
     private Boolean wayToHome;
+    private Boolean isInWork = Boolean.FALSE;
+    private Boolean isInHome = Boolean.FALSE;
+
     private Distance distanceBetweenHomeAndWork;
     private List<Double> distancesToHome = new LinkedList<>();
-
+    private LocalDateTime leaveHomeToGoToWorkTime;
+    private LocalDateTime startWorkTime;
 
     public DirectionWay() {
     }
@@ -73,6 +81,7 @@ public class DirectionWay {
                 }else if(!firstPreviousIsWayToHome && !secondPreviousIsWayToHome && !thirdPreviousIsWayToHome){
                     wayToHome = Boolean.FALSE;
                     wayToWork = Boolean.TRUE;
+                    setLeaveHomeToGoToWorkTime(new LocalDateTime());
                 }else{
                     wayToHome = Boolean.FALSE;
                     wayToWork = Boolean.FALSE;
@@ -119,6 +128,51 @@ public class DirectionWay {
         return distanceToWork;
     }
 
+    public void decideIsInHome(Position currentPosition, Position homePosition){
+        if(decideIsInPlace(currentPosition, homePosition)){
+            setIsInHome(Boolean.TRUE);
+            setIsInWork(Boolean.FALSE);
+        }else{
+            setIsInHome(Boolean.FALSE);
+            setIsInWork(Boolean.FALSE);
+
+            //todo: test it:
+            //set time when user leaved home,
+            //if leaveHome time is not inserted, then insert current time
+            if(leaveHomeToGoToWorkTime == null){
+                leaveHomeToGoToWorkTime = new LocalDateTime();
+            }
+        }
+    }
+
+    public void decideIsInWork(Position currentPosition, Position workPosition){
+        if(decideIsInPlace(currentPosition, workPosition)){
+            setIsInHome(Boolean.FALSE);
+            setIsInWork(Boolean.TRUE);
+
+            //if is no start work time, then insert current because user arrived to work
+            if(startWorkTime == null){
+                startWorkTime = new LocalDateTime();
+            }
+        }else{
+            setIsInHome(Boolean.FALSE);
+            setIsInWork(Boolean.FALSE);
+        }
+    }
+
+    public boolean decideIsInPlace(Position currentPosition, Position place) {
+        double distanceToHome = Distance.designateDistanceBetween(currentPosition, place);
+
+        double distanceToHomeInMeters = distanceToHome * 1000;
+
+        if(distanceToHomeInMeters < HOME_OR_WORK_ZONE){
+            Log.i(TAG, "User is in Place");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public Boolean isWayToWork() {
         return wayToWork;
     }
@@ -149,5 +203,37 @@ public class DirectionWay {
 
     public void setDistanceBetweenHomeAndWork(Distance distanceBetweenHomeAndWork) {
         this.distanceBetweenHomeAndWork = distanceBetweenHomeAndWork;
+    }
+
+    public LocalDateTime getLeaveHomeToGoToWorkTime() {
+        return leaveHomeToGoToWorkTime;
+    }
+
+    public void setLeaveHomeToGoToWorkTime(LocalDateTime leaveHomeToGoToWorkTime) {
+        this.leaveHomeToGoToWorkTime = leaveHomeToGoToWorkTime;
+    }
+
+    public Boolean getIsInWork() {
+        return isInWork;
+    }
+
+    public void setIsInWork(Boolean isInWork) {
+        this.isInWork = isInWork;
+    }
+
+    public Boolean getIsInHome() {
+        return isInHome;
+    }
+
+    public void setIsInHome(Boolean isInHome) {
+        this.isInHome = isInHome;
+    }
+
+    public LocalDateTime getStartWorkTime() {
+        return startWorkTime;
+    }
+
+    public void setStartWorkTime(LocalDateTime startWorkTime) {
+        this.startWorkTime = startWorkTime;
     }
 }

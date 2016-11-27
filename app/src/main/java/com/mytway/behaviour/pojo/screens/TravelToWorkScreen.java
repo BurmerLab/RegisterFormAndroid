@@ -1,6 +1,7 @@
 package com.mytway.behaviour.pojo.screens;
 
 import android.content.Context;
+import android.widget.RemoteViews;
 
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
@@ -19,16 +20,12 @@ public class TravelToWorkScreen implements Screen{
     private TimeArriveToWork timeArriveToWork;
     private TimeArriveToHome timeArriveToHome;
 
-    //todo: (moze wyzej w hierarchi?) zrobic parametr ktory bedzie ustawiac godzine i minute kiedy uzytkownik wyszedl z domu
-    //
-    private LocalDateTime exitOfTheHomeTime;
-
     //1)How much Time to arrive To Work = travelTime (01:12)
     //2)TimeArriveToWork = currentTime + travelTime (12:30)
     //3)TimeArriveToHome = currentTime + travelTime + session.workLength + travelBackToHome (21.00)
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session,
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
                               Context mContext, Position currentPosition) throws Exception {
 
         //1st Time to work
@@ -50,7 +47,7 @@ public class TravelToWorkScreen implements Screen{
     }
 
     @Override
-    public void prepareScreen(DirectionWay directionWay, Session session, Context mContext,
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext,
                               Position currentPosition, LocalDateTime startWorkTime) throws Exception {
         throw new Exception("Not implemented method prepareScreen in " + TAG);
     }

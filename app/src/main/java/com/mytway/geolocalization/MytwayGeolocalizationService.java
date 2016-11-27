@@ -197,39 +197,43 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 Distance distanceBetweenHomeAndWork = new Distance("", session.getWayDistance());
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
                 directionWay.decideWhichDirectionIs(currentPosition, session);
-                //todo: make method to decide direction
 
+                directionWay.decideIsInHome(currentPosition, session.getHomePlace());
+                directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
-                //todo: define times
-                LocalDateTime startWorkTime = new LocalDateTime();
-                LocalDateTime whenUserLeaveHome = new LocalDateTime();
+                //todo: add ion directionWays methods to define is user is in work/home place
+                LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
+                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
 
+                if(!directionWay.isWayToWork() && !directionWay.isWayToHome()){
+                    //Morning screen
+                    MorningScreen morningScreen = new MorningScreen();
+                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
+                } else if(directionWay.isWayToWork() && !directionWay.isWayToHome()){
+                    //TravelToWorkScreen
+                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
+                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-                //Morning screen
-                MorningScreen morningScreen = new MorningScreen();
-                morningScreen.prepareScreen(directionWay, session, mContext, currentPosition);
+                } else if(directionWay.getIsInWork()){
+                    //WorkScreen
+                    WorkScreen workScreen = new WorkScreen();
+                    workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
 
-                //TravelToWorkScreen
-                TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
-                travelToWorkScreen.prepareScreen(directionWay, session, mContext, currentPosition);
+                } else if(!directionWay.isWayToWork() && directionWay.isWayToHome()){
+                    //TravelToHomeScreen
+                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
+                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+                } else if(directionWay.getIsInHome()){
+                    Log.i(TAG, "User is in home and here should be Home Screen");
+                    //todo: add home screen...
+                }
 
-                //WorkScreen
-                WorkScreen workScreen = new WorkScreen();
-                workScreen.prepareScreen(directionWay, session, mContext, currentPosition, startWorkTime);
-
-                //TravelToHomeScreen
-                TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-                travelToHomeScreen.prepareScreen(directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-
-
-
-
-
-                view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
-                view.setTextViewText(R.id.firstTimeTextView, morningScreen.getTimeToDeparture().displayMessage());
-                view.setTextViewText(R.id.secondTimeTextView, morningScreen.getTimeInRoad().displayMessage());
-                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArriveToHome().displayMessage());
+//todo: add morning screen here (now is in if clausule)
+//                view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
+//                view.setTextViewText(R.id.firstTimeTextView, morningScreen.getTimeToDeparture().displayMessage());
+//                view.setTextViewText(R.id.secondTimeTextView, morningScreen.getTimeInRoad().displayMessage());
+//                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArriveToHome().displayMessage());
 
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
