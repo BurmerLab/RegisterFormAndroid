@@ -6,27 +6,28 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
+import com.mytway.behaviour.pojo.AProcessingTime;
 import com.mytway.behaviour.pojo.DirectionWay;
+import com.mytway.behaviour.pojo.IDisplayedTime;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Duration;
 import com.mytway.pojo.GoogleMapsDirectionJson;
 import com.mytway.pojo.Legs;
 import com.mytway.pojo.Position;
 
+import org.joda.time.LocalDateTime;
 import org.json.JSONException;
 
 import java.util.concurrent.ExecutionException;
 
-public class TravelTime {
+public class TravelTime extends AProcessingTime implements IDisplayedTime {
 
     private final String TAG = "TravelTime";
 
     private GoogleMapsDirectionJson googleMapsDirectionJson;
     private DirectionWay directionWay;
-//Example:
-//    https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&key=AIzaSyBLPJAGAe4Ypmb70IHMVh5WWz1OsEjGTMw
-//    http://stackoverflow.com/questions/16756955/travel-time-between-two-locations-in-google-map-android-api-v2
-//    http://maps.googleapis.com/maps/api/directions/json?origin=50.03260440260576,19.939129762351513&destination=50.0564951,20.8950155&sensor=true&units=metric
+    private String displayTimeMessage;
+
     public GoogleMapsDirectionJson getTravelTimeBetweenTwoPositions(Context context, Position startPosition, Position endPosition) {
 
         GoogleMapsDirectionJson googleMapsDirectionJson = null;
@@ -62,6 +63,31 @@ public class TravelTime {
         return googleMapsDirectionJson;
     }
 
+    @Override
+    public void processTime(Context context, Position currentPosition, Session session) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public void processTime() throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+        throw new Exception("Not supported processTime here, in " + TAG);
+    }
+
+    @Override
+    public String displayMessage() {
+        return displayTimeMessage;
+    }
+
     private class MytwayWebserviceGetTravelTimeBetweenTwoPositions extends AsyncTask<Position, Void, GoogleMapsDirectionJson> {
 
         @Override
@@ -93,7 +119,6 @@ public class TravelTime {
             setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
         }else if( directionWay.isWayToWork()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
-
         }else{
             Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
         }
@@ -118,6 +143,7 @@ public class TravelTime {
     }
     public void setGoogleMapsDirectionJson(Context context, Position currentPosition, Position endPosition) {
         this.googleMapsDirectionJson =  getTravelTimeBetweenTwoPositions(context, currentPosition, endPosition);
+        this.displayTimeMessage = this.googleMapsDirectionJson.getLegs().getDuration().getDurationTime().toString();
     }
 
     public DirectionWay getDirectionWay() {
@@ -126,5 +152,13 @@ public class TravelTime {
 
     public void setDirectionWay(DirectionWay directionWay) {
         this.directionWay = directionWay;
+    }
+
+    public String getDisplayTimeMessage() {
+        return displayTimeMessage;
+    }
+
+    public void setDisplayTimeMessage(String displayTimeMessage) {
+        this.displayTimeMessage = displayTimeMessage;
     }
 }

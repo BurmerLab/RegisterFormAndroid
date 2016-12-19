@@ -19,7 +19,6 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     private Session session;
     private CurrentTime currentTime = new CurrentTime();
     private TravelTime travelTime;
-//    private DirectionWay directionWay;
     private LocalDateTime timeToDeparture;
 
     @Override

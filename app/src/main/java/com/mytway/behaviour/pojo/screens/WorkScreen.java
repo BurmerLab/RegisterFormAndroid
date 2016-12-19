@@ -3,6 +3,7 @@ package com.mytway.behaviour.pojo.screens;
 import android.content.Context;
 import android.widget.RemoteViews;
 
+import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeToEndWork;
@@ -42,6 +43,11 @@ public class WorkScreen implements Screen {
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
         timeArriveToHome.processTime(mContext, currentPosition, session, startWorkTime);
         setTimeArriveToHome(timeArriveToHome);
+
+        view.setTextViewText(R.id.title, "WorkScreen");
+        view.setTextViewText(R.id.firstTimeTextView, this.getTimeToEndWork().displayMessage());
+        view.setTextViewText(R.id.secondTimeTextView, this.getTravelTimeOnRoadToHome().displayMessage());
+        view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
     }
 
     @Override

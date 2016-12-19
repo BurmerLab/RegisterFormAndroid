@@ -23,7 +23,7 @@ public class Session {
     public Position homePlace;
     public Position workPlace;
 
-    public double wayDistance;
+    public String wayDistance;
     public int wayDuration;
 
     private SharedPreferences sharedPreferences;
@@ -294,16 +294,16 @@ public class Session {
     }
 
     //------- WayDistance ---------------
-    public void setWayDistance(Double wayDistance) {
+    public void setWayDistance(String wayDistance) {
         sharedPreferences.edit().putString("wayDistance", wayDistance.toString()).commit();
     }
 
-    public double getWayDistance() {
-        double wayDistance;
+    public String getWayDistance() {
+        String wayDistance;
         if(PropertiesValues.MOCK_APP_TO_TESTS){
             wayDistance = this.wayDistance;
         }else{
-            wayDistance = sharedPreferences.getFloat("wayDistance", 0);
+            wayDistance = sharedPreferences.getString("wayDistance", "0");
             this.wayDistance = wayDistance;
         }
         return wayDistance;

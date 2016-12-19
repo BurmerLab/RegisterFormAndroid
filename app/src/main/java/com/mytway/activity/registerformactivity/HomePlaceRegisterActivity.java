@@ -93,7 +93,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     GoogleMapsDirectionJson gMapsDirection =
                             travelTime.getTravelTimeBetweenTwoPositions(getApplicationContext(), homePosition, workPosition);
                     int travelToWorkDuration;
-                    double travelToWorkDistance;
+                    Double travelToWorkDistance;
 
                     if(gMapsDirection != null){
                         travelToWorkDuration = gMapsDirection.getLegs().getDuration().getValue();
@@ -133,7 +133,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     session.setHomeLongitude("" + user.getHomePlace().getLongitude().floatValue());
                     session.setWorkLatitude("" + user.getWorkPlace().getLatitude().floatValue());
                     session.setWorkLongitude("" + user.getWorkPlace().getLongitude().floatValue());
-                    session.setWayDistance(travelToWorkDistance);
+                    session.setWayDistance(travelToWorkDistance.toString());
                     session.setWayDuration(travelToWorkDuration);
 
                     Toast.makeText(HomePlaceRegisterActivity.this, "Shared WorkLat: " + user.getWorkPlace().getLatitude().floatValue(), Toast.LENGTH_SHORT).show();

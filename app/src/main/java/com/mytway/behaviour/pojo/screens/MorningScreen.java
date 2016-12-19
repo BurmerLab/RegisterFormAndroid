@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeInRoad;
@@ -54,11 +55,17 @@ public class MorningScreen implements Screen {
         timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
+
+        view.setTextViewText(R.id.title, "Morning Screen");
+        view.setTextViewText(R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
+        view.setTextViewText(R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
+        view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+
     }
 
     @Override
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime) throws Exception {
-
+        throw new Exception("Not implemented method prepareScreen in " + TAG);
     }
 
     public TimeToDeparture getTimeToDeparture() {

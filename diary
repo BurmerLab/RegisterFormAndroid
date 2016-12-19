@@ -1,3 +1,7 @@
+Bobry
+lat: 50.0570291
+lon: 20.8951997
+
 1/18/2016
 Zmienilem pojo w UserTable zamiast HomePosition jest homeLatitude i HomeLongitude i tak samo dla work.
 WorkWeek pozostaje stringiem i jego String wyglada tak: 0101110 (pon wt, sro, czw, pia, sob, nie)
@@ -22,3 +26,148 @@ Prawie wszystko gotowe od strony google map, zrobilem mape, dodawanie markera, g
 Tak jak by brakowalo jakiegos odswiezenia- czegos brakuje .
 Przedebugowac moze sie uda znalezc.
 p.s w registerActivity, zmienilem w ifie zeby nie sprawdzalo checkValidation
+
+Wszystko dziala.
+Probowalem puscic to na emulatorze ale ciagle leci nul pointer w lozalization - bo jest nullem.
+GetLastKnowLocalization zwraca null bo urzadzneie jest "czyste"
+
+W klasie Geolocalization jest kod na podstawie ktorego mozna stworzyc cos fajnego- zerknac na to .
+
+2/11/2016
+W Geolocalization.java jest klasa w ktorej mozna uzyskac geolokalizacje,
+sprawdzic:
+-brakujace zmienne finalne
+-prawdopodobnie potrzebne beda Permissiony marshmallowe
+
+Mozna by metode WorkPlaceRegisterActivity.setup() przerobic tak zeby odwolywala sie po geolokalizacje do Geolocalization.java
+
+
+2/14/2016
+Zrobiona geolocalizacja w osobnej klasie, dziala rowniez w emulatorze. Teraz geolokalizacja nie dziala tylko z gestLastKnow()
+tylko dziala z bezposrednich zrodel. Trzeba toi jesszcze przetestowac.
+
+2/15/2016
+Baza zrobiona, rejestracja zapisuje uzytkownika do bazy,
+logowanie zrobione- wyszukuje w bazie login uzytkownika, teraz tylko dorobic:
+1) DONE Sprawdzanie czy uzytkownika login pasuje do wpisanego hasla
+2) Validacja formularza logowania
+3) DONEPozniej trzeba bedzie zabrac sie za sharedPreferences do sprawdzania podczas wlaczania aplikacji czy
+uzytkownik jest zalogowany.
+Pozniej juz funkcjonalnosc Mytway :)
+
+2/16/2016
+Zrobilem sprawdzanie logowanie i shared preferences,
+trzeba dorobic validacje do panelu login, i przetestowac calosc.
+
+2/17/2016
+Zrpobilem validacje login form,
+dodalem example of tabbed activity
+http://examples.javacodegeeks.com/android/core/app/fragment/android-fragment-tabs-example/
+albo mozna zrobic tak..
+
+2/23/2016
+Zrobilem slider z tekstem,
+Usunalem tlo zeby bylo na bialo, stare tlo ma kolor:
+android:background="@color/application_background_color"
+Wszystko fajnie dziala
+
+michalburmz5.nazwa.pl root/Wojna2ds
+Zrobic jakos polaczenie
+Zrobilem tabele t_user_repository
+
+Na jutro:
+1) w logowaniu musi byc stukanie do internetu do bazy danej ogolnej w poszukiwaniu uzytkownika oraz do bazy lokalnej
+1) sprawdzyc czy po zarejestrowaniu- wchodzi sie bezposrednio do mytwayActivity
+3) Zrobic widget w mytwayActivity - miejsce do tworzenia widgetu na pulpit
+
+
+2/25/2016
+Pracuje nad wysylaniem json messagea do webservicu, jest problem bo cos nie wykrywa hosta po stronie webowej aplikacji restowej.
+Zmienilem nazwe hosta z localhost xxxx na localhost 5432- jeszcze moge sprobowac michalburmz5.nazwa.pl:5432 postawic
+AsyncTask - lek na problem z wysylaniem zapytan http
+
+Na jutro:
+Sprawdzic jak sie dodaje rzeczy do kolejki ktora zostaje wyslana do internetu w momencie jak uzytkownik wlacza polaczenie z internetem
++ przetestowac dzialanie dodawania uzytkownika
++ na koncu mozna dodac jeszcze warunek w androidowej app, ze jak rejesturjemy sie drtugi raz to nie mozemy podac tego samego userName
+
+Webservice sprawdzac poleceniem:
+http://michalburmz5.nazwa.pl/MytwayWebServiceApplication/rest/database/verify
+
+
+2/26/2016
+Ladowanie do external DB zrobione, dodaje sie !
+-brakuje emailu,
+-length_time_work trzeba obciac tylko koncowke 8:0 zamiast "Work length: 8:0"
+
+Zrobilem poprawne odbieranie repsonsu z webservicu Restowego, tak ze oddaje nam co i jak z nazwa username czuy taka istenije czy nie
+
+
+3/6/2016
+----------------------------
+Zrobilem sprawdzanie hasla w LOGOWANIU, jesli jest net to sprawdza poprzez baze zewnetrzna. jak nie ma neta to sprawdza na bazie lokalnej
+
+
+3/12/2016
+Robie tak ze jak nie ma internetu to:
+    formularz w LoginActivity jest nie podswietlony
+    formularz w rRegistrationAcitivty rowniez
+Robilem dodatkowo w LoginActivity w metodzie isUserPasswordCorrectInExternalDatabase dodawanie do bazy lokalnej jesli nie istnial element
+Przetestowac scenariusze jeslI :
+User jest w ExtendsDB a nie ma go w lokalnej ( powinno dodac sie do lokalnej)
+User nie jest w Extends DB a jest w lokalnej (Blad registration - powinno dodac sie do registration?)
+User nie jest w Extends DB i nie jest w lokalnej ( wyswietl ze musi sie zarejestrowac)
+User podal zle haslo w external (wyswietl ze zle haslo)
+Zaslanianie formularzy gdy nima neta powinno dzialac :)
+
+ZABLOKOWAC obracanie
+
+
+
+
+9/13/2016
+----------------------------
+http://maps.googleapis.com/maps/api/directions/json?origin=50.03260440260576,19.939129762351513&destination=50.0564951,20.8950155&sensor=true&units=metric
+
+Zrobilem:
+Poprawilem webservice ktory zwraca z google travelTimeToWork
+Dodalem zeby isUserLogged robil sie na true po zarejestrowaniu (brakowalo)
+
+
+Do zrobienia:
+- Button odswiezania ma uruchamiac pobranie aktualnosci JSON z google direction i odswiezyc liczby, Buttoin czerwony (blokada/ permissions) wchodzi do activity z zapytanie o uprawnienia
+
+Obliczanie czasu:
+https://www.google.pl/?gws_rd=ssl#q=java+operations+on+time
+
+
+---------------------------------
+10/08/2016
+Dodalem  test do procesowania czasu dojazdu
+Dodalem wybor kierunku, tzn w zaleznosci od tego jaki jest kierunek tot aka trasa sie zwraca
+np.:
+kiedy keirunek jest do domu to sprawdza droge od CurrentPosition do Domu
+i na odwrot,
+wyniesiono metode obtainTravelTimeBasedOnDirectonWay z timeToTravel do TravelTime, tak samo z directions
+
+
+---------------------------------
+11/1/2016
+todo:
+* dodac parametry do rejestracji:
+* 1)dlugosc w km pomiedzy domem a praca
+* 2)czas pomiedzy domem a praca (z traffciem)
+* oba dodac do sesji
+
+todo: Przetestowac rejestracje distance i duration,
+przetestowac zapis do sesji
+
+
+--------------------------------
+15-11-2016
+Zmienilem, distance zapisuje sie jako string do bazy, po to zeby dokladniej przeliczac wartosci (zeby nie gubic dziesietnych kilometra)
+todo:
+Sprawdzic update bazy, po zmieniuonym typie z float na text,
+Zrobic zmiane w webservisie jesli jest potrzebmna
+Chyba nie trzeba robic zmiany bo juz jest zapis w postaci Varchar :)
+Sprawdzic dzialanie webservisu

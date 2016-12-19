@@ -20,6 +20,7 @@ import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
+import com.mytway.behaviour.pojo.screens.HomeScreen;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
@@ -176,7 +177,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void updateGeolocalization() throws Exception {
+    public void updateGeolocalization() throws Exception {
         mContext = getApplicationContext();
         session = new Session(mContext);
         RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
@@ -193,8 +194,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 Position currentPosition = new Position(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                 //Direction, is user is going to work or home??
-                DirectionWay directionWay = new DirectionWay(Boolean.TRUE, Boolean.FALSE);
-                Distance distanceBetweenHomeAndWork = new Distance("", session.getWayDistance());
+                DirectionWay directionWay = new DirectionWay();
+                Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
                 directionWay.decideWhichDirectionIs(currentPosition, session);
 
@@ -225,16 +226,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                     TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
                     travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
                 } else if(directionWay.getIsInHome()){
-                    Log.i(TAG, "User is in home and here should be Home Screen");
-                    //todo: add home screen...
+                    HomeScreen homeScreen = new HomeScreen();
+                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
                 }
-
-//todo: add morning screen here (now is in if clausule)
-//                view.setImageViewResource(R.id.refreshImage, R.drawable.ic_sync_button);
-//                view.setTextViewText(R.id.firstTimeTextView, morningScreen.getTimeToDeparture().displayMessage());
-//                view.setTextViewText(R.id.secondTimeTextView, morningScreen.getTimeInRoad().displayMessage());
-//                view.setTextViewText(R.id.thirdTimeTextView, morningScreen.getTimeArriveToHome().displayMessage());
-
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
