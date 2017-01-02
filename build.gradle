@@ -15,7 +15,7 @@ buildscript {
 
 //android {
 //    testOptions {
-//        unitTests.returnDegaultValues = true
+//        unitTests.returnDefaultValues = true
 //    }
 //}
 

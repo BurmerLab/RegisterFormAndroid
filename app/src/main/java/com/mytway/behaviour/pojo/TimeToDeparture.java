@@ -17,9 +17,17 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     private static final String EMPTY_STRING = "";
     private String displayTimeMessage;
     private Session session;
-    private CurrentTime currentTime = new CurrentTime();
+    private CurrentTime currentTime;
     private TravelTime travelTime;
     private LocalDateTime timeToDeparture;
+
+    public TimeToDeparture() {
+        currentTime = new CurrentTime();
+    }
+
+    public TimeToDeparture(CurrentTime currentTime) {
+        this.currentTime = currentTime;
+    }
 
     @Override
     public String displayMessage() {

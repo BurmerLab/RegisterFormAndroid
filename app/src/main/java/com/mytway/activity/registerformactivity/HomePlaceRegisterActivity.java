@@ -134,7 +134,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     session.setWorkLatitude("" + user.getWorkPlace().getLatitude().floatValue());
                     session.setWorkLongitude("" + user.getWorkPlace().getLongitude().floatValue());
                     session.setWayDistance(travelToWorkDistance.toString());
-                    session.setWayDuration(travelToWorkDuration);
+                    session.setWayDuration("" + travelToWorkDuration);
 
                     Toast.makeText(HomePlaceRegisterActivity.this, "Shared WorkLat: " + user.getWorkPlace().getLatitude().floatValue(), Toast.LENGTH_SHORT).show();
 
@@ -193,6 +193,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         mMap.setMyLocationEnabled(true);
 
         MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(HomePlaceRegisterActivity.this);
+        geolocalization.getLocalization();
         latitudeLocalization = geolocalization.getLatitude();
         longitudeLocalization = geolocalization.getLongitude();
 

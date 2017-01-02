@@ -11,7 +11,7 @@ public class CurrentTime {
     private LocalDateTime mockedCurrentTime = null;
 
     public CurrentTime() {
-//        obtainCurrentTime();
+        obtainCurrentTime();
     }
 
     public LocalDateTime getCurrentTime() {

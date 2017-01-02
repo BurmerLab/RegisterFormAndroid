@@ -48,51 +48,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		manager.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(),
 				PropertiesValues.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
 
-
-
-
-
-
-
-////		remoteViews.setTextViewText(R.id.firstTimeTextView, rideProcessor.rideProcess(context));
-//		// register for button event
-//		remoteViews.setOnClickPendingIntent(R.id.envelopeImage, buildButtonPendingIntent(context, appWidgetManager, appWidgetIds, remoteViews, R.id.envelopeImage));
 		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
 
-////Dziala, updejtuje pierwszy text
-////		String text = "LOL";
-////		if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context)
-////				&& PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context)) {
-////			//http://stackoverflow.com/questions/31502650/android-m-request-permission-non-activity
-////			Log.d(TAG, "Jestem w permissionUtilIfie");
-////
-////			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
-////			double latitudeLocalization = geolocalization.getLatitude();
-////			double longitudeLocalization = geolocalization.getLongitude();
-////
-////			Log.d(TAG, "Localization: lat: " + latitudeLocalization + " lon: " + longitudeLocalization);
-////
-//////			text = String.valueOf(geolocalization.getLatitude());
-////			text = "DUPA2";
-////			Log.d(TAG, "text: " + text);
-////		}else{
-////					openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
-//////			PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
-//////					PERMISSION_REQUEST_CODE_LOCATION,
-//////					context,
-//////					HomePlaceRegisterActivity.this,
-//////					"SOPRRY CAN HELP");
-////		}
-////		remoteViews.setTextViewText(R.id.firstTimeTextView, text);
-//
-//		//http://stackoverflow.com/questions/29821886/receiverrestrictedcontext-cannot-be-cast-to-android-app-activity
-//
-//
-//
-////		Intent intent = new Intent("APPWIDGET_UPDATE");
-////		intent.putExtra("newItemArrived", "Neue Frage erschienen");
-////		sendBroadcast(intent);
-//		// request for widget update
 		pushWidgetUpdate(context, remoteViews);
 	}
 
@@ -122,6 +79,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				&& PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context)) {
 
 			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
+			geolocalization.getLocalization();
 			double latitudeLocalization = geolocalization.getLatitude();
 			double longitudeLocalization = geolocalization.getLongitude();
 

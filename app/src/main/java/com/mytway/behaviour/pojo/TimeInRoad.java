@@ -32,7 +32,7 @@ public class TimeInRoad extends AProcessingTime implements IDisplayedTime{
     @Override
     public void processTime() {
         if(timeInRoad != null){
-            String displayMessage = prepareTimeFromLocalDateTimeToString(timeInRoad);
+            String displayMessage = convertTimeToTimeLeftFormat(timeInRoad);
             Log.i(TAG, "Time in road: " + displayMessage);
             setTimeInRoad(timeInRoad);
             setDisplayTimeMessage(displayMessage);

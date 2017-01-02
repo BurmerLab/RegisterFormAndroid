@@ -107,6 +107,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         mMap.setMyLocationEnabled(true);
 
         MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(WorkPlaceRegisterActivity.this);
+        geolocalization.getLocalization();
         latitudeLocalization = geolocalization.getLatitude();
         longitudeLocalization = geolocalization.getLongitude();
 

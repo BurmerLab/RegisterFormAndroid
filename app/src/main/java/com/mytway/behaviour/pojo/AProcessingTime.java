@@ -1,5 +1,7 @@
 package com.mytway.behaviour.pojo;
 
+import com.mytway.properties.PropertiesValues;
+
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 import org.joda.time.LocalDateTime;
@@ -12,6 +14,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public abstract class AProcessingTime {
+
+    private static final int ZERO = 0;
 
     public AProcessingTime() {
     }
@@ -63,6 +67,22 @@ public abstract class AProcessingTime {
                 .withMinuteOfHour(basedTime.getMinuteOfHour()).minusMinutes(minutesToAdd)
                 .withSecondOfMinute(basedTime.getSecondOfMinute()).minusSeconds(secondsToAdd);
         return timeAfterSubtract;
+    }
+
+    public String convertTimeToTimeLeftFormat(LocalDateTime timeToConvert){
+        StringBuilder timeLeft = new StringBuilder();
+
+        if(timeToConvert.getHourOfDay() != ZERO){
+            timeLeft.append(timeToConvert.getHourOfDay());
+            timeLeft.append(PropertiesValues.HOUR_CHARACTER);
+        }
+
+        if(timeToConvert.getMinuteOfHour() != ZERO){
+            timeLeft.append(timeToConvert.getMinuteOfHour());
+            timeLeft.append(PropertiesValues.MINUTES_CHARACTER);
+        }
+
+        return timeLeft.toString();
     }
 
 }

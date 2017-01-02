@@ -24,7 +24,7 @@ public class Session {
     public Position workPlace;
 
     public String wayDistance;
-    public int wayDuration;
+    public String wayDuration;
 
     private SharedPreferences sharedPreferences;
 
@@ -87,6 +87,8 @@ public class Session {
             getHomeLongitude();
             getWorkLatitude();
             getWorkLongitude();
+            getWayDistance();
+            getWayDuration();
         }
     }
 
@@ -310,16 +312,16 @@ public class Session {
     }
 
     //------- WayDuration ---------------
-    public void setWayDuration(int wayDuration) {
-        sharedPreferences.edit().putInt("wayDuration", wayDuration).commit();
+    public void setWayDuration(String wayDuration) {
+        sharedPreferences.edit().putString("wayDuration", wayDuration).commit();
     }
 
-    public int getWayDuration() {
-        int wayDuration;
+    public String getWayDuration() {
+        String wayDuration;
         if(PropertiesValues.MOCK_APP_TO_TESTS){
             wayDuration = this.wayDuration;
         }else{
-            wayDuration = sharedPreferences.getInt("wayDuration", 0);
+            wayDuration = sharedPreferences.getString("wayDuration", "0");
             this.wayDuration = wayDuration;
         }
         return wayDuration;

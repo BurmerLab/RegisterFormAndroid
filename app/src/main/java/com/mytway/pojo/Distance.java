@@ -4,7 +4,7 @@ public class Distance {
 
     private String text = "";
     private double valueInMeters = 0; //kilometers (double)
-    private final static int SEVEN_PERCENTAGE = 7;
+    private final static int SEVEN_PERCENTAGE = 1;
 
     public Distance(String text, double valueInMeters) {
         this.text = text;

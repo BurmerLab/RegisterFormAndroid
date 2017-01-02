@@ -46,6 +46,7 @@ public class RideProcessor extends FragmentActivity {
     private String setUpMap(Context contex) {
 
         MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(contex);
+        geolocalization.getLocalization();
         Double latitudeLocalization = geolocalization.getLatitude();
         Double longitudeLocalization = geolocalization.getLongitude();
 

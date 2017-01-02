@@ -77,9 +77,9 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
             LocalDateTime lenghtWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
 
             GoogleMapsDirectionJson currentTravelTimeToWork =
-                    travelTime.obtainCurrentTravelTimeToWork(context, currentPosition, session);
+                    travelTimeToWork.obtainCurrentTravelTimeToWork(context, currentPosition, session);
             GoogleMapsDirectionJson currentTravelTimeToHome =
-                    travelTime.obtainCurrentTravelTimeToHome(context, currentPosition, session);
+                    travelTimeToHome.obtainCurrentTravelTimeToHome(context, currentPosition, session);
 
             LocalDateTime currentAndTravelTime = addTimeTo(currentTime.getCurrentTime(),
                     currentTravelTimeToWork.getLegs().getDuration().getHour(),

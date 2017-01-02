@@ -90,6 +90,9 @@ public class DirectionWay {
             }else{
                 Log.i(TAG, "isWayToHome list is less then three boolean");
             }
+        }else{
+            wayToHome = Boolean.FALSE;
+            wayToWork = Boolean.FALSE;
         }
     }
 
@@ -155,7 +158,6 @@ public class DirectionWay {
                 startWorkTime = new LocalDateTime();
             }
         }else{
-            setIsInHome(Boolean.FALSE);
             setIsInWork(Boolean.FALSE);
         }
     }
@@ -163,9 +165,9 @@ public class DirectionWay {
     public boolean decideIsInPlace(Position currentPosition, Position place) {
         double distanceToHome = Distance.designateDistanceBetween(currentPosition, place);
 
-        double distanceToHomeInMeters = distanceToHome * 1000;
+        double distanceBetweens = distanceToHome * 1000;
 
-        if(distanceToHomeInMeters < HOME_OR_WORK_ZONE){
+        if(distanceBetweens < HOME_OR_WORK_ZONE){
             Log.i(TAG, "User is in Place");
             return true;
         }else{
@@ -235,5 +237,21 @@ public class DirectionWay {
 
     public void setStartWorkTime(LocalDateTime startWorkTime) {
         this.startWorkTime = startWorkTime;
+    }
+
+    public boolean isInHome() {
+        return isInHome && !isInWork && !wayToHome && !wayToWork;
+    }
+
+    public boolean isInWork() {
+        return isInWork && !isInHome && !wayToHome && !wayToWork;
+    }
+
+    public boolean isInWayToWork() {
+        return wayToWork && !isInWork && !isInHome && !wayToHome;
+    }
+
+    public boolean isInWayToHome() {
+        return wayToHome && !isInWork && !isInHome && !wayToWork;
     }
 }

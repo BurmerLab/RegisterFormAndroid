@@ -117,8 +117,13 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
     public void obtainTravelTimeBasedOnDirectonWay(Context context, Position currentPosition, Session session) {
         if(directionWay.isWayToHome()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
+
         }else if( directionWay.isWayToWork()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
+
+        }else if(directionWay.isInHome()) {
+            setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
+
         }else{
             Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
         }

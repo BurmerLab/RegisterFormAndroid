@@ -35,8 +35,12 @@ public class StartActivity extends Activity {
         }
 //        Retrieve sharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, MODE_PRIVATE);
+
+        //todo: remove it, it is only for second to remove one sharedPref
+//        sharedPreferences.edit().remove("way_distance").commit();
+
         Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
-//        Boolean isUserLogged = false;
+//        Boolean isUserLogged = true;
 
         if(isUserLogged){
             // Call Mytway activity

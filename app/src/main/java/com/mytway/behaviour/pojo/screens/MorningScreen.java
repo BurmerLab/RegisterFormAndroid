@@ -42,7 +42,7 @@ public class MorningScreen implements Screen {
         //2nd Time - Time in road
         TimeInRoad timeInRoad = new TimeInRoad();
         timeInRoad.setTimeInRoad(timeToDeparture);
-        LocalDateTime timeInRoadDateTime = timeToDeparture.getTravelTime().getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime();
+        timeInRoad.processTime();
         setTimeInRoad(timeInRoad);
         Log.i(TAG, "timeInRoad: " + timeInRoad.displayMessage());
 
@@ -51,7 +51,7 @@ public class MorningScreen implements Screen {
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
         timeArriveToHome.setTravelTimeToWork(travelTime);//travel time To work
         timeArriveToHome.setSession(session);
-        timeArriveToHome.setTravelTimeToWork(travelTime);//travel time to home
+        timeArriveToHome.setTravelTimeToHome(travelTime);//travel time to home
         timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());

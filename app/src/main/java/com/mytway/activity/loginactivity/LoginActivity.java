@@ -94,10 +94,9 @@ public class LoginActivity extends Activity {
                             session.setHomeLongitude("" + userTable.homePlaceLongitude);
                             session.setWorkLatitude("" + userTable.workPlaceLatitude);
                             session.setWorkLongitude("" + userTable.workPlaceLongitude);
-
+                            session.setWayDistance("" + userTable.wayDistance);
+                            session.setWayDuration("" + userTable.wayDuration);
                             Session sessionTwo = new Session(LoginActivity.this);
-
-                            Toast.makeText(LoginActivity.this, "Shared WorkLat: " + userTable.workPlaceLatitude, Toast.LENGTH_SHORT).show();
 
                             Intent intent = new Intent(LoginActivity.this, MytwayActivity.class);
                             if (intent.resolveActivity(getPackageManager()) != null) {
@@ -173,7 +172,6 @@ public class LoginActivity extends Activity {
         String userName = textViewUserName.getText().toString();
         String userPassword = textViewPassword.getText().toString();
 
-
         if(EthernetConnectivity.isEthernetOnline(LoginActivity.this)){
             MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase webServiceCheckIsPasswordIsCorrect = new MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase();
             MytwayWebserviceGetUserFromExternalDatabase webServiceGetUser = new MytwayWebserviceGetUserFromExternalDatabase();
@@ -193,7 +191,7 @@ public class LoginActivity extends Activity {
             }
 
             if(!isExternalPasswordCorrect){
-                Log.i(TAG, "External Password is not correct, returned false");
+                Log.i(TAG, "External Password is not correct");
                 return false;
             }
 

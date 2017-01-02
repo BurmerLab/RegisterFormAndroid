@@ -1,32 +1,21 @@
 package com.mytway.behaviour.pojo;
 
-import junit.framework.TestCase;
+import com.mytway.utility.CurrentTime;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Hours;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.junit.Test;
 
 import java.util.Calendar;
 
-public class AProcessingTimeTest extends TestCase {
+import static junit.framework.Assert.assertEquals;
+
+public class AProcessingTimeTest {
 
     private TimeToDeparture timeToDeparture = new TimeToDeparture();
-
-
-
-    public void testDateToCalendar() throws Exception {
-
-    }
-
-    public void testPrepareTimeFromStringToCalendar() throws Exception {
-
-    }
-
-    public void testPrepareTimeFromCalendarToString() throws Exception {
-
-    }
 
     @Test
     public void testDirrefenceHoursBetweenTimes() throws Exception {
@@ -115,6 +104,13 @@ public class AProcessingTimeTest extends TestCase {
                 .withHourOfDay(3)
                 .withMinuteOfHour(40)
                 .withSecondOfMinute(1);
+//        only for avoid nullpointer for mocked time
+        CurrentTime currentTime = new CurrentTime();
+        LocalDateTime mockedCurrentTime =
+                LocalDateTime.parse("3/15/2016T0530", DateTimeFormat.forPattern("MM/dd/yyyy'T'HHmm"));
+        currentTime.setMockedCurrentTime(mockedCurrentTime);
+
+        timeToDeparture = new TimeToDeparture(currentTime);
 
         LocalDateTime result = timeToDeparture.subtractTimeTo(basedTime, 2, 20, 0);
         System.out.println("Result hour: " + result.getHourOfDay());
@@ -123,5 +119,29 @@ public class AProcessingTimeTest extends TestCase {
         assertEquals(1, result.getHourOfDay());
         assertEquals(20, result.getMinuteOfHour());
         assertEquals(1, result.getSecondOfMinute());
+    }
+
+    @Test
+    public void testConvertTimeToTimeLeftFormat_hourAndMinutes(){
+        LocalDateTime timeToConvert = new LocalDateTime()
+                .withHourOfDay(3)
+                .withMinuteOfHour(40);
+        String convertedString = timeToDeparture.convertTimeToTimeLeftFormat(timeToConvert);
+
+        assertEquals("3h40m", convertedString);
+    }
+
+    @Test
+    public void testConvertTimeToTimeLeftFormat_onlyMinutes(){
+        LocalDateTime timeToConvert = new LocalDateTime()
+                .withYear(0)
+                .withMonthOfYear(1)
+                .withDayOfMonth(1)
+                .withHourOfDay(0)
+                .withMinuteOfHour(40)
+                .withSecondOfMinute(0);
+        String convertedString = timeToDeparture.convertTimeToTimeLeftFormat(timeToConvert);
+
+        assertEquals("40m", convertedString);
     }
 }

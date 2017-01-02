@@ -205,7 +205,8 @@ public class MytwayWebservice {
         userTable.homePlaceLatitude = jsonResult.getDouble("homePlaceLatitude");
         userTable.homePlaceLongitude = jsonResult.getDouble("homePlaceLongitude");
         userTable.workWeek = jsonResult.getString("workWeek");
-
+        userTable.wayDistance = jsonResult.getInt("wayDistance");
+        userTable.wayDuration = jsonResult.getInt("wayDuration");
         return userTable;
     }
 

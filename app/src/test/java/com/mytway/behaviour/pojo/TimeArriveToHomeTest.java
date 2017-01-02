@@ -15,11 +15,13 @@ import junit.framework.TestCase;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -29,9 +31,16 @@ import org.powermock.api.mockito.PowerMockito;
 @PrepareForTest(Log.class)
 public class TimeArriveToHomeTest extends TestCase {
 
-    @InjectMocks private TimeArriveToHome timeArriveToHomeWithInjectMock;
+    @InjectMocks
+    private TimeArriveToHome timeArriveToHomeWithInjectMock;
 
-    @Mock private TravelTime travelTime;
+    @Mock
+    private TravelTime travelTimeMock;
+
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testFullProcessTime() throws Exception {
@@ -62,8 +71,8 @@ public class TimeArriveToHomeTest extends TestCase {
 
         GoogleMapsDirectionJson gMapsDirectionToWork = creategMapsDirectionJson("100km", 600);//600s - 10min
         GoogleMapsDirectionJson gMapsDirectionToHome = creategMapsDirectionJson("100km", 1200);//1200s - 20min
-        Mockito.when(travelTime.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToWork);
-        Mockito.when(travelTime.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToHome);
+        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToWork);
+        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToHome);
 
         //When
         timeArriveToHomeWithInjectMock.fullProcessTime(contextMock, currentPosition, session);

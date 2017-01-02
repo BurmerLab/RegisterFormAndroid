@@ -27,6 +27,7 @@ import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
@@ -40,16 +41,18 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private Session session;
     private static final String TAG = "MytwayGeolocalizationService";
     private static final int RED_COLOR =  -65536;
-
     boolean isGPSEnabled = false;
-
     boolean isNetworkEnabled = false;
-
     boolean canGetLocation = false;
 
-    android.location.Location location;
+    public DirectionWay directionWay = new DirectionWay();
+
+    public android.location.Location location;
     private double latitude;
     private double longitude;
+    private AppWidgetManager manager;
+    private ComponentName thisWidget;
+    private RemoteViews view;
 
     // The minimum distance to change updates in metters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
@@ -60,9 +63,11 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
+    private MorningScreen morningScreen = new MorningScreen();
+
     public MytwayGeolocalizationService(Context context) {
         this.mContext = context;
-        getLocalization();
+//        getLocalization();
     }
 
     public MytwayGeolocalizationService() {
@@ -179,22 +184,27 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public void updateGeolocalization() throws Exception {
         mContext = getApplicationContext();
-        session = new Session(mContext);
-        RemoteViews view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
+
+        if(!PropertiesValues.MOCK_APP_TO_TESTS){
+            //remove in unit tests:
+            session = new Session(mContext);
+        }
+
+        view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
 
         if(session.isUserLogged()){
-            // Push update for this widget to the home screen
-            ComponentName thisWidget = new ComponentName(this, MyWidgetProvider.class);
-            AppWidgetManager manager = AppWidgetManager.getInstance(this);
+//            thisWidget = new ComponentName(this, MyWidgetProvider.class);
+            thisWidget = new ComponentName(this, MyWidgetProvider.class);
+            manager = AppWidgetManager.getInstance(this);
 
             if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
                     && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
 
-                Location currentLocation = getLocalization();
-                Position currentPosition = new Position(currentLocation.getLatitude(), currentLocation.getLongitude());
+                getLocalization();
+
+                Position currentPosition = new Position(location.getLatitude(), location.getLongitude());
 
                 //Direction, is user is going to work or home??
-                DirectionWay directionWay = new DirectionWay();
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
                 directionWay.decideWhichDirectionIs(currentPosition, session);
@@ -202,29 +212,28 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 directionWay.decideIsInHome(currentPosition, session.getHomePlace());
                 directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
-                //todo: add ion directionWays methods to define is user is in work/home place
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
                 LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
 
-                if(!directionWay.isWayToWork() && !directionWay.isWayToHome()){
+                if(directionWay.isInHome()){
                     //Morning screen
-                    MorningScreen morningScreen = new MorningScreen();
                     morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-                } else if(directionWay.isWayToWork() && !directionWay.isWayToHome()){
+                } else if(directionWay.isInWayToWork()){
                     //TravelToWorkScreen
                     TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
                     travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-                } else if(directionWay.getIsInWork()){
+                } else if(directionWay.isInWork()){
                     //WorkScreen
                     WorkScreen workScreen = new WorkScreen();
                     workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
 
-                } else if(!directionWay.isWayToWork() && directionWay.isWayToHome()){
+                } else if(directionWay.isInWayToHome()){
                     //TravelToHomeScreen
                     TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
                     travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+
                 } else if(directionWay.getIsInHome()){
                     HomeScreen homeScreen = new HomeScreen();
                     homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
@@ -276,4 +285,67 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         sendBroadcast(intent);
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Context getmContext() {
+        return mContext;
+    }
+
+    public void setmContext(Context mContext) {
+        this.mContext = mContext;
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    public DirectionWay getDirectionWay() {
+        return directionWay;
+    }
+
+    public void setDirectionWay(DirectionWay directionWay) {
+        this.directionWay = directionWay;
+    }
+
+    public MorningScreen getMorningScreen() {
+        return morningScreen;
+    }
+
+    public void setMorningScreen(MorningScreen morningScreen) {
+        this.morningScreen = morningScreen;
+    }
+
+    public AppWidgetManager getManager() {
+        return manager;
+    }
+
+    public void setManager(AppWidgetManager manager) {
+        this.manager = manager;
+    }
+
+    public ComponentName getThisWidget() {
+        return thisWidget;
+    }
+
+    public void setThisWidget(ComponentName thisWidget) {
+        this.thisWidget = thisWidget;
+    }
+
+    public RemoteViews getView() {
+        return view;
+    }
+
+    public void setView(RemoteViews view) {
+        this.view = view;
+    }
 }

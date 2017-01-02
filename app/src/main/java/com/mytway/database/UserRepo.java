@@ -206,7 +206,6 @@ public class UserRepo {
 
         UserTable userTable = new UserTable();
 
-//        Cursor cursor = db.rawQuery(selectQuery, new String[] { userName } );
         Cursor cursor = db.rawQuery(selectQuery, new String[] { userName } );
 
         if (cursor.moveToFirst()) {
