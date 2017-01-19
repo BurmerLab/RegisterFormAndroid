@@ -7,7 +7,6 @@ import com.mytway.pojo.Position;
 
 import junit.framework.TestCase;
 
-import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,20 +28,27 @@ public class DirectionWayTest extends TestCase {
         PowerMockito.mockStatic(Log.class);
         Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
         Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+        Position workPosition = new Position(50.032492, 19.940118);//Wadowicka 6, Krakow
         // home vs current = 5.890494509956249
 
         List<Double> previousDistancesToHome = new LinkedList<>();
         previousDistancesToHome.add(1.1);
         previousDistancesToHome.add(3.4);
         previousDistancesToHome.add(4.3);
-        directionWay.setDistancesToHome(previousDistancesToHome);
 
-        //todo: check what should be here, KM or Meters?
-        Distance fullDistanceBetweenHomeAndWork = new Distance("40 km", 40);
+        List<Double> previousDistancesToWork = new LinkedList<>();
+        previousDistancesToWork.add(70000.1);
+        previousDistancesToWork.add(69000.4);
+        previousDistancesToWork.add(68000.3);
+
+        directionWay.setDistancesToHomeList(previousDistancesToHome);
+        directionWay.setDistancesToWorkList(previousDistancesToWork);
+
+        Distance fullDistanceBetweenHomeAndWork = new Distance("40 m", 40);
         directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
 
         //when
-        directionWay.decideDirection(currentPosition, homePosition);
+        directionWay.decideDirection(currentPosition, homePosition, workPosition);
 
         //then
         assertEquals(Boolean.FALSE, directionWay.isWayToHome());
@@ -55,20 +61,21 @@ public class DirectionWayTest extends TestCase {
         PowerMockito.mockStatic(Log.class);
         Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
         Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+        Position workPosition = new Position(50.032492, 19.940118);//Wadowicka 6, Krakow
         // home vs current = 5.890494509956249
 
         List<Double> previousDistancesToHome = new LinkedList<>();
         previousDistancesToHome.add(14.3);
         previousDistancesToHome.add(16.4);
         previousDistancesToHome.add(12.1);
-        directionWay.setDistancesToHome(previousDistancesToHome);
+        directionWay.setDistancesToHomeList(previousDistancesToHome);
 
         //todo: check what should be here, KM or Meters?
         Distance fullDistanceBetweenHomeAndWork = new Distance("40 km", 40);
         directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
 
         //when
-        directionWay.decideDirection(currentPosition, homePosition);
+        directionWay.decideDirection(currentPosition, homePosition, workPosition);
 
         //then
         assertEquals(Boolean.FALSE, directionWay.isWayToHome());
@@ -139,6 +146,25 @@ public class DirectionWayTest extends TestCase {
         //then
         assertEquals(Boolean.TRUE, directionWay.getIsInHome());
         assertEquals(Boolean.FALSE, directionWay.getIsInWork());
+    }
+
+    @Test
+    public void testObtainListOfDirections(){
+        List<Double> previousDistancesToHomeList = new LinkedList<>();
+        previousDistancesToHomeList.add(10.0);
+        previousDistancesToHomeList.add(20.0);
+        previousDistancesToHomeList.add(30.0);
+
+        double currentDistanceToHome = 40.0;
+
+        List<Boolean> actualListOfDirections = directionWay.obtainListOfDirections(previousDistancesToHomeList, currentDistanceToHome);
+        List<Boolean> expectedListOfDirections = new LinkedList<>();
+        expectedListOfDirections.add(Boolean.FALSE);
+        expectedListOfDirections.add(Boolean.FALSE);
+        expectedListOfDirections.add(Boolean.FALSE);
+
+        assertEquals(expectedListOfDirections, actualListOfDirections);
+
     }
 
 }

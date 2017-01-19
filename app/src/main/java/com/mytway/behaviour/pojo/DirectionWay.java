@@ -1,6 +1,5 @@
 package com.mytway.behaviour.pojo;
 
-import android.nfc.Tag;
 import android.util.Log;
 
 import com.mytway.pojo.Distance;
@@ -17,13 +16,15 @@ public class DirectionWay {
     private static final String TAG = "DirectionWay";
     private static final int THREE_DISTANCES = 3;
     private static final double HOME_OR_WORK_ZONE = 300.0;
+    private static final int METERS_IN_KILOMETER = 1000;
     private Boolean wayToWork;
     private Boolean wayToHome;
     private Boolean isInWork = Boolean.FALSE;
     private Boolean isInHome = Boolean.FALSE;
 
     private Distance distanceBetweenHomeAndWork;
-    private List<Double> distancesToHome = new LinkedList<>();
+    private List<Double> distancesToHomeList = new LinkedList<>();
+    private List<Double> distancesToWorkList = new LinkedList<>();
     private LocalDateTime leaveHomeToGoToWorkTime;
     private LocalDateTime startWorkTime;
 
@@ -36,7 +37,7 @@ public class DirectionWay {
     }
 
     public void decideWhichDirectionIs(Position currentPosition, Session session){
-        this.decideDirection(currentPosition, session.getHomePlace());
+        this.decideDirection(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
     public static double designateDistanceBetween(Position startPosition, Position endPosition){
@@ -56,74 +57,97 @@ public class DirectionWay {
         return distance;
     }
 
-    //work on the same instances of DirectionWay because in distancesToHome is saved previous distances
-    public void decideDirection(Position currentPosition, Position homePosition){
-        double currentDistanceToHome = obtainDistanceToHome(currentPosition, homePosition);
+    //work on the same instances of DirectionWay because in distancesToHomeList is saved previous distances
+    public void decideDirection(Position currentPosition, Position homePosition, Position workPosition){
+        double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
+        double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
 
-        List<Boolean> previousDirectionsIsWayToHomeList =
-                obtainListOfDirections(distancesToHome, currentDistanceToHome);
+        List<Boolean> previousBooleansIsWayToHomeList =
+                obtainListOfDirections(distancesToHomeList, currentDistanceToHomeInMeters);
 
-        double sevenPercentageOfDistanceBetweenHomeAndWork = 0;
+        List<Boolean> previousBooleansIsWayToWorkList =
+                obtainListOfDirections(distancesToWorkList, currentDistanceToWorkInMeters);
+
+        double sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = 0;
         if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-            sevenPercentageOfDistanceBetweenHomeAndWork = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
+            sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
         }
 
-        if(sevenPercentageOfDistanceBetweenHomeAndWork < currentDistanceToHome){
-            if(previousDirectionsIsWayToHomeList.size() >= 3){
-                boolean firstPreviousIsWayToHome = previousDirectionsIsWayToHomeList.get(previousDirectionsIsWayToHomeList.size()-1);
-                boolean secondPreviousIsWayToHome = previousDirectionsIsWayToHomeList.get(previousDirectionsIsWayToHomeList.size()-2);
-                boolean thirdPreviousIsWayToHome = previousDirectionsIsWayToHomeList.get(previousDirectionsIsWayToHomeList.size()-3);
-
-                //if three last booleans is true, then direction is to home, if three last is false, then direction to work
-                if(firstPreviousIsWayToHome && secondPreviousIsWayToHome && thirdPreviousIsWayToHome){
-                    wayToHome = Boolean.TRUE;
-                    wayToWork = Boolean.FALSE;
-                }else if(!firstPreviousIsWayToHome && !secondPreviousIsWayToHome && !thirdPreviousIsWayToHome){
-                    wayToHome = Boolean.FALSE;
-                    wayToWork = Boolean.TRUE;
-                    setLeaveHomeToGoToWorkTime(new LocalDateTime());
-                }else{
-                    wayToHome = Boolean.FALSE;
-                    wayToWork = Boolean.FALSE;
-                    Log.i(TAG, "Not decided because was no three decides (True or False) in a row");
-                }
-            }else{
-                Log.i(TAG, "isWayToHome list is less then three boolean");
-            }
+        if(sevenPercentageOfDistanceBetweenHomeAndWorkInMeters < currentDistanceToHomeInMeters){
+            decideIsMoveWayToHome(previousBooleansIsWayToHomeList);
+            decideIsMoveWayToWork(previousBooleansIsWayToWorkList);
         }else{
             wayToHome = Boolean.FALSE;
             wayToWork = Boolean.FALSE;
         }
     }
 
-    public List<Boolean> obtainListOfDirections(List<Double> previousDistancesToHomeList, double currentDistanceToHome){
+    private void decideIsMoveWayToHome(List<Boolean> previousBooleansIsWayToHomeList) {
+        if(previousBooleansIsWayToHomeList.size() >= 2){
+            boolean firstPreviousIsWayToHome = previousBooleansIsWayToHomeList.get(previousBooleansIsWayToHomeList.size()-1);
+            boolean secondPreviousIsWayToHome = previousBooleansIsWayToHomeList.get(previousBooleansIsWayToHomeList.size()-2);
 
-        List<Boolean> isDirectionsIsToHome = new LinkedList<>();
+            //if two last booleans is true, then direction is to home, if three last is false, then direction to work
+            if(firstPreviousIsWayToHome && secondPreviousIsWayToHome){
+                wayToHome = Boolean.TRUE;
+                //todo: is it need to add leaveWorkToGoToHomeTime?
+            }else{
+                wayToHome = Boolean.FALSE;
+                Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
+            }
+        }else{
+            Log.i(TAG, "isWayToHome list is less then three boolean");
+        }
+    }
 
-            if(previousDistancesToHomeList.size() >= 1){
-                if(currentDistanceToHome < previousDistancesToHomeList.get(0)){
-                    isDirectionsIsToHome.add(Boolean.TRUE);
+    private void decideIsMoveWayToWork(List<Boolean> previousBooleansIsWayToWorkList) {
+        if(previousBooleansIsWayToWorkList.size() >= 2){
+            boolean firstPreviousIsWayToWork = previousBooleansIsWayToWorkList.get(previousBooleansIsWayToWorkList.size()-1);
+            boolean secondPreviousIsWayToWork = previousBooleansIsWayToWorkList.get(previousBooleansIsWayToWorkList.size() - 2);
+
+            //if two last booleans is true, then direction is to home, if three last is false, then direction to work
+            if(firstPreviousIsWayToWork && secondPreviousIsWayToWork){
+                wayToWork = Boolean.TRUE;
+                setLeaveHomeToGoToWorkTime(new LocalDateTime());
+            }else{
+                wayToWork = Boolean.FALSE;
+                Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
+            }
+        }else{
+            Log.i(TAG, "isWayToHome list is less then three boolean");
+        }
+    }
+
+    public List<Boolean> obtainListOfDirections(List<Double> previousDistancesList, double currentDistanceToHome){
+
+        List<Boolean> isDirectionsIsToHomeList = new LinkedList<>();
+
+            if(previousDistancesList.size() >= 1){
+                if(currentDistanceToHome < previousDistancesList.get(0)){
+                    isDirectionsIsToHomeList.add(Boolean.TRUE);
                 }else{
-                    isDirectionsIsToHome.add(Boolean.FALSE);
+                    isDirectionsIsToHomeList.add(Boolean.FALSE);
                 }
 
-                for(int i = 1; i <= previousDistancesToHomeList.size() - 1; i++){
-                    if(previousDistancesToHomeList.get(i) < previousDistancesToHomeList.get(i - 1)
-                            && currentDistanceToHome < previousDistancesToHomeList.get(i)){
-                        isDirectionsIsToHome.add(Boolean.TRUE);
+                for(int i = 1; i <= previousDistancesList.size() - 1; i++){
+                    if(previousDistancesList.get(i) < previousDistancesList.get(i - 1)
+                            && currentDistanceToHome < previousDistancesList.get(i)){
+                        isDirectionsIsToHomeList.add(Boolean.TRUE);
                     }else{
-                        isDirectionsIsToHome.add(Boolean.FALSE);
+                        isDirectionsIsToHomeList.add(Boolean.FALSE);
                     }
                 }
             }
 
-    return isDirectionsIsToHome;
+            previousDistancesList.add(currentDistanceToHome);
+
+    return isDirectionsIsToHomeList;
     }
 
 
-    public double obtainDistanceToHome(Position currentPosition, Position homePlace){
-        double distanceToHome = Distance.designateDistanceBetween(currentPosition, homePlace);
-        return distanceToHome;
+    public double obtainDistanceBetweenInMeters(Position currentPosition, Position secondPlace){
+        double distanceBetween = Distance.designateDistanceBetween(currentPosition, secondPlace);
+        return distanceBetween * METERS_IN_KILOMETER;
     }
 
     public int obtainDistanceToWork(Position currentPosition, Position workPlace){
@@ -191,12 +215,12 @@ public class DirectionWay {
         this.wayToHome = wayToHome;
     }
 
-    public List<Double> getDistancesToHome() {
-        return distancesToHome;
+    public List<Double> getDistancesToHomeList() {
+        return distancesToHomeList;
     }
 
-    public void setDistancesToHome(List<Double> distancesToHome) {
-        this.distancesToHome = distancesToHome;
+    public void setDistancesToHomeList(List<Double> distancesToHomeList) {
+        this.distancesToHomeList = distancesToHomeList;
     }
 
     public Distance getDistanceBetweenHomeAndWork() {
@@ -253,5 +277,13 @@ public class DirectionWay {
 
     public boolean isInWayToHome() {
         return wayToHome && !isInWork && !isInHome && !wayToWork;
+    }
+
+    public List<Double> getDistancesToWorkList() {
+        return distancesToWorkList;
+    }
+
+    public void setDistancesToWorkList(List<Double> distancesToWorkList) {
+        this.distancesToWorkList = distancesToWorkList;
     }
 }

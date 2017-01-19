@@ -5,32 +5,31 @@
     android:layout_height="@dimen/main_relative_layout_height_medium"
     android:layout_margin="@dimen/main_relative_layout_margin_medium"
     android:orientation="vertical"
+
     android:background="@color/widget_relative_layout_background_color"
     android:paddingTop="@dimen/main_relative_padding_top_medium">
 
+    <!--android:updatePeriodMillis="86400"-->
     <LinearLayout
         android:id="@+id/contentContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/main_linear_layout_padding_medium"
         android:paddingTop="@dimen/main_linear_layout_padding_top_medium"
         android:paddingBottom="@dimen/main_linear_layout_padding_bottom_medium"
         android:background="@color/widget_linear_layout_background_color"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:weightSum="15">
+        android:weightSum="15"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/header_height_medium"
             android:layout_below="@+id/contentContainer"
             android:layout_alignParentStart="true"
             android:background="@color/widget_header_grid_layout_background_color">
-
-
 
             <LinearLayout
                 android:orientation="vertical"
@@ -54,7 +53,7 @@
                     android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tarnów"
+                    android:text="middle"
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:textColor="@color/widgetTextColor"
@@ -66,114 +65,239 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp">
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingTop="0dp">
+
+                <!--android:layout_height="@dimen/times_row_size_medium"-->
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_width_size_medium"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/firstWidgetImageView"
+                        android:layout_column="1"
+                        android:src="@drawable/ic_time_to_departure_white" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
+                    <!--Wzor jak uzywac -->
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/first_time_height_size_medium"
+                        android:layout_marginTop="@dimen/time_text_maring_top_medium"
+                        android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
+                        android:includeFontPadding="false"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
                         android:text="02:41"
                         android:layout_column="0"
                         android:textColor="@color/widgetTextColor"
                         android:id="@+id/firstTimeTextView"
-                        android:layout_gravity="center"
                         android:textSize="@dimen/first_time_text_size_medium"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_width="@dimen/icon_width_size_medium"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal">
+
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:id="@+id/firstWidgetImageView"
-                        android:layout_column="1"
-                        android:src="@drawable/ic_car"
-                        android:layout_gravity="center"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/secondWidgetImageView"
+                        android:src="@drawable/ic_time_in_road_white"
+                        android:layout_column="3"
                         />
                 </LinearLayout>
-
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="match_parent">
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_height="wrap_content">
+
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12min"
+                        android:layout_height="@dimen/first_time_height_size_medium"
+                        android:layout_marginTop="@dimen/time_text_maring_top_medium"
+                        android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
+                        android:includeFontPadding="false"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="212m"
+                        android:layout_column="2"
                         android:textColor="@color/widgetTextColor"
                         android:id="@+id/secondTimeTextView"
-                        android:layout_gravity="center"
-                        android:layout_column="2"
                         android:textSize="@dimen/second_time_text_size_medium" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:id="@+id/secondWidgetImageView"
-                        android:src="@drawable/ic_go_work"
-                        android:layout_column="3"
-                        android:layout_gravity="center"
-                        />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12:30"
-                        android:textColor="@color/widgetTextColor"
-                        android:id="@+id/thirdTimeTextView"
-                        android:layout_gravity="center"
-                        android:layout_column="4"
-                        android:textSize="@dimen/third_time_text_size_medium" />
-                </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent">
                     <ImageView
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/icon_width_size_medium"
                         android:layout_height="match_parent"
                         android:id="@+id/widgetThirdImageView"
-                        android:src="@drawable/ic_home"
+                        android:src="@drawable/ic_arrive_to_home_white"
                         android:layout_alignRight="@+id/timeGrid"
                         android:layout_gravity="center"
                         android:layout_alignParentRight="true"
                         android:layout_column="5" />
                 </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/first_time_height_size_medium"
+                        android:layout_marginTop="@dimen/time_text_maring_top_medium"
+                        android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
+                        android:includeFontPadding="false"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="12:30"
+                        android:textColor="@color/widgetTextColor"
+                        android:id="@+id/thirdTimeTextView"
+                        android:layout_column="4"
+                        android:textSize="@dimen/third_time_text_size_medium"
+                        />
+                </LinearLayout>
+
+
             </LinearLayout>
 
         </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="0dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="0"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Small title 1"
+                        android:paddingLeft="2dp"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/first_time_little_title_size_medium"
+                        android:id="@+id/firstTimeSmallTitle"
+                        android:layout_weight="0.39" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Small title 2"
+                        android:paddingLeft="2dp"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/second_time_little_title_size_medium"
+                        android:id="@+id/secondTimeSmallTitle"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="Small title 2"
+                        android:paddingLeft="2dp"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/third_time_little_title_size_medium"
+                        android:id="@+id/thirdTimeSmallTitle" />
+                    <!--android:layout_gravity="center"-->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </LinearLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="@dimen/times_row_size_medium">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -184,12 +308,13 @@
 
                 <ImageView
                     android:id="@+id/envelopeImage"
-                    android:layout_height="47dp"
+                    android:layout_height="match_parent"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_email"
-                    android:layout_width="47dp"
-                    android:layout_gravity="center" />
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1.01" />
             </LinearLayout>
 
             <LinearLayout

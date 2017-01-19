@@ -57,7 +57,7 @@ public abstract class AProcessingTime {
 
         return timeAfterSum;
     }
-
+//6.00 - 13:00 = 17:00
     public LocalDateTime subtractTimeTo(LocalDateTime basedTime, int hourToAdd, int minutesToAdd, int secondsToAdd){
         LocalDateTime timeAfterSubtract = new LocalDateTime()
                 .withYear(basedTime.getYear())

@@ -1,8 +1,13 @@
 package com.mytway.behaviour.pojo.screens;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
@@ -14,6 +19,7 @@ import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
+import org.w3c.dom.Text;
 
 public class MorningScreen implements Screen {
 
@@ -56,10 +62,35 @@ public class MorningScreen implements Screen {
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
 
+
+        //Mozliwe: Size of text in TextView :
+//        TextView defaultTextView = new TextView(context);
+//        float sourceTextSize = defaultTextView.getTextSize();
+//        TextView.setTextSize(sourceTextSize/getResources().getDisplayMetrics().density);
+
+        Typeface typeFace = Typeface.createFromAsset(mContext.getAssets(),"Lionelofparis.ttf");
+        View v = view.apply(mContext, null);
+
+        //times:
         view.setTextViewText(R.id.title, "Morning Screen");
+
+        TextView firstTimeTextView = (TextView) v.findViewById(R.id.firstTimeTextView);
+        firstTimeTextView.setTypeface(typeFace);
+
+
         view.setTextViewText(R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
         view.setTextViewText(R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+
+        //icons:
+        view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_to_departure_white);
+        view.setImageViewResource(R.id.secondImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_arrive_to_home_white);
+
+        //small titles:
+        view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_to_departure_small_titles));
+        view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
+        view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
 
     }
 

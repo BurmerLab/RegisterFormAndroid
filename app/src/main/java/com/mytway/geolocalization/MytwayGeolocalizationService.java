@@ -193,7 +193,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
 
         if(session.isUserLogged()){
-//            thisWidget = new ComponentName(this, MyWidgetProvider.class);
             thisWidget = new ComponentName(this, MyWidgetProvider.class);
             manager = AppWidgetManager.getInstance(this);
 

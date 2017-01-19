@@ -2,13 +2,16 @@ package com.mytway.pojo;
 
 public class Distance {
 
+    private static final int KILOMETER_IN_METERS = 1000;
     private String text = "";
     private double valueInMeters = 0; //kilometers (double)
+    private double valueInKilometers = 0;
     private final static int SEVEN_PERCENTAGE = 1;
 
     public Distance(String text, double valueInMeters) {
         this.text = text;
         this.valueInMeters = valueInMeters;
+        this.valueInKilometers = valueInMeters / KILOMETER_IN_METERS;
     }
 
     public Distance() {

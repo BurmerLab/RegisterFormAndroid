@@ -9,175 +9,6 @@
     android:paddingTop="0dp"
     >
 
-    <LinearLayout
-        android:id="@+id/contentContainer"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="6dp"
-        android:paddingTop="32dp"
-        android:paddingBottom="12dp"
-        android:background="#98134bb3">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="2"
-            android:paddingBottom="5dp"
-            android:text=""
-            android:textColor="#fcfcfc"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="#e8134bb3" />
-
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="93dp"
-                android:rowCount="3"
-                android:columnCount="5"
-                android:id="@+id/gridTable"
-                android:backgroundTintMode="src_over"
-                android:background="#a8134bb3">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="first Message"
-                    android:layout_column="1"
-                    android:layout_row="1"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/firstMessageTextView"
-                    android:layout_gravity="center" />
-                <!--==============================================-->
-
-                <TextView
-                    android:layout_width="67dp"
-                    android:layout_height="44dp"
-                    android:text="02:34"
-                    android:layout_column="0"
-                    android:layout_row="0"
-                    android:background="#a30000"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/firstTimeTextView"
-                    android:layout_gravity="center" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/firstImageView"
-                    android:layout_column="1"
-                    android:layout_row="0"
-                    android:src="@drawable/ic_action_photo"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="26 min"
-                    android:layout_column="2"
-                    android:layout_row="0"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/secondTimeTextView"
-                    android:layout_gravity="center" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/secondImageView"
-                    android:layout_column="3"
-                    android:layout_row="0"
-                    android:src="@drawable/ic_action_photo"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12:23"
-                    android:layout_column="2"
-                    android:layout_row="1"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/thirdTimeTextView"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="second message"
-                    android:layout_column="3"
-                    android:layout_row="1"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/secondMessageTextView"
-                    android:layout_gravity="center" />
-                <!--===================================================-->
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/thirdImageView"
-                    android:layout_column="4"
-                    android:layout_row="0"
-                    android:src="@drawable/ic_action_photo"
-                    android:layout_gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="blablblal"
-                    android:layout_column="4"
-                    android:layout_row="1"
-                    android:textColor="@color/widgetTextColor"
-                    android:id="@+id/thirdMessageTextView"
-                    android:layout_gravity="center" />
-
-
-
-            </GridLayout>
-            <!--<Button-->
-                <!--android:id="@+id/sync_button"-->
-                <!--android:layout_width="30dp"-->
-                <!--android:layout_height="30dp"-->
-                <!--android:layout_centerInParent="true"-->
-                <!--android:background="@drawable/ic_sync_button"-->
-                <!--android:text="" />-->
-
-        </FrameLayout>
-
-
-        <!--<RelativeLayout-->
-        <!--android:id="@+id/buttonContainer"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true" >-->
-
-        <!--<Button-->
-        <!--android:id="@+id/sync_button"-->
-        <!--android:layout_width="30dp"-->
-        <!--android:layout_height="30dp"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:background="@drawable/ic_sync_button"-->
-        <!--android:text="" />-->
-        <!--</RelativeLayout>-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/desc"-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:maxLines="5"-->
-            <!--android:text=""-->
-            <!--android:textColor="#fcfcfc"-->
-            <!--android:textSize="13sp"-->
-            <!--android:textStyle="normal"-->
-            <!--android:background="#2ca543" />-->
-        <!--</RelativeLayout>-->
-
-    </LinearLayout>
-
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -185,5 +16,15 @@
         android:layout_alignParentStart="true"
         android:layout_marginStart="106dp"
         android:layout_marginTop="74dp"></TableLayout>
+
+    <TextView
+        android:text="TextView "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tableLayout"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:id="@+id/textView2"
+        android:background="@color/application_color" />
 
 </RelativeLayout>

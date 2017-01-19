@@ -48,7 +48,8 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
                 Log.i(TAG, "Standard type work");
                 if(!session.getStartStandardTimeWork().equals(EMPTY_STRING)){
                     LocalDateTime startStandardTimeWork = prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());
-
+//                    timeToDeparture = (7:00 - 56min) - 13:02 = 6.04 - 13:02
+                    // timeToDeparture = (7:00 - 50min) - 05:00 = 6:10 - 5:00 = 1:10
                     // timeToDeparture = (startWorkTime - travelTime) - currentTime
                     LocalDateTime startStandardWorkTimeMinusTravelTime =
                             subtractTimeTo(startStandardTimeWork,

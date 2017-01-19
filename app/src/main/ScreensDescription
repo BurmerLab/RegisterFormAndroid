@@ -1,0 +1,25 @@
+Morning Screen:
+1st Time - time to departure (Pokazuje czas do kiedy trzeba wyjechac zeby zdazyc do pracy)
+IKONA: ic_time_to_departure_white
+STANDARD:
+timeToDeparture = (startWorkTime - travelTime) - currentTime
+timeToDeparture = (7:00 - 56min) - 13:02 = 6.04 - 13:02
+FLEXIBLE:
+timeToDeparture = currentTime + travelTime
+timeToDeparture = 13:02 + 56min = 13:59
+
+2nd Time - Time in road (Czas w podrozy) np. 56min)
+IKONA: ic_time_in_road_white
+
+3rd Time - Arrive Time (When We will come back to home)
+IKONA: Strzalka i dom
+
+--------------------------------------------------------------------------------------
+
+TravelToWorkScreen
+//1st Time to work - How much Time to arrive To Work = travelTime (01:12)
+
+//2nd TimeArriveToWork = currentTime + travelTime - Time when user arrive to work
+
+//3rd timeArriveToHome = currentTime + travelTime + session.workLength + travelBackToHome (21.00) Time when user will back to home
+

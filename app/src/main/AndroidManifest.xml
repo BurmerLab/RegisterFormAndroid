@@ -18,7 +18,8 @@
         android:normalScreens="true"
         android:smallScreens="true"
         android:xlargeScreens="true" />
-    <!-- allowBackup temporary for deleting sharedPrefs/Database after uninstall-->
+
+    <!-- allowBackup temporary for deleting sharedPrefs/Database after uninstall -->
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -91,7 +92,8 @@
         <activity
             android:name=".utils.NoPermissionsActivity"
             android:label="@string/title_activity_no_permissions" />
-        <activity android:name=".utils.SettingsActivity"></activity>
+        <activity android:name=".utils.SettingsActivity" />
+        <activity android:name=".ForTest"></activity>
     </application>
 
 </manifest>

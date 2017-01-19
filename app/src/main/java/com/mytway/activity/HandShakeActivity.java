@@ -57,9 +57,6 @@ public class HandShakeActivity extends Activity {
                     getString(R.string.application_basing_on_your_localization));
         }
 
-
-
-
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
