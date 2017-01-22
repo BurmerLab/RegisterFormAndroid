@@ -1,8 +1,17 @@
 package com.mytway.behaviour.pojo.screens;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -62,21 +71,12 @@ public class MorningScreen implements Screen {
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
 
-
-        //Mozliwe: Size of text in TextView :
-//        TextView defaultTextView = new TextView(context);
-//        float sourceTextSize = defaultTextView.getTextSize();
-//        TextView.setTextSize(sourceTextSize/getResources().getDisplayMetrics().density);
-
-        Typeface typeFace = Typeface.createFromAsset(mContext.getAssets(),"Lionelofparis.ttf");
-        View v = view.apply(mContext, null);
+        ObjectAnimator flip = ObjectAnimator.ofFloat(R.id.firstTimeTextView, "rotationX", 0f, 180f);
+        flip.setDuration(1000);
+        flip.start();
 
         //times:
         view.setTextViewText(R.id.title, "Morning Screen");
-
-        TextView firstTimeTextView = (TextView) v.findViewById(R.id.firstTimeTextView);
-        firstTimeTextView.setTypeface(typeFace);
-
 
         view.setTextViewText(R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
         view.setTextViewText(R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());

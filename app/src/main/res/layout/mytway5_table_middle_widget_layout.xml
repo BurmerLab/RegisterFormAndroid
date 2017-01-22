@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="@dimen/main_relative_layout_height_medium"
     android:layout_margin="@dimen/main_relative_layout_margin_medium"
@@ -54,6 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="middle"
+                    android:fontFamily="casual"
                     android:layout_weight="1"
                     android:layout_gravity="center"
                     android:textColor="@color/widgetTextColor"
@@ -98,21 +100,24 @@
                     android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
-                    <!--Wzor jak uzywac -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/first_time_height_size_medium"
                         android:layout_marginTop="@dimen/time_text_maring_top_medium"
                         android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
-                        android:includeFontPadding="false"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="02:41"
-                        android:layout_column="0"
+                        android:text="12:30"
                         android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/third_time_text_size_medium"
+                        android:fontFamily="casual"
+                        android:includeFontPadding="true"
+                        android:layout_column="0"
                         android:id="@+id/firstTimeTextView"
-                        android:textSize="@dimen/first_time_text_size_medium"/>
+                         />
+
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -143,15 +148,17 @@
                         android:layout_height="@dimen/first_time_height_size_medium"
                         android:layout_marginTop="@dimen/time_text_maring_top_medium"
                         android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
-                        android:includeFontPadding="false"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="212m"
-                        android:layout_column="2"
+                        android:text="12:30"
                         android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/third_time_text_size_medium"
+                        android:fontFamily="casual"
+                        android:includeFontPadding="true"
+                        android:layout_column="2"
                         android:id="@+id/secondTimeTextView"
-                        android:textSize="@dimen/second_time_text_size_medium" />
+                        />
                 </LinearLayout>
 
 
@@ -182,15 +189,16 @@
                         android:layout_height="@dimen/first_time_height_size_medium"
                         android:layout_marginTop="@dimen/time_text_maring_top_medium"
                         android:layout_marginBottom="@dimen/time_text_margin_bottom_medium"
-                        android:includeFontPadding="false"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:text="12:30"
                         android:textColor="@color/widgetTextColor"
+                        android:textSize="@dimen/third_time_text_size_medium"
+                        android:fontFamily="casual"
+                        android:includeFontPadding="true"
                         android:id="@+id/thirdTimeTextView"
                         android:layout_column="4"
-                        android:textSize="@dimen/third_time_text_size_medium"
                         />
                 </LinearLayout>
 
@@ -224,6 +232,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:text="Small title 1"
                         android:paddingLeft="2dp"
+                        android:fontFamily="casual"
                         android:textColor="@color/widgetTextColor"
                         android:textSize="@dimen/first_time_little_title_size_medium"
                         android:id="@+id/firstTimeSmallTitle"

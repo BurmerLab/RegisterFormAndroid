@@ -43,9 +43,9 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="second_time_little_title_size_medium">10dp</dimen>
     <dimen name="third_time_little_title_size_medium">10dp</dimen>
 
-    <dimen name="first_time_height_size_medium">35dip</dimen>
-    <dimen name="time_text_maring_top_medium">-5dip</dimen>
-    <dimen name="time_text_margin_bottom_medium">0dip</dimen>
+    <dimen name="first_time_height_size_medium">37dip</dimen>
+    <dimen name="time_text_maring_top_medium">-7dip</dimen>
+    <dimen name="time_text_margin_bottom_medium">1dip</dimen>
 
     <!-- LDPI SMALL-->
     <!--small = NORMAL DIMENSIONS * 0.75; 130dp * 0.75 = 97.5-->
