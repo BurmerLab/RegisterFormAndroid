@@ -41,13 +41,14 @@ public class WorkScreen implements Screen {
 
         //3) TimeArriveToHome - o ktorej dojedziemy do domu (TimeToEndWork + travelTime(ToHome)
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
+        timeArriveToHome.setTravelTimeToHome(travelTimeOnRoadToHome);
         timeArriveToHome.processTime(mContext, currentPosition, session, startWorkTime);
         setTimeArriveToHome(timeArriveToHome);
 
         view.setTextViewText(R.id.title, "WorkScreen");
-        view.setTextViewText(R.id.firstTimeTextView, this.getTimeToEndWork().displayMessage());
-        view.setTextViewText(R.id.secondTimeTextView, this.getTravelTimeOnRoadToHome().displayMessage());
-        view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+        view.setTextViewText(R.id.firstTimeSmallTitle, this.getTimeToEndWork().displayMessage());
+        view.setTextViewText(R.id.secondTimeSmallTitle, this.getTravelTimeOnRoadToHome().displayMessage());
+        view.setTextViewText(R.id.thirdTimeSmallTitle, this.getTimeArriveToHome().displayMessage());
     }
 
     @Override

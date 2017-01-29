@@ -124,6 +124,9 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
         }else if(directionWay.isInHome()) {
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace());
 
+        }else if(directionWay.isInWork()) {
+            setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace());
+
         }else{
             Log.i(TAG, "There is no direction defined (isWayToHome and Work set to false, not supported");
         }
@@ -148,7 +151,8 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
     }
     public void setGoogleMapsDirectionJson(Context context, Position currentPosition, Position endPosition) {
         this.googleMapsDirectionJson =  getTravelTimeBetweenTwoPositions(context, currentPosition, endPosition);
-        this.displayTimeMessage = this.googleMapsDirectionJson.getLegs().getDuration().getDurationTime().toString();
+        String displayMessage = convertTimeToTimeLeftFormat(this.googleMapsDirectionJson.getLegs().getDuration().getDurationTime());
+        setDisplayTimeMessage(displayMessage);
     }
 
     public DirectionWay getDirectionWay() {

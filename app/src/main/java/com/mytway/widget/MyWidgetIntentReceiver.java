@@ -22,6 +22,12 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 //			context.startActivity(intent);
 //		}
 
+		//added for restart widget after bootloaded app
+		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+			Intent pushIntent = new Intent(context, MytwayGeolocalizationService.class);
+			context.startService(pushIntent);
+		}
+
 	}
 
 	private void updateWidgetPictureAndButtonListener(Context context, String messageText) {
@@ -29,8 +35,6 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 		// updating view
 		remoteViews.setTextViewText(R.id.title, messageText);
-//		remoteViews.setTextViewText(R.id.desc, getDesc(context));
-
 
 		// re-registering for click listener, remoteViews, R.id.envelopeimage
 		remoteViews.setOnClickPendingIntent(R.id.sync_button, MyWidgetProvider.buildButtonPendingIntent(context, AppWidgetManager.getInstance(context),
@@ -42,12 +46,4 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 		MyWidgetProvider.pushWidgetUpdate(context.getApplicationContext(),	remoteViews);
 	}
 
-	private String getDesc(Context context) {
-		// some static jokes from xml
-		msg = context.getResources().getStringArray(R.array.news_headlines);
-		if (clickCount >= msg.length) {
-			clickCount = 0;
-		}
-		return msg[clickCount];
-	}
 }

@@ -207,4 +207,5 @@
     </string-array>
     <string name="title_activity_no_permissions">NoPermissionsActivity</string>
     <string name="title_activity_tested_localization">TestedLocalizationActivity</string>
+    <string name="time_arrive_to_work_small_titles">time arrive to work</string>
 </resources>

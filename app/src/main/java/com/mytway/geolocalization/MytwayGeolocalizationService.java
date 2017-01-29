@@ -20,9 +20,7 @@ import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
-import com.mytway.behaviour.pojo.screens.HomeScreen;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
-import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Distance;
@@ -212,31 +210,41 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
-                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
+//                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
 
-                if(directionWay.isInHome()){
-                    //Morning screen
-                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+                LocalDateTime startWorkTime = new LocalDateTime()
+                        .withYear(0)
+                        .withMonthOfYear(1)
+                        .withDayOfMonth(1)
+                        .withHourOfDay(21)
+                        .withMinuteOfHour(1)
+                        .withSecondOfMinute(0);
 
-                } else if(directionWay.isInWayToWork()){
+//                if(directionWay.isInHome()){
+//                    //Morning screen
+//                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+//
+//                } else if(directionWay.isInWayToWork()){
                     //TravelToWorkScreen
-                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
-                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+//                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
+//                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-                } else if(directionWay.isInWork()){
-                    //WorkScreen
+//                } else if(directionWay.isInWork()){
+//                    //WorkScreen
                     WorkScreen workScreen = new WorkScreen();
+                    directionWay.setIsInWork(Boolean.TRUE);
+                    directionWay.setIsInHome(Boolean.FALSE);
                     workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
-
-                } else if(directionWay.isInWayToHome()){
-                    //TravelToHomeScreen
-                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-
-                } else if(directionWay.getIsInHome()){
-                    HomeScreen homeScreen = new HomeScreen();
-                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-                }
+//
+//                } else if(directionWay.isInWayToHome()){
+//                    //TravelToHomeScreen
+//                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
+//                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+//
+//                } else if(directionWay.getIsInHome()){
+//                    HomeScreen homeScreen = new HomeScreen();
+//                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+//                }
             }else{
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);

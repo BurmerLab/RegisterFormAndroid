@@ -45,10 +45,18 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// initializing widget layout
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),	R.layout.mytway5_table_middle_widget_layout);
 
+		//refresh button
+		Intent intentSync = new Intent(context, MyWidgetProvider.class);
+		intentSync.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE); //You need to specify the action for the intent. Right now that intent is doing nothing for there is no action to be broadcasted.
+		PendingIntent pendingSync = PendingIntent.getBroadcast(context,0, intentSync, PendingIntent.FLAG_UPDATE_CURRENT); //You need to specify a proper flag for the intent. Or else the intent will become deleted.
+		remoteViews.setOnClickPendingIntent(R.id.refreshImage,pendingSync);
+		appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
+
 		//http://www.parallelrealities.co.uk/2011/09/using-alarmmanager-for-updating-android.html
 		manager.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(),
 				PropertiesValues.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
 
+		// after click, move to permission activity:
 		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
 
 		pushWidgetUpdate(context, remoteViews);

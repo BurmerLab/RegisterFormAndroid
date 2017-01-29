@@ -40,11 +40,6 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
             //TimeArriveToHome - (TimeToEndWork + travelTime(ToHome)
             LocalDateTime lenghtWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
 
-            //Travel time
-            TravelTime travelTime = new TravelTime();
-            travelTime.setDirectionWay(directionWay);
-            travelTime.obtainTravelTimeBasedOnDirectonWay(context, currentPosition, session);
-
             //startWorkTime + lengthWorkTime + travelTime
             LocalDateTime timeToEndWork = addTimeTo(startWorkTime,
                     lenghtWorkTime.getHourOfDay(),

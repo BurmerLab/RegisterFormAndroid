@@ -132,6 +132,16 @@ public class AProcessingTimeTest {
     }
 
     @Test
+    public void testConvertTimeToTimeLeftFormat_bigGourAndBigMinutes(){
+        LocalDateTime timeToConvert = new LocalDateTime()
+                .withHourOfDay(12)
+                .withMinuteOfHour(40);
+        String convertedString = timeToDeparture.convertTimeToTimeLeftFormat(timeToConvert);
+
+        assertEquals("12h40m", convertedString);
+    }
+
+    @Test
     public void testConvertTimeToTimeLeftFormat_onlyMinutes(){
         LocalDateTime timeToConvert = new LocalDateTime()
                 .withYear(0)
@@ -144,4 +154,5 @@ public class AProcessingTimeTest {
 
         assertEquals("40m", convertedString);
     }
+
 }

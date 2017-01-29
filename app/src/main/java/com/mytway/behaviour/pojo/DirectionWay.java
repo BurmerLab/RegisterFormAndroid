@@ -17,8 +17,8 @@ public class DirectionWay {
     private static final int THREE_DISTANCES = 3;
     private static final double HOME_OR_WORK_ZONE = 300.0;
     private static final int METERS_IN_KILOMETER = 1000;
-    private Boolean wayToWork;
-    private Boolean wayToHome;
+    private Boolean wayToWork = Boolean.FALSE;
+    private Boolean wayToHome = Boolean.FALSE;
     private Boolean isInWork = Boolean.FALSE;
     private Boolean isInHome = Boolean.FALSE;
 

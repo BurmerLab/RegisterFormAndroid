@@ -160,7 +160,7 @@
                     <ImageView
                         android:layout_width="@dimen/icon_width_size_medium"
                         android:layout_height="match_parent"
-                        android:id="@+id/widgetThirdImageView"
+                        android:id="@+id/thirdWidgetImageView"
                         android:src="@drawable/ic_arrive_to_home_white"
                         android:layout_alignRight="@+id/timeGrid"
                         android:layout_gravity="center"

@@ -29,26 +29,44 @@ public class TravelToWorkScreen implements Screen{
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
                               Context mContext, Position currentPosition) throws Exception {
 
-        //1st Time to work
+        //1st time in road (S&F)
         TravelTime travelTime = new TravelTime();
         travelTime.setDirectionWay(directionWay);
         travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
         setTravelTime(travelTime);
 
-        //2nd TimeArriveToWork = currentTime + travelTime
+        //2nd time Arrive To Work = currentTime + travelTime (S&F)
         TimeArriveToWork timeArriveToWork = new TimeArriveToWork();
+        timeArriveToWork.setTravelTimeToWork(travelTime);
+        timeArriveToWork.setSession(session);
         timeArriveToWork.processTime();
         setTimeArriveToWork(timeArriveToWork);
 
-        //3rd timeArriveToHome
+        //3rd timeArriveToHome (S&F)
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
-        timeArriveToHome.processTime();
+        timeArriveToHome.setSession(session);
+        timeArriveToHome.setTravelTimeToHome(travelTime);
+        timeArriveToHome.setTravelTimeToWork(travelTime);
+        timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
 
-        view.setTextViewText(R.id.title, "TravelToWorkScreen");
+        //times:
+        view.setTextViewText(R.id.title, "Travel To Work");
         view.setTextViewText(R.id.firstTimeTextView, this.getTravelTime().displayMessage());
         view.setTextViewText(R.id.secondTimeTextView, this.getTimeArriveToWork().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+
+        //icons:
+        view.setImageViewResource(R.id.firstWidgetImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.secondWidgetImageView, R.drawable.ic_time_arrive_to_work);
+        view.setImageViewResource(R.id.thirdWidgetImageView, R.drawable.ic_arrive_to_home_white);
+
+        //small titles:
+        view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
+        view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_arrive_to_work_small_titles));
+        view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
+
+
     }
 
     @Override
