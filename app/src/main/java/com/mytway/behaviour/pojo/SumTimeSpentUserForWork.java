@@ -43,8 +43,10 @@ public class SumTimeSpentUserForWork extends AProcessingTime implements IDisplay
             String displayMessage = prepareTimeFromLocalDateTimeToString(sumTimeSpentUserForWork);
             Log.i(TAG, "SumTimeSpentUserForWork: " + displayMessage);
 
+            String sumTimeSpentUserForWorkInTimeLeftFormat = convertTimeToTimeLeftFormat(sumTimeSpentUserForWork);
+
             setSumTimeSpentUserForWork(sumTimeSpentUserForWork);
-            setDisplayTimeMessage(displayMessage);
+            setDisplayTimeMessage(sumTimeSpentUserForWorkInTimeLeftFormat);
         }
     }
 

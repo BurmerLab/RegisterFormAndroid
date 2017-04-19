@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
-import com.mytway.activity.utils.NoPermissionsActivity;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
 
 public class MyWidgetIntentReceiver extends BroadcastReceiver {
@@ -21,6 +20,8 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 //			intent.putExtra("Permissions", "No");
 //			context.startActivity(intent);
 //		}
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),	R.layout.mytway5_table_middle_widget_layout);
+		updateWidgetPictureAndButtonListener(context, "lol");
 
 		//added for restart widget after bootloaded app
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
@@ -36,12 +37,14 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 		// updating view
 		remoteViews.setTextViewText(R.id.title, messageText);
 
-		// re-registering for click listener, remoteViews, R.id.envelopeimage
-		remoteViews.setOnClickPendingIntent(R.id.sync_button, MyWidgetProvider.buildButtonPendingIntent(context, AppWidgetManager.getInstance(context),
-				new int[]{0}, remoteViews, R.id.envelopeImage));
+		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.refreshWidgetContent(context));
 
-		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context, AppWidgetManager.getInstance(context),
-				new int[]{0}, remoteViews, R.id.image4));
+		// re-registering for click listener, remoteViews, R.id.envelopeimage
+//		remoteViews.setOnClickPendingIntent(R.id.sync_button, MyWidgetProvider.buildButtonPendingIntent(context, AppWidgetManager.getInstance(context),
+//				new int[]{0}, remoteViews, R.id.envelopeImage));
+//
+//		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context, AppWidgetManager.getInstance(context),
+//				new int[]{0}, remoteViews, R.id.image4));
 
 		MyWidgetProvider.pushWidgetUpdate(context.getApplicationContext(),	remoteViews);
 	}

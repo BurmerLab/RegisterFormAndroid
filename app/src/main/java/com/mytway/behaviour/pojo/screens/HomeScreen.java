@@ -10,6 +10,8 @@ import com.mytway.utility.Session;
 
 import org.joda.time.LocalDateTime;
 
+import java.util.Calendar;
+
 public class HomeScreen implements Screen{
     private static final String TAG = "HomeScreen";
 
@@ -22,8 +24,8 @@ public class HomeScreen implements Screen{
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
                               Context mContext, Position currentPosition, LocalDateTime startWorkTime)
             throws Exception {
-
-        view.setTextViewText(R.id.title, "Home Screen");
+        String time = Calendar.getInstance().getTime().toString();
+        view.setTextViewText(R.id.title, "Home Screen " + time);
         view.setTextViewText(R.id.firstTimeTextView, "Home1");
         view.setTextViewText(R.id.secondTimeTextView, "Home2");
         view.setTextViewText(R.id.thirdTimeTextView, "Home3");

@@ -17,6 +17,7 @@ import com.mytway.utility.permission.PermissionUtil;
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -111,5 +112,14 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         location.setLatitude(1.2345d);
         location.setLongitude(1.2345d);
         return location;
+    }
+
+
+    @Test
+    public void testDat(){
+        LocalDateTime localDateTime = new LocalDateTime();
+        System.out.println("TUTAJ: " + localDateTime.toString("dd-mm-yyyy MM:hh:ss"));
+        System.out.println("TUTAJ2: " + localDateTime.toString("dd-mm-yyyy MM:hh:ss aa"));
+        //TUTAJ: 2017-03-29T17:04:18.213
     }
 }

@@ -42,6 +42,10 @@ public class TimeToEndWork extends AProcessingTime implements IDisplayedTime{
                     lenghtWorkTime.getMinuteOfHour(),
                     lenghtWorkTime.getSecondOfMinute());
 
+//mialem do zrobienia ile jest godzin, problem jest w tym ze po dodaniu:
+            //2016-01-01 22:00 + 08:00 to wychodzi na 2016-01-02 04:00 czyli zwraca 4 godizny a nie 8
+
+//            LocalDateTime finaltimeToEndWork = dirrefenceHoursBetweenTimes();
             String displayMessage = prepareTimeFromLocalDateTimeToString(timeToEndWork);
             Log.i(TAG, "TimeToEndWork: " + displayMessage);
 

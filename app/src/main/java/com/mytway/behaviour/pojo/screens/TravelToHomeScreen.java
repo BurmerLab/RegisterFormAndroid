@@ -13,6 +13,8 @@ import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 
+import java.util.Calendar;
+
 public class TravelToHomeScreen implements Screen{
     //3) laczny czas od wyjscia z pracy do domu = current time - kiedy user wyszedl z domu(param)
     private static final String TAG = "TravelToHomeScreen";
@@ -27,29 +29,42 @@ public class TravelToHomeScreen implements Screen{
     }
 
     @Override
-    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context context,
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext,
                               Position currentPosition, LocalDateTime whenUserLeaveHome)
             throws Exception {
         //1st Travel time travelTimeToHome
         TravelTime travelTimeToHome = new TravelTime();
         travelTimeToHome.setDirectionWay(directionWay);
-        travelTimeToHome.obtainTravelTimeBasedOnDirectonWay(context, currentPosition, session);
+        travelTimeToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
         setTravelTimeToHome(travelTimeToHome);
 
         //2nd TimeArriveToHome = currentTime + travelTimeToHome
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
-        timeArriveToHome.processTime(context, currentPosition, session);
+        timeArriveToHome.setDirectionWay(directionWay);
+        timeArriveToHome.processTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
 
         //3rd SumTimeSpentForWork = current time - kiedy user wyszedl z domu(param)
         SumTimeSpentUserForWork sumTimeSpentUserForWork = new SumTimeSpentUserForWork();
-        sumTimeSpentUserForWork.processTime(context, currentPosition, session, whenUserLeaveHome);
+        sumTimeSpentUserForWork.processTime(mContext, currentPosition, session, whenUserLeaveHome);
         setSumTimeSpentUserForWork(sumTimeSpentUserForWork);
 
-        view.setTextViewText(R.id.title, "TravelToHomeScreen");
+        //times:
+        String time = Calendar.getInstance().getTime().toString();
+        view.setTextViewText(R.id.title, "TravelToHomeScreen " + time);
         view.setTextViewText(R.id.firstTimeTextView, this.getTravelTimeToHome().displayMessage());
         view.setTextViewText(R.id.secondTimeTextView, this.getTimeArriveToHome().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getSumTimeSpentUserForWork().displayMessage());
+
+        //icons:
+        view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.secondImageView, R.drawable.ic_arrive_to_home_white);
+        view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_time_sum_spent_from_leave_home_white);
+
+        //small titles:
+        view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
+        view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
+        view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_spent_from_leave_home));
 
     }
 

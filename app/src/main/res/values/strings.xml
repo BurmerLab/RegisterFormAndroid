@@ -74,9 +74,15 @@
 
 
     //Morning Screen small titles
-    <string name="time_to_departure_small_titles">time to departure</string>
-    <string name="time_in_road_small_titles">time in road</string>
+    <string name="time_to_departure_small_titles">to departure</string>
+    <string name="time_in_road_small_titles">in road</string>
     <string name="time_arrive_to_home_small_titles">arrive to home</string>
+
+    //Work Screen small titles
+    <string name="time_to_end_work">to end work</string>
+
+    //TravelToHomeScreen small titles
+    <string name="time_spent_from_leave_home">spent from leave home</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

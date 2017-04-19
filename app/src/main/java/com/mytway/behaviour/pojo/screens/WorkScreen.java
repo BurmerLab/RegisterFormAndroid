@@ -13,6 +13,8 @@ import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 
+import java.util.Calendar;
+
 public class WorkScreen implements Screen {
 
     private TimeToEndWork timeToEndWork;
@@ -26,6 +28,9 @@ public class WorkScreen implements Screen {
                               Position currentPosition, LocalDateTime startWorkTime)
             throws Exception {
 
+        Position currentPositionMocked = new Position(50.02999195226106, 19.945344775915146);
+
+
         //1) TimeToEndWork = startWorkParameter  + session.workLength
         //(startWorkParameter  + session.workLength)  - currentTime =
         // (12.00 + 8.00) - 14.00 = 16.00 - 14.00 = 02:00 (koniec pracy)
@@ -36,19 +41,37 @@ public class WorkScreen implements Screen {
         //2) TravelTimeBackToHome  = travelTime (toHome)
         TravelTime travelTimeOnRoadToHome = new TravelTime();
         travelTimeOnRoadToHome.setDirectionWay(directionWay);
-        travelTimeOnRoadToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
+//        travelTimeOnRoadToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
+        travelTimeOnRoadToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPositionMocked, session);
         setTravelTimeOnRoadToHome(travelTimeOnRoadToHome);
+        travelTimeOnRoadToHome.processTime();
+
 
         //3) TimeArriveToHome - o ktorej dojedziemy do domu (TimeToEndWork + travelTime(ToHome)
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
-        timeArriveToHome.setTravelTimeToHome(travelTimeOnRoadToHome);
+        timeArriveToHome.setTravelTime(travelTimeOnRoadToHome);
         timeArriveToHome.processTime(mContext, currentPosition, session, startWorkTime);
         setTimeArriveToHome(timeArriveToHome);
 
-        view.setTextViewText(R.id.title, "WorkScreen");
-        view.setTextViewText(R.id.firstTimeSmallTitle, this.getTimeToEndWork().displayMessage());
-        view.setTextViewText(R.id.secondTimeSmallTitle, this.getTravelTimeOnRoadToHome().displayMessage());
-        view.setTextViewText(R.id.thirdTimeSmallTitle, this.getTimeArriveToHome().displayMessage());
+        //times:
+        String time = Calendar.getInstance().getTime().toString();
+        view.setTextViewText(R.id.title, "Work Screen " + time);
+
+        view.setTextViewText(R.id.firstTimeTextView, this.getTimeToEndWork().displayMessage());
+        view.setTextViewText(R.id.secondTimeTextView, this.getTravelTimeOnRoadToHome().displayMessage());
+        view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+
+        //icons:
+        view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_to_departure_white);
+        view.setImageViewResource(R.id.secondImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_arrive_to_home_white);
+
+        //small titles:
+        view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_to_end_work));
+        view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
+        view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
+
+
     }
 
     @Override

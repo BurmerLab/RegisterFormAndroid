@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
@@ -36,10 +37,10 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		TIME.set(Calendar.SECOND, 0);
 		TIME.set(Calendar.MILLISECOND, 0);
 
-		final Intent intentToService = new Intent(context, MytwayGeolocalizationService.class);
+		final Intent intentToMytwayGeolocalizationService = new Intent(context, MytwayGeolocalizationService.class);
 
 		if (service == null){
-			service = PendingIntent.getService(context, 0, intentToService, PendingIntent.FLAG_CANCEL_CURRENT);
+			service = PendingIntent.getService(context, 0, intentToMytwayGeolocalizationService, PendingIntent.FLAG_CANCEL_CURRENT);
 		}
 
 		// initializing widget layout
@@ -48,8 +49,17 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		//refresh button
 		Intent intentSync = new Intent(context, MyWidgetProvider.class);
 		intentSync.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE); //You need to specify the action for the intent. Right now that intent is doing nothing for there is no action to be broadcasted.
-		PendingIntent pendingSync = PendingIntent.getBroadcast(context,0, intentSync, PendingIntent.FLAG_UPDATE_CURRENT); //You need to specify a proper flag for the intent. Or else the intent will become deleted.
-		remoteViews.setOnClickPendingIntent(R.id.refreshImage,pendingSync);
+
+		//mozna wyuwalic
+//		PendingIntent pendingSync = PendingIntent.getBroadcast(context,0, intentSync, PendingIntent.FLAG_UPDATE_CURRENT); //You need to specify a proper flag for the intent. Or else the intent will become deleted.
+//		remoteViews.setOnClickPendingIntent(R.id.refreshImage, pendingSync);
+
+		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.refreshWidgetContent(context));
+
+		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context, AppWidgetManager.getInstance(context),
+				new int[]{0}, remoteViews, R.id.image4));
+
+
 		appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
 
 		//http://www.parallelrealities.co.uk/2011/09/using-alarmmanager-for-updating-android.html
@@ -57,7 +67,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				PropertiesValues.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
 
 		// after click, move to permission activity:
-		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
+//		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);
 
 		pushWidgetUpdate(context, remoteViews);
 	}
@@ -112,6 +122,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		}
 
 		return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+
+	public static PendingIntent refreshWidgetContent(Context context) {
+
+		Intent pushIntent = new Intent(context, MytwayGeolocalizationService.class);
+		context.startService(pushIntent);
+
+		return PendingIntent.getBroadcast(context, 0, pushIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	public static PendingIntent buildButtonSettingsPendingIntent(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, RemoteViews remoteViews, int viewId) {

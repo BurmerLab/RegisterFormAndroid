@@ -16,6 +16,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Log.class)
 public class DirectionWayTest extends TestCase {
@@ -164,6 +166,50 @@ public class DirectionWayTest extends TestCase {
         expectedListOfDirections.add(Boolean.FALSE);
 
         assertEquals(expectedListOfDirections, actualListOfDirections);
+
+    }
+
+    @Test
+    public void testDouble(){
+        double first = 2.20;
+        Double second = 2.20;
+
+        if(second < first){
+            System.out.println("MNIEJSZY");
+        }else{
+            System.out.println("NIE");
+        }
+    }
+
+    @Test
+    public void testKolejnosci(){
+
+        List<Integer> previousDistancesList = new LinkedList<>();
+        previousDistancesList.add(50);
+        previousDistancesList.add(40);
+        previousDistancesList.add(40);
+        previousDistancesList.add(30);
+        previousDistancesList.add(30);
+        previousDistancesList.add(20);
+        previousDistancesList.add(10);
+        previousDistancesList.add(10);
+        previousDistancesList.add(5);
+
+        int currentDistanceToPoint = 4;
+
+        boolean isDirectionToHome = false;
+
+        int i = previousDistancesList.size() - 1;
+        isDirectionToHome = (previousDistancesList.get(i) < previousDistancesList.get(i - 1)
+                ||
+                previousDistancesList.get(i - 1) < previousDistancesList.get(i - 2)
+                ||
+                previousDistancesList.get(i - 2) < previousDistancesList.get(i - 3)
+        )
+                &&
+                currentDistanceToPoint < previousDistancesList.get(i);
+
+        assertEquals(isDirectionToHome, true);
 
     }
 

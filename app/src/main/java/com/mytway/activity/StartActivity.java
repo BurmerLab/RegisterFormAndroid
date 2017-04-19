@@ -26,8 +26,15 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_start);
 
         if (!PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
-                && !PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
+                && !PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())
+                && ! PermissionUtil.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, getApplicationContext())) {
             PermissionUtil.requestPermission(Manifest.permission.ACCESS_FINE_LOCATION,
+                    PERMISSION_REQUEST_CODE_LOCATION,
+                    getApplicationContext(),
+                    StartActivity.this,
+                    getString(R.string.application_basing_on_your_localization));
+
+            PermissionUtil.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     PERMISSION_REQUEST_CODE_LOCATION,
                     getApplicationContext(),
                     StartActivity.this,

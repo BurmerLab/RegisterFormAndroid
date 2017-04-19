@@ -13,6 +13,8 @@ import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 
+import java.util.Calendar;
+
 public class TravelToWorkScreen implements Screen{
 
     private static final String TAG = "TravelToWorkScreen";
@@ -50,8 +52,10 @@ public class TravelToWorkScreen implements Screen{
         timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
         setTimeArriveToHome(timeArriveToHome);
 
+        String time = Calendar.getInstance().getTime().toString();
+
         //times:
-        view.setTextViewText(R.id.title, "Travel To Work");
+        view.setTextViewText(R.id.title, "Travel To Work " + time);
         view.setTextViewText(R.id.firstTimeTextView, this.getTravelTime().displayMessage());
         view.setTextViewText(R.id.secondTimeTextView, this.getTimeArriveToWork().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());

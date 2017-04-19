@@ -171,3 +171,29 @@ Sprawdzic update bazy, po zmieniuonym typie z float na text,
 Zrobic zmiane w webservisie jesli jest potrzebmna
 Chyba nie trzeba robic zmiany bo juz jest zapis w postaci Varchar :)
 Sprawdzic dzialanie webservisu
+
+Zmiana fontsu:
+Po inicjalizacji buttonu/textview itp., bez fonts/font.ttf tlyko od razu plik ttf
+Typeface type = Typeface.createFromAsset(getAssets(),"agoestoesan.ttf");
+mLoginActivityButton.setTypeface(type);
+
+zrodlo:
+http://stackoverflow.com/questions/2888508/how-to-change-the-font-on-the-textview
+
+icony: program
+http://stackoverflow.com/questions/35401968/how-to-create-vector-drawables-for-android
+
+Icony jak definiowac:
+http://stackoverflow.com/questions/5350624/set-icon-for-android-application
+
+TimeToDepartureIcon
+https://icons8.com/web-app/for/androidL/leave
+
+obracanie imageView:
+http://android-coding.blogspot.com/2015/10/interactive-flip-imageview-using.html
+
+Restart servisu bo loadzie:
+http://www.jjoe64.com/2011/06/autostart-service-on-device-boot.html
+
+Rozne rozmiary czcionki w roznych literach:
+http://stackoverflow.com/questions/16335178/different-font-size-of-strings-in-the-same-textview

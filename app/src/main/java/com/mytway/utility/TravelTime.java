@@ -75,7 +75,8 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
 
     @Override
     public void processTime() throws Exception {
-        throw new Exception("Not supported processTime here, in " + TAG);
+        String travelTime = convertTimeToTimeLeftFormat(googleMapsDirectionJson.getLegs().getDuration().getDurationTime());
+        setDisplayTimeMessage(travelTime);
     }
 
     @Override

@@ -80,7 +80,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
                 Log.i(TAG, "User TypeWork not defined, not handled problem");
             }
 
-            String displayMessage = prepareTimeFromLocalDateTimeToString(timeToDepartureLocalDateTime);
+            String displayMessage = convertTimeToTimeLeftFormat(timeToDepartureLocalDateTime);
             Log.i(TAG, "Time to departure: " + displayMessage);
 
             setTimeToDeparture(timeToDepartureLocalDateTime);

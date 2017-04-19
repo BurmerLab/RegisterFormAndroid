@@ -11,6 +11,6 @@
     <color name="widget_linear_layout_background_color">#98134bb3</color>
     <color name="widget_header_grid_layout_background_color">#98111ac9</color>
     <color name="widget_grid_layout_background_color">#a8134bb3</color>
-
+    <color name="light_blue">#ff00a2e8</color>
 
 </resources>

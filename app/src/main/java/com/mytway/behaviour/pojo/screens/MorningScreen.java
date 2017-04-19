@@ -9,7 +9,10 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.text.SpannableString;
 import android.text.format.DateFormat;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -24,11 +27,14 @@ import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
 import com.mytway.pojo.Position;
+import com.mytway.utility.DisplayMessageStyle;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
 import org.w3c.dom.Text;
+
+import java.util.Calendar;
 
 public class MorningScreen implements Screen {
 
@@ -75,14 +81,17 @@ public class MorningScreen implements Screen {
         flip.setDuration(1000);
         flip.start();
 
-        //times:
-        view.setTextViewText(R.id.title, "Morning Screen");
+        String time = Calendar.getInstance().getTime().toString();
 
-        view.setTextViewText(R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
-        view.setTextViewText(R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
+        //times:
+        view.setTextViewText(R.id.title, "Morning Screen: " + time);
+
+        DisplayMessageStyle.displayLeftTime(view, R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
+        DisplayMessageStyle.displayLeftTime(view, R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
 
         //icons:
+        view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);
         view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_to_departure_white);
         view.setImageViewResource(R.id.secondImageView, R.drawable.ic_time_in_road_white);
         view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_arrive_to_home_white);
@@ -91,6 +100,7 @@ public class MorningScreen implements Screen {
         view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_to_departure_small_titles));
         view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
         view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
+
 
     }
 

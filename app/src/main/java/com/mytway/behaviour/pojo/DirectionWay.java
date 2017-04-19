@@ -1,5 +1,6 @@
 package com.mytway.behaviour.pojo;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.mytway.pojo.Distance;
@@ -8,8 +9,14 @@ import com.mytway.utility.Session;
 
 import org.joda.time.LocalDateTime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.lang.Boolean.TRUE;
 
 public class DirectionWay {
 
@@ -62,6 +69,9 @@ public class DirectionWay {
         double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
         double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
 
+        distancesToHomeList.add(currentDistanceToHomeInMeters);
+        distancesToWorkList.add(currentDistanceToWorkInMeters);
+
         List<Boolean> previousBooleansIsWayToHomeList =
                 obtainListOfDirections(distancesToHomeList, currentDistanceToHomeInMeters);
 
@@ -73,6 +83,14 @@ public class DirectionWay {
             sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
         }
 
+        saveToFile("===================decideDirection()============================");
+        saveToFile("currentPosition: " + currentPosition.getLongitude() + " , " + currentPosition.getLatitude());
+        saveToFile("currentDistanceToHomeInMeters: " + currentDistanceToHomeInMeters);
+        saveToFile("currentDistanceToWorkInMeters: " + currentDistanceToWorkInMeters);
+        saveToFile("sevenPercentageOfDistanceBetweenHomeAndWorkInMeters: " + sevenPercentageOfDistanceBetweenHomeAndWorkInMeters);
+        saveToFile("===============================================");
+
+
         if(sevenPercentageOfDistanceBetweenHomeAndWorkInMeters < currentDistanceToHomeInMeters){
             decideIsMoveWayToHome(previousBooleansIsWayToHomeList);
             decideIsMoveWayToWork(previousBooleansIsWayToWorkList);
@@ -80,18 +98,51 @@ public class DirectionWay {
             wayToHome = Boolean.FALSE;
             wayToWork = Boolean.FALSE;
         }
+
+    }
+
+    public static void saveToFile(String content) {
+        try{
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(dir, "DirectionWay.txt");
+            LocalDateTime currentLocalDateTime = new LocalDateTime();
+            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+            FileOutputStream fop = new FileOutputStream(file, true);
+            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+            fop.write(pointXml.getBytes());
+            fop.flush();
+            fop.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void decideIsMoveWayToHome(List<Boolean> previousBooleansIsWayToHomeList) {
-        if(previousBooleansIsWayToHomeList.size() >= 2){
-            boolean firstPreviousIsWayToHome = previousBooleansIsWayToHomeList.get(previousBooleansIsWayToHomeList.size()-1);
-            boolean secondPreviousIsWayToHome = previousBooleansIsWayToHomeList.get(previousBooleansIsWayToHomeList.size()-2);
 
-            //if two last booleans is true, then direction is to home, if three last is false, then direction to work
-            if(firstPreviousIsWayToHome && secondPreviousIsWayToHome){
-                wayToHome = Boolean.TRUE;
-                //todo: is it need to add leaveWorkToGoToHomeTime?
+        saveToFile(" previousBooleansIsWayToHomeList.size(): " + previousBooleansIsWayToHomeList.size());
+
+        if(previousBooleansIsWayToHomeList.size() >= 2){
+
+            int i = previousBooleansIsWayToHomeList.size() - 1;
+            //check last 3 decides, if one is true, then decide that user is in way to home
+            if(previousBooleansIsWayToHomeList.get(i) || previousBooleansIsWayToHomeList.get(i - 1)
+                    || previousBooleansIsWayToHomeList.get(i - 2)){
+                saveToFile(">>> previousBooleansIsWayToHomeList.get(i): " + previousBooleansIsWayToHomeList.get(i));
+                saveToFile(">>> previousBooleansIsWayToHomeList.get(i - 1): " + previousBooleansIsWayToHomeList.get(i - 1));
+                saveToFile(">>> previousBooleansIsWayToHomeList.get(i - 2): " + previousBooleansIsWayToHomeList.get(i - 2));
+                saveToFile("Way to home = true");
+                wayToHome = TRUE;
             }else{
+                saveToFile("IS NOT IN WAY TO HOME - isDirectionsIsToPointList.add(FALSE)");
                 wayToHome = Boolean.FALSE;
                 Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
             }
@@ -101,47 +152,53 @@ public class DirectionWay {
     }
 
     private void decideIsMoveWayToWork(List<Boolean> previousBooleansIsWayToWorkList) {
-        if(previousBooleansIsWayToWorkList.size() >= 2){
-            boolean firstPreviousIsWayToWork = previousBooleansIsWayToWorkList.get(previousBooleansIsWayToWorkList.size()-1);
-            boolean secondPreviousIsWayToWork = previousBooleansIsWayToWorkList.get(previousBooleansIsWayToWorkList.size() - 2);
+        saveToFile(" previousBooleansIsWayToWorkList.size(): " + previousBooleansIsWayToWorkList.size());
 
-            //if two last booleans is true, then direction is to home, if three last is false, then direction to work
-            if(firstPreviousIsWayToWork && secondPreviousIsWayToWork){
-                wayToWork = Boolean.TRUE;
-                setLeaveHomeToGoToWorkTime(new LocalDateTime());
+        if(previousBooleansIsWayToWorkList.size() >= 2){
+
+            int i = previousBooleansIsWayToWorkList.size() - 1;
+            //check last 3 decides, if one is true, then decide that user is in way to work
+            if(previousBooleansIsWayToWorkList.get(i) || previousBooleansIsWayToWorkList.get(i - 1)
+                    || previousBooleansIsWayToWorkList.get(i - 2)){
+                saveToFile(">>> previousBooleansIsWayToWorkList.get(i): " + previousBooleansIsWayToWorkList.get(i));
+                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 1): " + previousBooleansIsWayToWorkList.get(i - 1));
+                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 2): " + previousBooleansIsWayToWorkList.get(i - 2));
+                saveToFile("Way to work = true");
+                wayToWork = TRUE;
             }else{
+                saveToFile("IS NOT IN WAY TO work - isDirectionsIsToPointList.add(FALSE)");
                 wayToWork = Boolean.FALSE;
                 Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
             }
         }else{
-            Log.i(TAG, "isWayToHome list is less then three boolean");
+            Log.i(TAG, "isWayToWork list is less then three boolean");
         }
     }
 
-    public List<Boolean> obtainListOfDirections(List<Double> previousDistancesList, double currentDistanceToHome){
+    public List<Boolean> obtainListOfDirections(List<Double> previousDistancesList, double currentDistanceToPoint){
 
-        List<Boolean> isDirectionsIsToHomeList = new LinkedList<>();
+        List<Boolean> isDirectionsIsToPointList = new LinkedList<>();
 
-            if(previousDistancesList.size() >= 1){
-                if(currentDistanceToHome < previousDistancesList.get(0)){
-                    isDirectionsIsToHomeList.add(Boolean.TRUE);
-                }else{
-                    isDirectionsIsToHomeList.add(Boolean.FALSE);
-                }
+        saveToFile("---------previousDistance List:------- ");
+        for(Double previousDistance : previousDistancesList){
+            saveToFile("previousDistance: " + previousDistance);
+        }
+        saveToFile("----------------------------- ");
 
-                for(int i = 1; i <= previousDistancesList.size() - 1; i++){
-                    if(previousDistancesList.get(i) < previousDistancesList.get(i - 1)
-                            && currentDistanceToHome < previousDistancesList.get(i)){
-                        isDirectionsIsToHomeList.add(Boolean.TRUE);
-                    }else{
-                        isDirectionsIsToHomeList.add(Boolean.FALSE);
-                    }
-                }
-            }
+        saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
 
-            previousDistancesList.add(currentDistanceToHome);
+        int i = previousDistancesList.size() - 1;
+        if(currentDistanceToPoint < previousDistancesList.get(i)){
+            saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
+            saveToFile(">>> previousDistancesList.get(i): " + previousDistancesList.get(i));
+            saveToFile("isDirectionsIsToPointList.add(TRUE) ");
+            isDirectionsIsToPointList.add(TRUE);
+        }else{
+            saveToFile("isDirectionsIsToPointList.add(FALSE) ");
+            isDirectionsIsToPointList.add(Boolean.FALSE);
+        }
 
-    return isDirectionsIsToHomeList;
+        return isDirectionsIsToPointList;
     }
 
 
@@ -157,7 +214,7 @@ public class DirectionWay {
 
     public void decideIsInHome(Position currentPosition, Position homePosition){
         if(decideIsInPlace(currentPosition, homePosition)){
-            setIsInHome(Boolean.TRUE);
+            setIsInHome(TRUE);
             setIsInWork(Boolean.FALSE);
         }else{
             setIsInHome(Boolean.FALSE);
@@ -175,7 +232,7 @@ public class DirectionWay {
     public void decideIsInWork(Position currentPosition, Position workPosition){
         if(decideIsInPlace(currentPosition, workPosition)){
             setIsInHome(Boolean.FALSE);
-            setIsInWork(Boolean.TRUE);
+            setIsInWork(TRUE);
 
             //if is no start work time, then insert current because user arrived to work
             if(startWorkTime == null){
@@ -191,8 +248,12 @@ public class DirectionWay {
 
         double distanceBetweens = distanceToHome * 1000;
 
+        saveToFile(" distance: " + distanceToHome);
+        saveToFile(" distanceBetweens( <300?): " + distanceBetweens);
+
         if(distanceBetweens < HOME_OR_WORK_ZONE){
             Log.i(TAG, "User is in Place");
+            saveToFile("User is in Place");
             return true;
         }else{
             return false;

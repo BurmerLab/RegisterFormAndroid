@@ -12,15 +12,21 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
+import com.mytway.behaviour.pojo.screens.HomeScreen;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
+import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Distance;
@@ -32,6 +38,10 @@ import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
 import org.joda.time.LocalDateTime;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Calendar;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
 
@@ -53,10 +63,10 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private RemoteViews view;
 
     // The minimum distance to change updates in metters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
     // The minimum time beetwen updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 0;
+    private static final long MIN_TIME_BW_UPDATES = 1;
 
     // Declaring a Location Manager
     protected LocationManager locationManager;
@@ -70,6 +80,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public MytwayGeolocalizationService() {
     }
+
 
     public android.location.Location getLocalization() {
 
@@ -97,8 +108,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                     Log.d("GPS Enabled", "GPS Enabled");
                     if (locationManager != null) {
-                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        updateGPSCoordinates(location);
+                        android.location.Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        updateGPSCoordinates(gpsLocation);
+                        location = gpsLocation;
                     }
                 }
 
@@ -110,10 +122,13 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                         Log.d("Network", "Network");
 
                         if (locationManager != null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            updateGPSCoordinates(location);
+                            android.location.Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            updateGPSCoordinates(networkLocation);
+                            location = networkLocation;
                         }
                     }
+                }else{
+                    Toast.makeText(mContext, "NIMA NETWORKA", Toast.LENGTH_SHORT).show();
                 }
             }
         } catch (Exception e) {
@@ -189,6 +204,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }
 
         view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
+        String time = Calendar.getInstance().getTime().toString();
 
         if(session.isUserLogged()){
             thisWidget = new ComponentName(this, MyWidgetProvider.class);
@@ -197,55 +213,110 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
                     && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
 
-                getLocalization();
 
-                Position currentPosition = new Position(location.getLatitude(), location.getLongitude());
+
+
+                getLocalization();
+        //-----------Only for saving current Localization to file-------
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "MYTWAY_LOCALIZATION_LOGS_2.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "<Placemark>\n" +
+                        "        <name> " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</name>\n" +
+                        "        <description> " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
+                        "        <Point>\n" +
+//                        "            <coordinates> "+ location.getLongitude() + " , " + location.getLatitude() + " </coordinates>\n" +
+                        "            <coordinates> "+ longitude + " , " + latitude + " </coordinates>\n" +
+                        "        </Point>\n" +
+                        "    </Placemark>\n\n";
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+
+                System.out.println("Done");
+
+
+        //----------------------------------------------------
+//            Stara wersja, gdzie nie updejtowalo lokalizacji
+//                Position currentPosition = new Position(location.getLatitude(), location.getLongitude());
+
+                //Nowa wersja, moze bedzie updejtowac lokalizacje
+                Position currentPosition = new Position(latitude, longitude);
 
                 //Direction, is user is going to work or home??
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
                 directionWay.decideWhichDirectionIs(currentPosition, session);
-
                 directionWay.decideIsInHome(currentPosition, session.getHomePlace());
                 directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
+                //todo: zakomentowane, odkomentowac kod produkcyjny
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
-//                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
+//                LocalDateTime whenUserLeaveHome = new LocalDateTime()
+//                        .withYear(0)
+//                        .withMonthOfYear(1)
+//                        .withDayOfMonth(1)
+//                        .withHourOfDay(6)
+//                        .withMinuteOfHour(20)
+//                        .withSecondOfMinute(0);
 
-                LocalDateTime startWorkTime = new LocalDateTime()
-                        .withYear(0)
-                        .withMonthOfYear(1)
-                        .withDayOfMonth(1)
-                        .withHourOfDay(21)
-                        .withMinuteOfHour(1)
-                        .withSecondOfMinute(0);
+                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
+//                LocalDateTime startWorkTime = new LocalDateTime()
+//                        .withYear(0)
+//                        .withMonthOfYear(1)
+//                        .withDayOfMonth(1)
+//                        .withHourOfDay(7)
+//                        .withMinuteOfHour(1)
+//                        .withSecondOfMinute(0);
 
-//                if(directionWay.isInHome()){
-//                    //Morning screen
-//                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
-//
-//                } else if(directionWay.isInWayToWork()){
-                    //TravelToWorkScreen
-//                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
-//                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+                if(directionWay.isInHome()){
+                    //Morning screen
+                    DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
+                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-//                } else if(directionWay.isInWork()){
-//                    //WorkScreen
+                } else if(directionWay.isInWayToWork()){
+//                    TravelToWorkScreen
+                    DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
+                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
+                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+
+                } else if(directionWay.isInWork()){
+//                    directionWay.setIsInWork(Boolean.TRUE);
+//                    directionWay.setIsInHome(Boolean.FALSE);
+                    //WorkScreen
+                    DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
                     WorkScreen workScreen = new WorkScreen();
-                    directionWay.setIsInWork(Boolean.TRUE);
-                    directionWay.setIsInHome(Boolean.FALSE);
                     workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
-//
-//                } else if(directionWay.isInWayToHome()){
+
+                } else if(directionWay.isInWayToHome()){
+//                    directionWay.setIsInWork(Boolean.FALSE);
+//                    directionWay.setIsInHome(Boolean.FALSE);
+//                    directionWay.setWayToHome(Boolean.TRUE);
 //                    //TravelToHomeScreen
-//                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-//                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+                    DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
+                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
+                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
 //
-//                } else if(directionWay.getIsInHome()){
-//                    HomeScreen homeScreen = new HomeScreen();
-//                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-//                }
+                } else if(directionWay.getIsInHome()){
+                    DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
+                    HomeScreen homeScreen = new HomeScreen();
+                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+                } else {
+                    DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
+                    view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
+                }
             }else{
+                view.setTextViewText(R.id.title, "NOT FOUNDED " + time);
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
             }
