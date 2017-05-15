@@ -10,12 +10,12 @@ import com.mytway.utility.Session;
 import org.joda.time.LocalDateTime;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 public class DirectionWay {
@@ -24,16 +24,19 @@ public class DirectionWay {
     private static final int THREE_DISTANCES = 3;
     private static final double HOME_OR_WORK_ZONE = 300.0;
     private static final int METERS_IN_KILOMETER = 1000;
-    private Boolean wayToWork = Boolean.FALSE;
-    private Boolean wayToHome = Boolean.FALSE;
-    private Boolean isInWork = Boolean.FALSE;
-    private Boolean isInHome = Boolean.FALSE;
+    private Boolean wayToWork = FALSE;
+    private Boolean wayToHome = FALSE;
+    private Boolean isInWork = FALSE;
+    private Boolean isInHome = FALSE;
 
     private Distance distanceBetweenHomeAndWork;
     private List<Double> distancesToHomeList = new LinkedList<>();
     private List<Double> distancesToWorkList = new LinkedList<>();
     private LocalDateTime leaveHomeToGoToWorkTime;
     private LocalDateTime startWorkTime;
+
+    private List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
+    private List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
 
     public DirectionWay() {
     }
@@ -43,7 +46,7 @@ public class DirectionWay {
         this.wayToHome = wayToHome;
     }
 
-    public void decideWhichDirectionIs(Position currentPosition, Session session){
+    public void decideTravelDirectionsAre(Position currentPosition, Session session){
         this.decideDirection(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
@@ -69,36 +72,57 @@ public class DirectionWay {
         double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
         double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
 
+        if(distancesToHomeList.size() > 0){
+            Boolean isInWayToHome = obtainDirection(distancesToHomeList, currentDistanceToHomeInMeters);
+            isInWayToHomePreviousDecisions.add(isInWayToHome);
+        }
+
+        if(distancesToWorkList.size() > 0){
+            Boolean isInWayToWork = obtainDirection(distancesToWorkList, currentDistanceToWorkInMeters);
+            isInWayToWorkPreviousDecisions.add(isInWayToWork);
+        }
+
         distancesToHomeList.add(currentDistanceToHomeInMeters);
         distancesToWorkList.add(currentDistanceToWorkInMeters);
-
-        List<Boolean> previousBooleansIsWayToHomeList =
-                obtainListOfDirections(distancesToHomeList, currentDistanceToHomeInMeters);
-
-        List<Boolean> previousBooleansIsWayToWorkList =
-                obtainListOfDirections(distancesToWorkList, currentDistanceToWorkInMeters);
 
         double sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = 0;
         if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
             sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
         }
 
-        saveToFile("===================decideDirection()============================");
-        saveToFile("currentPosition: " + currentPosition.getLongitude() + " , " + currentPosition.getLatitude());
-        saveToFile("currentDistanceToHomeInMeters: " + currentDistanceToHomeInMeters);
-        saveToFile("currentDistanceToWorkInMeters: " + currentDistanceToWorkInMeters);
-        saveToFile("sevenPercentageOfDistanceBetweenHomeAndWorkInMeters: " + sevenPercentageOfDistanceBetweenHomeAndWorkInMeters);
-        saveToFile("===============================================");
-
+//        saveToFile("===================decideDirection()============================");
+//        saveToFile("currentPosition: " + currentPosition.getLongitude() + " , " + currentPosition.getLatitude());
+//        saveToFile("currentDistanceToHomeInMeters: " + currentDistanceToHomeInMeters);
+//        saveToFile("currentDistanceToWorkInMeters: " + currentDistanceToWorkInMeters);
+//        saveToFile("sevenPercentageOfDistanceBetweenHomeAndWorkInMeters: " + sevenPercentageOfDistanceBetweenHomeAndWorkInMeters);
+//        saveToFile("===============================================");
 
         if(sevenPercentageOfDistanceBetweenHomeAndWorkInMeters < currentDistanceToHomeInMeters){
-            decideIsMoveWayToHome(previousBooleansIsWayToHomeList);
-            decideIsMoveWayToWork(previousBooleansIsWayToWorkList);
+            decideIsMoveWayToHomeBasedOnPreviousDecisions(isInWayToHomePreviousDecisions);
+            decideIsMoveWayToWorkBasedOnPreviousDecisions(isInWayToWorkPreviousDecisions);
         }else{
-            wayToHome = Boolean.FALSE;
-            wayToWork = Boolean.FALSE;
+            saveToFile("--------------Way to HOME FALSE, Way to Work FALSE------------------");
+            wayToHome = FALSE;
+            wayToWork = FALSE;
         }
 
+        stayOnlyNewestDistances(distancesToHomeList);
+        stayOnlyNewestDistances(distancesToWorkList);
+        stayOnlyNewestDecisions(isInWayToHomePreviousDecisions);
+        stayOnlyNewestDecisions(isInWayToWorkPreviousDecisions);
+
+    }
+
+    private void stayOnlyNewestDecisions(List<Boolean> elements) {
+        while(elements.size() > 7){
+            elements.subList(0,5).clear();
+        }
+    }
+
+    private void stayOnlyNewestDistances(List<Double> elements) {
+        while(elements.size() > 7){
+            elements.subList(0,5).clear();
+        }
     }
 
     public static void saveToFile(String content) {
@@ -126,79 +150,97 @@ public class DirectionWay {
         }
     }
 
-    private void decideIsMoveWayToHome(List<Boolean> previousBooleansIsWayToHomeList) {
+    private void decideIsMoveWayToHomeBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToHomeList) {
 
+        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
         saveToFile(" previousBooleansIsWayToHomeList.size(): " + previousBooleansIsWayToHomeList.size());
+        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
 
-        if(previousBooleansIsWayToHomeList.size() >= 2){
+        for(Boolean previousDecision : previousBooleansIsWayToHomeList){
+            saveToFile("previousDecision HOME: " + previousDecision);
+        }
+
+        if(previousBooleansIsWayToHomeList.size() >= 4){
 
             int i = previousBooleansIsWayToHomeList.size() - 1;
-            //check last 3 decides, if one is true, then decide that user is in way to home
-            if(previousBooleansIsWayToHomeList.get(i) || previousBooleansIsWayToHomeList.get(i - 1)
-                    || previousBooleansIsWayToHomeList.get(i - 2)){
-                saveToFile(">>> previousBooleansIsWayToHomeList.get(i): " + previousBooleansIsWayToHomeList.get(i));
-                saveToFile(">>> previousBooleansIsWayToHomeList.get(i - 1): " + previousBooleansIsWayToHomeList.get(i - 1));
-                saveToFile(">>> previousBooleansIsWayToHomeList.get(i - 2): " + previousBooleansIsWayToHomeList.get(i - 2));
-                saveToFile("Way to home = true");
-                wayToHome = TRUE;
-            }else{
-                saveToFile("IS NOT IN WAY TO HOME - isDirectionsIsToPointList.add(FALSE)");
-                wayToHome = Boolean.FALSE;
-                Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
-            }
+            saveToFile("previousBooleansIsWayToHomeList.size() - 1 =" + i);
+
+            wayToHome = ((previousBooleansIsWayToHomeList.get(i) && previousBooleansIsWayToHomeList.get(i - 1))
+                    ||
+                    (previousBooleansIsWayToHomeList.get(i - 1) && previousBooleansIsWayToHomeList.get(i - 2))
+                    ||
+                    (previousBooleansIsWayToHomeList.get(i) && previousBooleansIsWayToHomeList.get(i - 2))
+                    ||
+                    (previousBooleansIsWayToHomeList.get(i) && previousBooleansIsWayToHomeList.get(i - 3))
+                    ||
+                    (previousBooleansIsWayToHomeList.get(i) && previousBooleansIsWayToHomeList.get(i - 4)));
+
+            saveToFile("wayToHome = " + wayToHome);
         }else{
             Log.i(TAG, "isWayToHome list is less then three boolean");
         }
     }
 
-    private void decideIsMoveWayToWork(List<Boolean> previousBooleansIsWayToWorkList) {
+    private void decideIsMoveWayToWorkBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToWorkList) {
+        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
         saveToFile(" previousBooleansIsWayToWorkList.size(): " + previousBooleansIsWayToWorkList.size());
+        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
+
+        for(Boolean previousDecision : previousBooleansIsWayToWorkList){
+            saveToFile("previousDecision WORK: " + previousDecision);
+        }
 
         if(previousBooleansIsWayToWorkList.size() >= 2){
 
             int i = previousBooleansIsWayToWorkList.size() - 1;
+
+
+            wayToWork = ((previousBooleansIsWayToWorkList.get(i) && previousBooleansIsWayToWorkList.get(i - 1))
+                    ||
+                    (previousBooleansIsWayToWorkList.get(i) && previousBooleansIsWayToWorkList.get(i - 2))
+                    ||
+                    (previousBooleansIsWayToWorkList.get(i) && previousBooleansIsWayToWorkList.get(i - 3))
+                    ||
+                    (previousBooleansIsWayToWorkList.get(i) && previousBooleansIsWayToWorkList.get(i - 4)));
+
+            saveToFile("wayToWork = " + wayToWork);
+
             //check last 3 decides, if one is true, then decide that user is in way to work
-            if(previousBooleansIsWayToWorkList.get(i) || previousBooleansIsWayToWorkList.get(i - 1)
-                    || previousBooleansIsWayToWorkList.get(i - 2)){
-                saveToFile(">>> previousBooleansIsWayToWorkList.get(i): " + previousBooleansIsWayToWorkList.get(i));
-                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 1): " + previousBooleansIsWayToWorkList.get(i - 1));
-                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 2): " + previousBooleansIsWayToWorkList.get(i - 2));
-                saveToFile("Way to work = true");
-                wayToWork = TRUE;
-            }else{
-                saveToFile("IS NOT IN WAY TO work - isDirectionsIsToPointList.add(FALSE)");
-                wayToWork = Boolean.FALSE;
-                Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
-            }
+//            if(previousBooleansIsWayToWorkList.get(i) || previousBooleansIsWayToWorkList.get(i - 1)
+//                    || previousBooleansIsWayToWorkList.get(i - 2)){
+//                saveToFile(">>> previousBooleansIsWayToWorkList.get(i): " + previousBooleansIsWayToWorkList.get(i));
+//                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 1): " + previousBooleansIsWayToWorkList.get(i - 1));
+//                saveToFile(">>> previousBooleansIsWayToWorkList.get(i - 2): " + previousBooleansIsWayToWorkList.get(i - 2));
+//                saveToFile("Way to work = true");
+//                wayToWork = TRUE;
+//            }else{
+//                saveToFile("IS NOT IN WAY TO WORK - wayToWork = FALSE");
+//                wayToWork = FALSE;
+//                Log.i(TAG, "Not decided because was no two decides (True or False) in a row");
+//            }
         }else{
             Log.i(TAG, "isWayToWork list is less then three boolean");
         }
     }
 
-    public List<Boolean> obtainListOfDirections(List<Double> previousDistancesList, double currentDistanceToPoint){
+    public Boolean obtainDirection(List<Double> previousDistancesList, double currentDistanceToPoint){
 
-        List<Boolean> isDirectionsIsToPointList = new LinkedList<>();
-
-        saveToFile("---------previousDistance List:------- ");
-        for(Double previousDistance : previousDistancesList){
-            saveToFile("previousDistance: " + previousDistance);
-        }
-        saveToFile("----------------------------- ");
-
-        saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
+//        saveToFile("---------previousDistance List:------- ");
+//        for(Double previousDistance : previousDistancesList){
+//            saveToFile("previousDistance: " + previousDistance);
+//        }
+//        saveToFile("----------------------------- ");
 
         int i = previousDistancesList.size() - 1;
+        saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
+        saveToFile(">>> i: " + i);
         if(currentDistanceToPoint < previousDistancesList.get(i)){
-            saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
-            saveToFile(">>> previousDistancesList.get(i): " + previousDistancesList.get(i));
-            saveToFile("isDirectionsIsToPointList.add(TRUE) ");
-            isDirectionsIsToPointList.add(TRUE);
+//            saveToFile("Direction Decision: TRUE ");
+            return TRUE;
         }else{
-            saveToFile("isDirectionsIsToPointList.add(FALSE) ");
-            isDirectionsIsToPointList.add(Boolean.FALSE);
+//            saveToFile("Direction Decision: FALSE ");
+            return FALSE;
         }
-
-        return isDirectionsIsToPointList;
     }
 
 
@@ -215,10 +257,16 @@ public class DirectionWay {
     public void decideIsInHome(Position currentPosition, Position homePosition){
         if(decideIsInPlace(currentPosition, homePosition)){
             setIsInHome(TRUE);
-            setIsInWork(Boolean.FALSE);
+            startWorkTime = null;
+            saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
+            saveToFile("<<<<<<<<<<<<<<<< IS IN HOME DECISION TRUE >>>>>>>>>>>>>>>>>>");
+            setIsInWork(FALSE);
+            setWayToHome(FALSE);
+            setWayToWork(FALSE);
         }else{
-            setIsInHome(Boolean.FALSE);
-            setIsInWork(Boolean.FALSE);
+            saveToFile("<<<<<<<<<<<<<<<< IT IS NOT IN HOME >>>>>>>>>>>>>>>>>>");
+            setIsInHome(FALSE);
+//            setIsInWork(FALSE);
 
             //todo: test it:
             //set time when user leaved home,
@@ -231,24 +279,28 @@ public class DirectionWay {
 
     public void decideIsInWork(Position currentPosition, Position workPosition){
         if(decideIsInPlace(currentPosition, workPosition)){
-            setIsInHome(Boolean.FALSE);
+            setIsInHome(FALSE);
             setIsInWork(TRUE);
-
+            leaveHomeToGoToWorkTime = null;
+            saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
+            saveToFile("<<<<<<<<<<<<<<<< IS IN HOME DECISION WORK >>>>>>>>>>>>>>>>>>");
+            setWayToHome(FALSE);
+            setWayToWork(FALSE);
             //if is no start work time, then insert current because user arrived to work
             if(startWorkTime == null){
                 startWorkTime = new LocalDateTime();
             }
         }else{
-            setIsInWork(Boolean.FALSE);
+            setIsInWork(FALSE);
         }
     }
 
     public boolean decideIsInPlace(Position currentPosition, Position place) {
-        double distanceToHome = Distance.designateDistanceBetween(currentPosition, place);
+        double distanceTo = Distance.designateDistanceBetween(currentPosition, place);
 
-        double distanceBetweens = distanceToHome * 1000;
+        double distanceBetweens = distanceTo * 1000;
 
-        saveToFile(" distance: " + distanceToHome);
+        saveToFile(" distance: " + distanceTo);
         saveToFile(" distanceBetweens( <300?): " + distanceBetweens);
 
         if(distanceBetweens < HOME_OR_WORK_ZONE){
@@ -346,5 +398,29 @@ public class DirectionWay {
 
     public void setDistancesToWorkList(List<Double> distancesToWorkList) {
         this.distancesToWorkList = distancesToWorkList;
+    }
+
+    public List<Boolean> getIsInWayToHomePreviousDecisions() {
+        return isInWayToHomePreviousDecisions;
+    }
+
+    public void setIsInWayToHomePreviousDecisions(List<Boolean> isInWayToHomePreviousDecisions) {
+        this.isInWayToHomePreviousDecisions = isInWayToHomePreviousDecisions;
+    }
+
+    public List<Boolean> getIsInWayToWorkPreviousDecisions() {
+        return isInWayToWorkPreviousDecisions;
+    }
+
+    public void setIsInWayToWorkPreviousDecisions(List<Boolean> isInWayToWorkPreviousDecisions) {
+        this.isInWayToWorkPreviousDecisions = isInWayToWorkPreviousDecisions;
+    }
+
+    public void setWayToWork(Boolean wayToWork) {
+        this.wayToWork = wayToWork;
+    }
+
+    public void setWayToHome(Boolean wayToHome) {
+        this.wayToHome = wayToHome;
     }
 }

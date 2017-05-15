@@ -12,11 +12,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -41,6 +39,7 @@ import org.joda.time.LocalDateTime;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
@@ -80,7 +79,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public MytwayGeolocalizationService() {
     }
-
 
     public android.location.Location getLocalization() {
 
@@ -213,41 +211,10 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
                     && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
 
-
-
-
                 getLocalization();
-        //-----------Only for saving current Localization to file-------
-                File sdCard = Environment.getExternalStorageDirectory();
-                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
 
-                if(!dir.exists()){
-                    dir.mkdirs();
-                }
-
-                File file = new File(dir, "MYTWAY_LOCALIZATION_LOGS_2.txt");
-                LocalDateTime currentLocalDateTime = new LocalDateTime();
-
-                FileOutputStream fop = new FileOutputStream(file, true);
-                String pointXml = "<Placemark>\n" +
-                        "        <name> " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</name>\n" +
-                        "        <description> " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
-                        "        <Point>\n" +
-//                        "            <coordinates> "+ location.getLongitude() + " , " + location.getLatitude() + " </coordinates>\n" +
-                        "            <coordinates> "+ longitude + " , " + latitude + " </coordinates>\n" +
-                        "        </Point>\n" +
-                        "    </Placemark>\n\n";
-
-
-                fop.write(pointXml.getBytes());
-                fop.flush();
-                fop.close();
-
-                System.out.println("Done");
-
-
-        //----------------------------------------------------
-//            Stara wersja, gdzie nie updejtowalo lokalizacji
+                //----------------------------------------------------
+//                Stara wersja, gdzie nie updejtowalo lokalizacji
 //                Position currentPosition = new Position(location.getLatitude(), location.getLongitude());
 
                 //Nowa wersja, moze bedzie updejtowac lokalizacje
@@ -256,7 +223,11 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 //Direction, is user is going to work or home??
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
-                directionWay.decideWhichDirectionIs(currentPosition, session);
+
+                if(!directionWay.isInWayToWork() || !directionWay.isInWayToHome()){
+                    directionWay.decideTravelDirectionsAre(currentPosition, session);
+                }
+
                 directionWay.decideIsInHome(currentPosition, session.getHomePlace());
                 directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
@@ -281,11 +252,13 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 if(directionWay.isInHome()){
                     //Morning screen
+                    saveToFileLocalization("Morning");
                     DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
                     morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
                 } else if(directionWay.isInWayToWork()){
 //                    TravelToWorkScreen
+                    saveToFileLocalization("TravelToWork");
                     DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
                     TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
                     travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
@@ -294,6 +267,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                    directionWay.setIsInWork(Boolean.TRUE);
 //                    directionWay.setIsInHome(Boolean.FALSE);
                     //WorkScreen
+                    saveToFileLocalization("Work ");
                     DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
                     WorkScreen workScreen = new WorkScreen();
                     workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
@@ -303,19 +277,23 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                    directionWay.setIsInHome(Boolean.FALSE);
 //                    directionWay.setWayToHome(Boolean.TRUE);
 //                    //TravelToHomeScreen
+                    saveToFileLocalization("TravelToHome");
                     DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
                     TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
                     travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
 //
                 } else if(directionWay.getIsInHome()){
+                    saveToFileLocalization("Home screen");
                     DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
                     HomeScreen homeScreen = new HomeScreen();
                     homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
                 } else {
+                    saveToFileLocalization("Not Found yet");
                     DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
                     view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
                 }
             }else{
+                saveToFileLocalization("Not Founded");
                 view.setTextViewText(R.id.title, "NOT FOUNDED " + time);
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
@@ -325,6 +303,35 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }else{
             Log.i(TAG, "User is not logged");
         }
+    }
+
+    public void saveToFileLocalization(String screenTitle) throws IOException {
+        //-----------Only for saving current Localization to file-------
+        File sdCard = Environment.getExternalStorageDirectory();
+        File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+
+        File file = new File(dir, "MYTWAY_LOCALIZATION_LOGS_2.txt");
+        LocalDateTime currentLocalDateTime = new LocalDateTime();
+
+        FileOutputStream fop = new FileOutputStream(file, true);
+        String pointXml = "<Placemark>\n" +
+                "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</name>\n" +
+                "        <description> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
+                "        <Point>\n" +
+//                        "            <coordinates> "+ location.getLongitude() + " , " + location.getLatitude() + " </coordinates>\n" +
+                "            <coordinates> "+ longitude + " , " + latitude + " </coordinates>\n" +
+                "        </Point>\n" +
+                "    </Placemark>\n\n";
+
+        fop.write(pointXml.getBytes());
+        fop.flush();
+        fop.close();
+
+        System.out.println("Done");
     }
 
     public void onDestroy(){

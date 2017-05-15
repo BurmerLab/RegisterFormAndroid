@@ -82,7 +82,7 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         Mockito.when(directionWayMock.isInHome()).thenReturn(true);
         Position mockedCurrentPosition = new Position(22.0d, 33.0d);
 
-        Mockito.doNothing().when(directionWayMock).decideWhichDirectionIs(mockedCurrentPosition, sessionMock);
+        Mockito.doNothing().when(directionWayMock).decideTravelDirectionsAre(mockedCurrentPosition, sessionMock);
 
         PowerMock.mockStatic(PermissionUtil.class);
         EasyMock.expect(PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, contextMock)).andReturn(true).anyTimes();
