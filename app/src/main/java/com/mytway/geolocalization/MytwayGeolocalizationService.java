@@ -213,26 +213,33 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 getLocalization();
 
-                //----------------------------------------------------
-//                Stara wersja, gdzie nie updejtowalo lokalizacji
-//                Position currentPosition = new Position(location.getLatitude(), location.getLongitude());
-
-                //Nowa wersja, moze bedzie updejtowac lokalizacje
                 Position currentPosition = new Position(latitude, longitude);
 
-                //Direction, is user is going to work or home??
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
 
-                if(!directionWay.isInWayToWork() || !directionWay.isInWayToHome()){
-                    directionWay.decideTravelDirectionsAre(currentPosition, session);
-                }
+                saveToFile("--------------------BEFORE-Decisions------------------------");
+                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ");
+                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ");
+                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ");
+                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ");
+                saveToFile("----------------------------------------------------\n");
 
+                directionWay.decideTravelDirectionsAre(currentPosition, session);
                 directionWay.decideIsInHome(currentPosition, session.getHomePlace());
                 directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
+                saveToFile("--------------------AFTER-------------------------");
+                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ");
+                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ");
+                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ");
+                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ");
+                saveToFile("----------------------------------------------------\n");
+
                 //todo: zakomentowane, odkomentowac kod produkcyjny
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
+//                saveToFile("-----TIME whenUserLeaveHome = " + whenUserLeaveHome.toString() + " -------");
+
 //                LocalDateTime whenUserLeaveHome = new LocalDateTime()
 //                        .withYear(0)
 //                        .withMonthOfYear(1)
@@ -302,6 +309,31 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             manager.updateAppWidget(thisWidget, view);
         }else{
             Log.i(TAG, "User is not logged");
+        }
+    }
+
+    public static void saveToFile(String content) {
+        try{
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(dir, "DirectionWay.txt");
+            LocalDateTime currentLocalDateTime = new LocalDateTime();
+            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+            FileOutputStream fop = new FileOutputStream(file, true);
+            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+            fop.write(pointXml.getBytes());
+            fop.flush();
+            fop.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

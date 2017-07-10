@@ -238,6 +238,22 @@ public class DirectionWayTest extends TestCase {
     }
 
     @Test
+    public void testCuttingList(){
+        List<Boolean> previousDistancesList = new LinkedList<>();
+        previousDistancesList.add(true);
+        previousDistancesList.add(true);
+        previousDistancesList.add(true);
+        previousDistancesList.add(true);
+        previousDistancesList.add(true);
+        previousDistancesList.add(false);
+        previousDistancesList.add(true);
+
+        directionWay.stayOnlyNewestDecisions(previousDistancesList);
+
+        assertEquals(previousDistancesList.size(), 5);
+    }
+
+    @Test
     public void checkMethodToRemoveListElements(){
         List<String> elements = new LinkedList<>();
         elements.add("1");
