@@ -38,6 +38,9 @@ public class DirectionWay {
     private List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
     private List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
 
+    private List<Double> previousDistancesToHome = new LinkedList<>();
+    private List<Double> previousDistancesToWork = new LinkedList<>();
+
     public DirectionWay() {
     }
 
@@ -47,7 +50,10 @@ public class DirectionWay {
     }
 
     public void decideTravelDirectionsAre(Position currentPosition, Session session){
-        this.decideDirection(currentPosition, session.getHomePlace(), session.getWorkPlace());
+        //nowa wersja
+        this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
+        //stara wersja
+//        this.decideDirection(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
     public static double designateDistanceBetween(Position startPosition, Position endPosition){
@@ -65,6 +71,124 @@ public class DirectionWay {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c;
         return distance;
+    }
+
+    public void decideDirectionNew(Position currentPosition, Position homePosition, Position workPosition) {
+        double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
+        double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
+        double sevenPercentageOfDistanceBtwHomeAndWorkInMeters = 0;
+
+        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
+            sevenPercentageOfDistanceBtwHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
+        }else{
+            sevenPercentageOfDistanceBtwHomeAndWorkInMeters = 1000;
+        }
+
+        //Start condition
+
+        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
+            decideIsInHome(currentPosition, homePosition);
+            decideIsInWork(currentPosition, workPosition);
+            obtainStartCurrentDirection(currentDistanceToHomeInMeters);
+        }else{
+            saveToFile("HOME: " + isInHome());
+            saveToFile("WORK: " + isInWork());
+            saveToFile("WAY HOME" + isInWayToHome());
+            saveToFile("WAY WORK" + isInWayToWork());
+        }
+
+        if(isInHome()) {
+            //can be isInHome or wayToWork
+            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
+                saveToFile("USTAWIAM IS IN HOME");
+                setIsInHome(TRUE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
+            }else {
+                saveToFile("USTAWIAM IS IN WAY TO HOME");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(TRUE);
+            }
+        }else if(isInWayToWork()){
+            //can be wayToWork or isInWork or wayToHome?
+            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
+                saveToFile("USTAWIAM IS IN WORK");
+                setIsInHome(FALSE);
+                setIsInWork(TRUE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
+
+            }else{
+                saveToFile("USTAWIAM IS IN WAY TO WORK");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(TRUE);
+            }
+        }else if(isInWork()){
+            //can be isInWork or wayToHome
+            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
+                saveToFile("USTAWIAM IS IN WORK");
+                setIsInHome(FALSE);
+                setIsInWork(TRUE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
+            }else{
+                saveToFile("USTAWIAM IS IN WAY TO HOME");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(TRUE);
+                setWayToWork(FALSE);
+            }
+        }else if(isInWayToHome()){
+            //can be wayToHome or isInHome
+            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
+                saveToFile("USTAWIAM IS IN HOME");
+                setIsInHome(TRUE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
+
+            }else{
+                saveToFile("USTAWIAM IS IN WAY TO HOME");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(TRUE);
+                setWayToWork(FALSE);
+            }
+        }else{
+            saveToFile("NIE ZNALAZLEM KIERUNKU :(");
+        }
+
+    }
+
+    public void obtainStartCurrentDirection(double currentDistanceToHomeInMeters) {
+        saveToFile("WSZYSTKIE FLAGI FALSE, DEFAULT: is in home");
+
+        //Countaing is user in way to home or work
+        if(previousDistancesToHome.size() == 0){
+            previousDistancesToHome.add(currentDistanceToHomeInMeters);
+        }
+
+        if(previousDistancesToHome.size() > 0){
+            double previousDistanceToHome =  previousDistancesToHome.get(previousDistancesToHome.size() - 1);
+            if(previousDistanceToHome > currentDistanceToHomeInMeters){
+                saveToFile("STARTOWY KIERUNEK: USTAWIAM way to home");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(TRUE);
+                setWayToWork(FALSE);
+            }else{
+                saveToFile("STARTOWY KIERUNEK ELSE: USTAWIAM way to work");
+                setIsInHome(FALSE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(TRUE);
+            }
+        }
     }
 
     //work on the same instances of DirectionWay because in distancesToHomeList is saved previous distances
@@ -251,9 +375,6 @@ public class DirectionWay {
             setIsInHome(FALSE);
 //            setIsInWork(FALSE);
 
-            //todo: test it:
-            //set time when user leaved home,
-            //if leaveHome time is not inserted, then insert current time
             if(leaveHomeToGoToWorkTime == null){
                 leaveHomeToGoToWorkTime = new LocalDateTime();
             }
