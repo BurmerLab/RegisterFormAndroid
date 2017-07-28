@@ -18,7 +18,7 @@ public class PropertiesValues {
 
     public static int WORK_AND_HOME_PLACE_MAP_ZOOM_LEVEL = 16;
 
-    public static final int INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS = 1000 * 120;//1000 * 30 = 30sek
+    public static final int INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS = 1000 * 60;//1000 * 30 = 30sek
 
     public static final String HOUR_CHARACTER = "h";
 

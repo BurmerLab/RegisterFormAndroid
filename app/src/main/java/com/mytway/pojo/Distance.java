@@ -6,7 +6,7 @@ public class Distance {
     private String text = "";
     private double valueInMeters = 0; //kilometers (double)
     private double valueInKilometers = 0;
-    private final static int SEVEN_PERCENTAGE = 1;
+    private final static int PERCENTAGE = 6;
 
     public Distance(String text, double valueInMeters) {
         this.text = text;
@@ -35,8 +35,8 @@ public class Distance {
     }
 
     public double obtainSevenPercentFromDistance(){
-        double sevenPercentageFromDistance = (SEVEN_PERCENTAGE * valueInMeters) / 100;
-        return sevenPercentageFromDistance;
+        double percentageFromDistance = (PERCENTAGE * valueInMeters) / 100;
+        return percentageFromDistance;
     }
 
     public String getText() {

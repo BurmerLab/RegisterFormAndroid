@@ -49,6 +49,14 @@ public class DirectionWay {
         this.wayToHome = wayToHome;
     }
 
+    public void setPreviousDistancesToHome(List<Double> previousDistancesToHome) {
+        this.previousDistancesToHome = previousDistancesToHome;
+    }
+
+    public List<Double> getPreviousDistancesToHome() {
+        return previousDistancesToHome;
+    }
+
     public void decideTravelDirectionsAre(Position currentPosition, Session session){
         //nowa wersja
         this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
@@ -76,12 +84,12 @@ public class DirectionWay {
     public void decideDirectionNew(Position currentPosition, Position homePosition, Position workPosition) {
         double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
         double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
-        double sevenPercentageOfDistanceBtwHomeAndWorkInMeters = 0;
+        double percentageOfDistanceBtwHomeAndWorkInMeters = 0;
 
         if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-            sevenPercentageOfDistanceBtwHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
+            percentageOfDistanceBtwHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
         }else{
-            sevenPercentageOfDistanceBtwHomeAndWorkInMeters = 1000;
+            percentageOfDistanceBtwHomeAndWorkInMeters = 1000;
         }
 
         //Start condition
@@ -99,28 +107,33 @@ public class DirectionWay {
 
         if(isInHome()) {
             //can be isInHome or wayToWork
-            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
+            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
                 saveToFile("USTAWIAM IS IN HOME");
                 setIsInHome(TRUE);
                 setIsInWork(FALSE);
                 setWayToHome(FALSE);
                 setWayToWork(FALSE);
             }else {
-                saveToFile("USTAWIAM IS IN WAY TO HOME");
+                saveToFile("USTAWIAM IS IN WAY TO WORK");
                 setIsInHome(FALSE);
                 setIsInWork(FALSE);
                 setWayToHome(FALSE);
                 setWayToWork(TRUE);
             }
         }else if(isInWayToWork()){
-            //can be wayToWork or isInWork or wayToHome?
-            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
+            //can be wayToWork or isInWork or isInHome
+            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
                 saveToFile("USTAWIAM IS IN WORK");
                 setIsInHome(FALSE);
                 setIsInWork(TRUE);
                 setWayToHome(FALSE);
                 setWayToWork(FALSE);
-
+            }else if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
+                saveToFile("USTAWIAM IS IN HOME");
+                setIsInHome(TRUE);
+                setIsInWork(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
             }else{
                 saveToFile("USTAWIAM IS IN WAY TO WORK");
                 setIsInHome(FALSE);
@@ -130,7 +143,7 @@ public class DirectionWay {
             }
         }else if(isInWork()){
             //can be isInWork or wayToHome
-            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
+            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
                 saveToFile("USTAWIAM IS IN WORK");
                 setIsInHome(FALSE);
                 setIsInWork(TRUE);
@@ -144,14 +157,19 @@ public class DirectionWay {
                 setWayToWork(FALSE);
             }
         }else if(isInWayToHome()){
-            //can be wayToHome or isInHome
-            if(sevenPercentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
+            //can be wayToHome or isInHome or isInWork
+            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters) {
                 saveToFile("USTAWIAM IS IN HOME");
                 setIsInHome(TRUE);
                 setIsInWork(FALSE);
                 setWayToHome(FALSE);
                 setWayToWork(FALSE);
-
+            }else if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
+                saveToFile("USTAWIAM IS IN WORK");
+                setIsInHome(FALSE);
+                setIsInWork(TRUE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
             }else{
                 saveToFile("USTAWIAM IS IN WAY TO HOME");
                 setIsInHome(FALSE);
@@ -166,7 +184,7 @@ public class DirectionWay {
     }
 
     public void obtainStartCurrentDirection(double currentDistanceToHomeInMeters) {
-        saveToFile("WSZYSTKIE FLAGI FALSE, DEFAULT: is in home");
+//        saveToFile("WSZYSTKIE FLAGI FALSE, DEFAULT: is in home");
 
         //Countaing is user in way to home or work
         if(previousDistancesToHome.size() == 0){
@@ -176,18 +194,20 @@ public class DirectionWay {
         if(previousDistancesToHome.size() > 0){
             double previousDistanceToHome =  previousDistancesToHome.get(previousDistancesToHome.size() - 1);
             if(previousDistanceToHome > currentDistanceToHomeInMeters){
-                saveToFile("STARTOWY KIERUNEK: USTAWIAM way to home");
+                saveToFile("KIERUNEK: USTAWIAM way to home");
                 setIsInHome(FALSE);
                 setIsInWork(FALSE);
                 setWayToHome(TRUE);
                 setWayToWork(FALSE);
             }else{
-                saveToFile("STARTOWY KIERUNEK ELSE: USTAWIAM way to work");
+                saveToFile("KIERUNEK ELSE: USTAWIAM way to work");
                 setIsInHome(FALSE);
                 setIsInWork(FALSE);
                 setWayToHome(FALSE);
                 setWayToWork(TRUE);
             }
+            previousDistancesToHome.add(currentDistanceToHomeInMeters);
+            stayOnlyNewestDecisions(previousDistancesToHome);
         }
     }
 
@@ -236,11 +256,11 @@ public class DirectionWay {
         //commented for test
         stayOnlyNewestDistances(distancesToHomeList);
         stayOnlyNewestDistances(distancesToWorkList);
-        stayOnlyNewestDecisions(isInWayToHomePreviousDecisions);
-        stayOnlyNewestDecisions(isInWayToWorkPreviousDecisions);
+//        stayOnlyNewestDecisions(isInWayToHomePreviousDecisions);
+//        stayOnlyNewestDecisions(isInWayToWorkPreviousDecisions);
     }
 
-    public void stayOnlyNewestDecisions(List<Boolean> elements) {
+    public void stayOnlyNewestDecisions(List<Double> elements) {
         while(elements.size() >= 5){
             elements.subList(Math.max(elements.size() - 3, 0), elements.size()).clear();
         }

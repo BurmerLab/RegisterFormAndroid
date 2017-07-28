@@ -92,6 +92,20 @@ public class DirectionWayTest extends TestCase {
     }
 
     @Test
+    public void testObtainStartCurrentDirection(){
+
+        Double currentDistanceToHome = new Double(5);
+
+        List<Double> previousDistancesToHome = new LinkedList<>();
+        previousDistancesToHome.add(10D);
+        previousDistancesToHome.add(20D);
+        previousDistancesToHome.add(30D);
+        directionWay.setPreviousDistancesToHome(previousDistancesToHome);
+        directionWay.obtainStartCurrentDirection(currentDistanceToHome);
+        assertEquals(true, directionWay.isInWayToHome());
+    }
+
+    @Test
     public void testOfLinkedList(){
         List<Integer> linkedLIst = new LinkedList<>();
         linkedLIst.add(1);
@@ -237,21 +251,6 @@ public class DirectionWayTest extends TestCase {
 
     }
 
-    @Test
-    public void testCuttingList(){
-        List<Boolean> previousDistancesList = new LinkedList<>();
-        previousDistancesList.add(true);
-        previousDistancesList.add(true);
-        previousDistancesList.add(true);
-        previousDistancesList.add(true);
-        previousDistancesList.add(true);
-        previousDistancesList.add(false);
-        previousDistancesList.add(true);
-
-        directionWay.stayOnlyNewestDecisions(previousDistancesList);
-
-        assertEquals(previousDistancesList.size(), 5);
-    }
 
     @Test
     public void checkMethodToRemoveListElements(){

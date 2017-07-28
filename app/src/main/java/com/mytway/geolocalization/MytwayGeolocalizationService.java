@@ -226,8 +226,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("----------------------------------------------------\n");
 
                 directionWay.decideTravelDirectionsAre(currentPosition, session);
-                directionWay.decideIsInHome(currentPosition, session.getHomePlace());
-                directionWay.decideIsInWork(currentPosition, session.getWorkPlace());
 
                 saveToFile("--------------------AFTER-------------------------");
                 saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ");
@@ -271,8 +269,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                     travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
                 } else if(directionWay.isInWork()){
-//                    directionWay.setIsInWork(Boolean.TRUE);
-//                    directionWay.setIsInHome(Boolean.FALSE);
                     //WorkScreen
                     saveToFileLocalization("Work ");
                     DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
@@ -280,9 +276,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                     workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
 
                 } else if(directionWay.isInWayToHome()){
-//                    directionWay.setIsInWork(Boolean.FALSE);
-//                    directionWay.setIsInHome(Boolean.FALSE);
-//                    directionWay.setWayToHome(Boolean.TRUE);
 //                    //TravelToHomeScreen
                     saveToFileLocalization("TravelToHome");
                     DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");

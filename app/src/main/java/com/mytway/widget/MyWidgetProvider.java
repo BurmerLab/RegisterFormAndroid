@@ -56,8 +56,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.refreshWidgetContent(context));
 
-		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context, AppWidgetManager.getInstance(context),
-				new int[]{0}, remoteViews, R.id.image4));
+		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.buildButtonSettingsPendingIntent(context,
+				AppWidgetManager.getInstance(context),
+				new int[]{0}, remoteViews, R.id.refreshImage));
+//		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context,
+//				AppWidgetManager.getInstance(context),
+//				new int[]{0}, remoteViews, R.id.image4));
 
 
 		appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
