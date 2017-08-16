@@ -50,15 +50,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		Intent intentSync = new Intent(context, MyWidgetProvider.class);
 		intentSync.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE); //You need to specify the action for the intent. Right now that intent is doing nothing for there is no action to be broadcasted.
 
-		//mozna wyuwalic
-//		PendingIntent pendingSync = PendingIntent.getBroadcast(context,0, intentSync, PendingIntent.FLAG_UPDATE_CURRENT); //You need to specify a proper flag for the intent. Or else the intent will become deleted.
-//		remoteViews.setOnClickPendingIntent(R.id.refreshImage, pendingSync);
-
-		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.refreshWidgetContent(context));
-
+		//tutuaj jest odswiezanie po kliknieciu na guzik :)
 		remoteViews.setOnClickPendingIntent(R.id.refreshImage, MyWidgetProvider.buildButtonSettingsPendingIntent(context,
 				AppWidgetManager.getInstance(context),
 				new int[]{0}, remoteViews, R.id.refreshImage));
+
+
 //		remoteViews.setOnClickPendingIntent(R.id.image4, MyWidgetProvider.buildButtonSettingsPendingIntent(context,
 //				AppWidgetManager.getInstance(context),
 //				new int[]{0}, remoteViews, R.id.image4));
@@ -139,33 +136,28 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	public static PendingIntent buildButtonSettingsPendingIntent(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, RemoteViews remoteViews, int viewId) {
 		++MyWidgetIntentReceiver.clickCount;
 
-		Intent intent;
+//		Intent intent;
 
-		if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context)
-				&& PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context)) {
+//		if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, context)
+//				&& PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, context)) {
 
-			MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(context);
-			double latitudeLocalization = geolocalization.getLatitude();
-			double longitudeLocalization = geolocalization.getLongitude();
-
-			intent = new Intent();
+			Intent intent = new Intent();
 			intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
-			intent.putExtra("DUPA", "Lat:" + latitudeLocalization + " Lon: " + longitudeLocalization);
-		}else{
-			String[] missingPermissions =
-					obtainMissingPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, context);
-
-			openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, viewId, missingPermissions);
-
-			//Nie ma permissions, wyswietl activity!!
-			intent = new Intent(context, SettingsActivity.class);
-			intent.setAction("PERMISSIONS");
-			intent.putExtra("MissingPermissions", missingPermissions);
-
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			context.startActivity(intent);
-			context.sendBroadcast(intent);
-		}
+//		}else{
+//			String[] missingPermissions =
+//					obtainMissingPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, context);
+//
+//			openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, viewId, missingPermissions);
+//
+//			//Nie ma permissions, wyswietl activity!!
+//			intent = new Intent(context, SettingsActivity.class);
+//			intent.setAction("PERMISSIONS");
+//			intent.putExtra("MissingPermissions", missingPermissions);
+//
+//			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//			context.startActivity(intent);
+//			context.sendBroadcast(intent);
+//		}
 
 		return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}

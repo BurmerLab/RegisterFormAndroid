@@ -30,10 +30,16 @@ public class DirectionWay {
     private Boolean isInHome = FALSE;
 
     private Distance distanceBetweenHomeAndWork;
+    private double percentageDistanceBtwHomeAndWork;
+
     private List<Double> distancesToHomeList = new LinkedList<>();
     private List<Double> distancesToWorkList = new LinkedList<>();
-    private LocalDateTime leaveHomeToGoToWorkTime;
+
+    private LocalDateTime leaveHomeTime;
     private LocalDateTime startWorkTime;
+
+    private LocalDateTime leaveWorkTime;
+    private LocalDateTime gotHomeTime;
 
     private List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
     private List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
@@ -58,10 +64,7 @@ public class DirectionWay {
     }
 
     public void decideTravelDirectionsAre(Position currentPosition, Session session){
-        //nowa wersja
         this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
-        //stara wersja
-//        this.decideDirection(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
     public static double designateDistanceBetween(Position startPosition, Position endPosition){
@@ -82,18 +85,127 @@ public class DirectionWay {
     }
 
     public void decideDirectionNew(Position currentPosition, Position homePosition, Position workPosition) {
-        double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
-        double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
-        double percentageOfDistanceBtwHomeAndWorkInMeters = 0;
+        double currentDistToHomeInM = obtainDistanceBetweenInMeters(currentPosition, homePosition);
+        double currentDistToWorkInM = obtainDistanceBetweenInMeters(currentPosition, workPosition);
 
-        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-            percentageOfDistanceBtwHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
+        setFirstDirections(currentPosition, homePosition, workPosition, currentDistToHomeInM);
+
+        if(isInHome()) {
+            //can be isInHome or wayToWork
+            if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())){
+                inHomeOperations();
+                saveToFileDirections("IS IN HOME");
+            }else {
+                inWayToWorkOperations();
+                saveToFileDirections("IS IN WAY TO WORK");
+            }
+        }else if(isInWayToWork()){
+            //can be wayToWork or isInWork or isInHome
+            if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+                inWorkOperations();
+                saveToFileDirections("IS IN WORK");
+
+            }else if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())){
+                inHomeOperations();
+                saveToFileDirections("IS IN HOME");
+
+            }else{
+                inWayToWorkOperations();
+                saveToFileDirections("IS IN WAY TO WORK");
+            }
+        }else if(isInWork()){
+            //can be isInWork or wayToHome
+            if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+                inWorkOperations();
+                saveToFileDirections("IS IN WORK");
+
+            }else{
+                inWayToHomeOperations();
+                saveToFileDirections("IS IN WAY TO HOME");
+
+            }
+        }else if(isInWayToHome()){
+            //can be isInHome or wayToHome or isInWork
+            if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())) {
+                inHomeOperations();
+                saveToFileDirections("IS IN HOME");
+
+            }else if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+                inWorkOperations();
+                saveToFileDirections("IS IN WORK");
+
+            }else{
+                inWayToHomeOperations();
+                saveToFileDirections("IS WAY TO HOME");
+            }
         }else{
-            percentageOfDistanceBtwHomeAndWorkInMeters = 1000;
+            saveToFile("NIE ZNALAZLEM KIERUNKU :(");
+            saveToFileDirections("NIE ZNALAZLEM KIERUNKU ");
         }
 
-        //Start condition
+    }
 
+    public void inWayToHomeOperations() {
+        saveToFile("SETUP IS IN WAY TO HOME");
+        setIsInHome(FALSE);
+        setIsInWork(FALSE);
+        setWayToHome(TRUE);
+        setWayToWork(FALSE);
+
+        setLeaveWorkTimeOnCurrentTime();
+        saveToFileTime("Save Leave Work time on current time");
+    }
+
+    public void inWorkOperations() {
+        saveToFile("SETUP IS IN WORK");
+        setIsInHome(FALSE);
+        setIsInWork(TRUE);
+        setWayToHome(FALSE);
+        setWayToWork(FALSE);
+
+        setStartWorkTimeOnCurrentTime();
+        saveToFileTime("Save Start Work time on current time");
+    }
+
+    public void inWayToWorkOperations() {
+        saveToFile("SETUP IS IN WAY TO WORK");
+        setIsInHome(FALSE);
+        setIsInWork(FALSE);
+        setWayToHome(FALSE);
+        setWayToWork(TRUE);
+
+        setLeaveHomeTimeOnCurrentTime();
+        saveToFileTime("Save Leave Home time on current time");
+    }
+
+    public void inHomeOperations() {
+        saveToFile("SETUP IS IN HOME");
+        setIsInHome(TRUE);
+        setIsInWork(FALSE);
+        setWayToHome(FALSE);
+        setWayToWork(FALSE);
+
+        setGotHomeTimeOnCurrentTime();
+        saveToFileTime("Save Got Home time on current time");
+    }
+
+    public boolean isInWork(double currentDistanceToWorkInMeters, double percentageOfDistanceBtwHomeAndWorkInMeters) {
+        return percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters;
+    }
+
+    public boolean isInHome(double currentDistanceToHomeInMeters, double percentageOfDistanceBtwHomeAndWorkInMeters) {
+        return percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters;
+    }
+
+    public void getPercentageOfDistanceBtwHomeAndWorkInMeters() {
+        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
+            setPercentageDistanceBtwHomeAndWork(distanceBetweenHomeAndWork.obtainSevenPercentFromDistance());
+        }else{
+            setPercentageDistanceBtwHomeAndWork(1000d);
+        }
+    }
+
+    public void setFirstDirections(Position currentPosition, Position homePosition, Position workPosition, double currentDistanceToHomeInMeters) {
         if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
             decideIsInHome(currentPosition, homePosition);
             decideIsInWork(currentPosition, workPosition);
@@ -104,112 +216,40 @@ public class DirectionWay {
             saveToFile("WAY HOME" + isInWayToHome());
             saveToFile("WAY WORK" + isInWayToWork());
         }
-
-        if(isInHome()) {
-            //can be isInHome or wayToWork
-            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
-                saveToFile("USTAWIAM IS IN HOME");
-                setIsInHome(TRUE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else {
-                saveToFile("USTAWIAM IS IN WAY TO WORK");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(TRUE);
-            }
-        }else if(isInWayToWork()){
-            //can be wayToWork or isInWork or isInHome
-            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
-                saveToFile("USTAWIAM IS IN WORK");
-                setIsInHome(FALSE);
-                setIsInWork(TRUE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters){
-                saveToFile("USTAWIAM IS IN HOME");
-                setIsInHome(TRUE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else{
-                saveToFile("USTAWIAM IS IN WAY TO WORK");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(TRUE);
-            }
-        }else if(isInWork()){
-            //can be isInWork or wayToHome
-            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
-                saveToFile("USTAWIAM IS IN WORK");
-                setIsInHome(FALSE);
-                setIsInWork(TRUE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else{
-                saveToFile("USTAWIAM IS IN WAY TO HOME");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(TRUE);
-                setWayToWork(FALSE);
-            }
-        }else if(isInWayToHome()){
-            //can be wayToHome or isInHome or isInWork
-            if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters) {
-                saveToFile("USTAWIAM IS IN HOME");
-                setIsInHome(TRUE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else if(percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters){
-                saveToFile("USTAWIAM IS IN WORK");
-                setIsInHome(FALSE);
-                setIsInWork(TRUE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
-            }else{
-                saveToFile("USTAWIAM IS IN WAY TO HOME");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(TRUE);
-                setWayToWork(FALSE);
-            }
-        }else{
-            saveToFile("NIE ZNALAZLEM KIERUNKU :(");
-        }
-
     }
 
     public void obtainStartCurrentDirection(double currentDistanceToHomeInMeters) {
 //        saveToFile("WSZYSTKIE FLAGI FALSE, DEFAULT: is in home");
-
-        //Countaing is user in way to home or work
-        if(previousDistancesToHome.size() == 0){
-            previousDistancesToHome.add(currentDistanceToHomeInMeters);
-        }
-
-        if(previousDistancesToHome.size() > 0){
-            double previousDistanceToHome =  previousDistancesToHome.get(previousDistancesToHome.size() - 1);
-            if(previousDistanceToHome > currentDistanceToHomeInMeters){
-                saveToFile("KIERUNEK: USTAWIAM way to home");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(TRUE);
-                setWayToWork(FALSE);
-            }else{
-                saveToFile("KIERUNEK ELSE: USTAWIAM way to work");
-                setIsInHome(FALSE);
-                setIsInWork(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(TRUE);
+        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
+            //Countaing is user in way to home or work
+            if(previousDistancesToHome.size() == 0){
+                previousDistancesToHome.add(currentDistanceToHomeInMeters);
             }
-            previousDistancesToHome.add(currentDistanceToHomeInMeters);
-            stayOnlyNewestDecisions(previousDistancesToHome);
+
+            if(previousDistancesToHome.size() > 0){
+                double previousDistanceToHome =  previousDistancesToHome.get(previousDistancesToHome.size() - 1);
+                if(previousDistanceToHome > currentDistanceToHomeInMeters){
+                    saveToFile("KIERUNEK: SETUP way to home");
+                    setIsInHome(FALSE);
+                    setIsInWork(FALSE);
+                    setWayToHome(TRUE);
+                    setWayToWork(FALSE);
+                }else{
+                    setLeaveHomeTimeOnCurrentTime();
+
+                    saveToFile("KIERUNEK ELSE: SETUP way to work");
+                    setIsInHome(FALSE);
+                    setIsInWork(FALSE);
+                    setWayToHome(FALSE);
+                    setWayToWork(TRUE);
+                }
+                previousDistancesToHome.add(currentDistanceToHomeInMeters);
+                stayOnlyNewestDecisions(previousDistancesToHome);
+            }
         }
     }
+
+
 
     //work on the same instances of DirectionWay because in distancesToHomeList is saved previous distances
     public void decideDirection(Position currentPosition, Position homePosition, Position workPosition){
@@ -297,6 +337,56 @@ public class DirectionWay {
         }
     }
 
+    public static void saveToFileDirections(String content) {
+        try{
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(dir, "DIRECTIONS.txt");
+            LocalDateTime currentLocalDateTime = new LocalDateTime();
+            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+            FileOutputStream fop = new FileOutputStream(file, true);
+            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+            fop.write(pointXml.getBytes());
+            fop.flush();
+            fop.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveToFileTime(String content) {
+        try{
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(dir, "TIMES.txt");
+            LocalDateTime currentLocalDateTime = new LocalDateTime();
+            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+            FileOutputStream fop = new FileOutputStream(file, true);
+            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+            fop.write(pointXml.getBytes());
+            fop.flush();
+            fop.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private boolean decideIsMoveWayToHomeBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToHomeList) {
         saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
         saveToFile(" previousBooleansIsWayToHomeList.size(): " + previousBooleansIsWayToHomeList.size());
@@ -350,12 +440,6 @@ public class DirectionWay {
 
     public Boolean obtainDirection(List<Double> previousDistancesList, double currentDistanceToPoint){
 
-//        saveToFile("---------previousDistance List:------- ");
-//        for(Double previousDistance : previousDistancesList){
-//            saveToFile("previousDistance: " + previousDistance);
-//        }
-//        saveToFile("----------------------------- ");
-
         int i = previousDistancesList.size() - 1;
         saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
         saveToFile(">>> i: " + i);
@@ -393,33 +477,32 @@ public class DirectionWay {
         }else{
             saveToFile("<<<<<<<<<<<<<<<< NOT IN HOME >>>>>>>>>>>>>>>>>>");
             setIsInHome(FALSE);
-//            setIsInWork(FALSE);
 
-            if(leaveHomeToGoToWorkTime == null){
-                leaveHomeToGoToWorkTime = new LocalDateTime();
-            }
+            setLeaveHomeTimeOnCurrentTime();
         }
     }
 
     public void decideIsInWork(Position currentPosition, Position workPosition){
-        if(decideIsInPlace(currentPosition, workPosition)){
-            setIsInWork(TRUE);
-            setIsInHome(FALSE);
-            setWayToHome(FALSE);
-            setWayToWork(FALSE);
+        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
+            if(decideIsInPlace(currentPosition, workPosition)){
+                setIsInWork(TRUE);
+                setIsInHome(FALSE);
+                setWayToHome(FALSE);
+                setWayToWork(FALSE);
 
-            leaveHomeToGoToWorkTime = null;
+                leaveHomeTime = null;
 
-            saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
-            saveToFile("<<<<<<<<<<<<<<<< IS IN WORK >>>>>>>>>>>>>>>>>>");
+                saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
+                saveToFile("<<<<<<<<<<<<<<<< IS IN WORK >>>>>>>>>>>>>>>>>>");
 
-            //if is no start work time, then insert current because user arrived to work
-            if(startWorkTime == null){
-                startWorkTime = new LocalDateTime();
+                //if is no start work time, then insert current because user arrived to work
+                if(startWorkTime == null){
+                    startWorkTime = new LocalDateTime();
+                }
+            }else{
+                saveToFile("<<<<<<<<<<<<<<<< NOT IN WORK >>>>>>>>>>>>>>>>>>");
+                setIsInWork(FALSE);
             }
-        }else{
-            saveToFile("<<<<<<<<<<<<<<<< NOT IN WORK >>>>>>>>>>>>>>>>>>");
-            setIsInWork(FALSE);
         }
     }
 
@@ -472,12 +555,12 @@ public class DirectionWay {
         this.distanceBetweenHomeAndWork = distanceBetweenHomeAndWork;
     }
 
-    public LocalDateTime getLeaveHomeToGoToWorkTime() {
-        return leaveHomeToGoToWorkTime;
+    public LocalDateTime getLeaveHomeTime() {
+        return leaveHomeTime;
     }
 
-    public void setLeaveHomeToGoToWorkTime(LocalDateTime leaveHomeToGoToWorkTime) {
-        this.leaveHomeToGoToWorkTime = leaveHomeToGoToWorkTime;
+    public void setLeaveHomeTime(LocalDateTime leaveHomeTime) {
+        this.leaveHomeTime = leaveHomeTime;
     }
 
     public Boolean getIsInWork() {
@@ -550,5 +633,69 @@ public class DirectionWay {
 
     public void setWayToHome(Boolean wayToHome) {
         this.wayToHome = wayToHome;
+    }
+
+    public LocalDateTime getGotHomeTime() {
+        return gotHomeTime;
+    }
+
+    public void setGotHomeTime(LocalDateTime gotHomeTime) {
+        this.gotHomeTime = gotHomeTime;
+    }
+
+    public LocalDateTime getLeaveWorkTime() {
+        return leaveWorkTime;
+    }
+
+    public void setLeaveWorkTime(LocalDateTime leaveWorkTime) {
+        this.leaveWorkTime = leaveWorkTime;
+    }
+
+    public void setLeaveHomeTimeOnCurrentTime() {
+        if(leaveHomeTime == null){
+            leaveHomeTime = new LocalDateTime();
+        }
+    }
+
+    public void resetLeaveHomeTime() {
+        leaveHomeTime = null;
+    }
+
+    public void setStartWorkTimeOnCurrentTime() {
+        if(startWorkTime == null){
+            startWorkTime = new LocalDateTime();
+        }
+    }
+
+    public void resetStartWorkTime() {
+        startWorkTime = null;
+    }
+
+    public void setLeaveWorkTimeOnCurrentTime() {
+        if(leaveWorkTime == null){
+            leaveWorkTime = new LocalDateTime();
+        }
+    }
+
+    public void resetLeaveWorkTime() {
+        leaveWorkTime = null;
+    }
+
+    public void setGotHomeTimeOnCurrentTime() {
+        if(gotHomeTime == null){
+            gotHomeTime = new LocalDateTime();
+        }
+    }
+
+    public void resetGotHomeTime() {
+        gotHomeTime = null;
+    }
+
+    public double getPercentageDistanceBtwHomeAndWork() {
+        return percentageDistanceBtwHomeAndWork;
+    }
+
+    public void setPercentageDistanceBtwHomeAndWork(double percentageDistanceBtwHomeAndWork) {
+        this.percentageDistanceBtwHomeAndWork = percentageDistanceBtwHomeAndWork;
     }
 }

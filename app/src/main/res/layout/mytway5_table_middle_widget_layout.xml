@@ -100,6 +100,8 @@
                     android:layout_gravity="center"
                     android:layout_height="wrap_content">
 
+
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/first_time_height_size_medium"
@@ -225,6 +227,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal">
 
+                    <ProgressBar
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:id="@+id/firstProgressBar" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -253,6 +261,11 @@
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal">
 
+                    <ProgressBar
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:id="@+id/secondProgressBar" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -269,16 +282,16 @@
 
                 <LinearLayout
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal">
+
+                    <ProgressBar
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:id="@+id/thirdProgressBar" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -290,6 +303,12 @@
                         android:textSize="@dimen/third_time_little_title_size_medium"
                         android:id="@+id/thirdTimeSmallTitle" />
                     <!--android:layout_gravity="center"-->
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
                 </LinearLayout>
 
                 <LinearLayout

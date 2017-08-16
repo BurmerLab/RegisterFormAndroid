@@ -2,24 +2,9 @@ package com.mytway.behaviour.pojo.screens;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.text.SpannableString;
-import android.text.format.DateFormat;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
+import android.os.Handler;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.DirectionWay;
@@ -32,7 +17,6 @@ import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
 import org.joda.time.LocalDateTime;
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 
@@ -43,6 +27,8 @@ public class MorningScreen implements Screen {
     private TimeToDeparture timeToDeparture;
     private TimeInRoad timeInRoad;
     private TimeArriveToHome timeArriveToHome;
+    private int mProgressStatus = 0;
+    private Handler mHandler = new Handler();
 
     @Override
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
@@ -86,9 +72,18 @@ public class MorningScreen implements Screen {
         //times:
         view.setTextViewText(R.id.title, "Morning Screen: " + time);
 
+
         DisplayMessageStyle.displayLeftTime(view, R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
         DisplayMessageStyle.displayLeftTime(view, R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
+
+        //progressBars
+        int fullTravelTime = Integer.getInteger(session.getFullTimeTravelHomeToWork());
+        int currentTravelTime = Integer.getInteger(travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime());
+
+        view.setProgressBar(R.id.firstProgressBar, , 3, false);
+        view.setProgressBar(R.id.secondProgressBar, 10, 8, false);
+        view.setProgressBar(R.id.thirdProgressBar, 10, 5, false);
 
         //icons:
         view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);

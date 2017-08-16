@@ -171,9 +171,28 @@ public class WorkWeek implements Parcelable {
             }else  if(x == 6 && eachDayNumber == 1) {
                 workWeek.setSunday(true);
             }
-
         }
-
         return workWeek;
+    }
+
+    public boolean checkIsDayEnable(int dayOfWeek){
+        if(dayOfWeek <= 7){
+            if(dayOfWeek == 1){
+                return monday;
+            }else if(dayOfWeek == 2){
+                return tuesday;
+            }else if(dayOfWeek == 3){
+                return wednesday;
+            }else if(dayOfWeek == 4){
+                return thursday;
+            }else if(dayOfWeek == 5){
+                return friday;
+            }else if(dayOfWeek == 6){
+                return tuesday;
+            }else if(dayOfWeek == 7){
+                return sunday;
+            }
+        }
+        return false;
     }
 }

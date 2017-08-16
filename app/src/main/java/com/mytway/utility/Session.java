@@ -3,6 +3,7 @@ package com.mytway.utility;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.mytway.pojo.GoogleMapsDirectionJson;
 import com.mytway.pojo.Position;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.properties.SharedPreferencesNames;
@@ -25,6 +26,7 @@ public class Session {
 
     public String wayDistance;
     public String wayDuration;
+    public String fullTimeTravelHomeToWork;
 
     private SharedPreferences sharedPreferences;
 
@@ -325,6 +327,30 @@ public class Session {
             this.wayDuration = wayDuration;
         }
         return wayDuration;
+    }
+
+    //------- fullTimeTravelHomeToWork ---------------
+    public void setFullTimeTravelHomeToWork(Context context) {
+        TravelTime travelTime = new TravelTime();
+
+        Position homePosition = new Position(Double.parseDouble(homeLatitude), Double.parseDouble(homeLongitude));
+        Position workPosition = new Position(Double.parseDouble(workLatitude), Double.parseDouble(workLongitude));
+
+        GoogleMapsDirectionJson googleMapsDirectionJson = travelTime.getTravelTimeBetweenTwoPositions(context, homePosition, workPosition);
+        String fullTimeTravelHomeToWork = googleMapsDirectionJson.getLegs().getDuration().getText();
+
+        sharedPreferences.edit().putString("fullTimeTravelHomeToWork", fullTimeTravelHomeToWork).commit();
+    }
+
+    public String getFullTimeTravelHomeToWork() {
+        String fullTimeTravelHomeToWork;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            fullTimeTravelHomeToWork = this.fullTimeTravelHomeToWork;
+        }else{
+            fullTimeTravelHomeToWork = sharedPreferences.getString("fullTimeTravelHomeToWork", "0");
+            this.fullTimeTravelHomeToWork = fullTimeTravelHomeToWork;
+        }
+        return fullTimeTravelHomeToWork;
     }
 
 

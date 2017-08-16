@@ -15,13 +15,9 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-//		if(intent.getAction().equals("PERMISSION")){
-//			intent = new Intent(context, NoPermissionsActivity.class);
-//			intent.putExtra("Permissions", "No");
-//			context.startActivity(intent);
-//		}
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),	R.layout.mytway5_table_middle_widget_layout);
-		updateWidgetPictureAndButtonListener(context, "lol");
+
+		updateWidgetPictureAndButtonListener(context, "Bootload");
 
 		//added for restart widget after bootloaded app
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {

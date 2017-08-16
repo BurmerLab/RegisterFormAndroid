@@ -28,8 +28,6 @@ import com.mytway.pojo.User;
 import com.mytway.utility.EthernetConnectivity;
 import com.mytway.utility.MytwayWebservice;
 import com.mytway.utility.Session;
-import com.mytway.utility.WriteDbToExternal;
-import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.validation.Validation;
 
 import org.json.JSONException;
@@ -49,7 +47,6 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Stetho.initializeWithDefaults(this);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_form_login);
 

@@ -55,6 +55,12 @@ public class HandShakeActivity extends Activity {
                     getApplicationContext(),
                     HandShakeActivity.this,
                     getString(R.string.application_basing_on_your_localization));
+
+            PermissionUtil.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    1,
+                    getApplicationContext(),
+                    HandShakeActivity.this,
+                    getString(R.string.application_basing_on_your_localization));
         }
 
         // Instantiate a ViewPager and a PagerAdapter.

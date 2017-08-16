@@ -99,7 +99,7 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         serviceInjectMocks.setManager(managerMock);
         serviceInjectMocks.setThisWidget(thisWidget);
         serviceInjectMocks.setView(viewMock);
-        serviceInjectMocks.updateGeolocalization();
+        serviceInjectMocks.computeMytwayWidget();
 
         //then
         Mockito.doNothing().when(MorningScreenMock).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition);

@@ -29,6 +29,8 @@ import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
+import com.mytway.pojo.TypeWork;
+import com.mytway.pojo.WorkWeek;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
 import com.mytway.utility.permission.PermissionUtil;
@@ -161,14 +163,12 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(action.equals("DUPKA")){
-                //action for sms received
-                WidgetUtils.location = getLocalization();
-            }
-            else if(action.equals(android.telephony.TelephonyManager.ACTION_PHONE_STATE_CHANGED)){
-                //action for phone state changed
-            }
+//            String action = intent.getAction();
+//            if(action.equals("DUPKA")){
+//                //action for sms received
+//                WidgetUtils.location = getLocalization();
+//            }
+//            /
         }
     };
 
@@ -185,20 +185,21 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         try {
-            updateGeolocalization();
+            computeMytwayWidget();
         } catch (Exception e) {
-            Log.i(TAG, "Problem with method updateGeolocalization in service", e);
+            Log.i(TAG, "Problem with method computeMytwayWidget in service", e);
             e.printStackTrace();
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public void updateGeolocalization() throws Exception {
+    public void computeMytwayWidget() throws Exception {
         mContext = getApplicationContext();
 
         if(!PropertiesValues.MOCK_APP_TO_TESTS){
             //remove in unit tests:
             session = new Session(mContext);
+            session.setFullTimeTravelHomeToWork(mContext);
         }
 
         view = new RemoteViews(getPackageName(), R.layout.mytway5_table_middle_widget_layout);
@@ -218,83 +219,78 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
 
-                saveToFile("--------------------BEFORE-Decisions------------------------");
-                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ");
-                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ");
-                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ");
-                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ");
-                saveToFile("----------------------------------------------------\n");
+                saveToFile("--------------------BEFORE-Decisions------------------------", "DirectionWay.txt");
+                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
+                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
                 directionWay.decideTravelDirectionsAre(currentPosition, session);
 
-                saveToFile("--------------------AFTER-------------------------");
-                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ");
-                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ");
-                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ");
-                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ");
-                saveToFile("----------------------------------------------------\n");
+                saveToFile("--------------------AFTER-------------------------", "DirectionWay.txt");
+                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
-                //todo: zakomentowane, odkomentowac kod produkcyjny
-                LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeToGoToWorkTime();//directionWay.getLeaveHomeToGoToWorkTime()
-//                saveToFile("-----TIME whenUserLeaveHome = " + whenUserLeaveHome.toString() + " -------");
-
-//                LocalDateTime whenUserLeaveHome = new LocalDateTime()
-//                        .withYear(0)
-//                        .withMonthOfYear(1)
-//                        .withDayOfMonth(1)
-//                        .withHourOfDay(6)
-//                        .withMinuteOfHour(20)
-//                        .withSecondOfMinute(0);
-
+                LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeTime();//directionWay.getLeaveHomeTime()
                 LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
-//                LocalDateTime startWorkTime = new LocalDateTime()
-//                        .withYear(0)
-//                        .withMonthOfYear(1)
-//                        .withDayOfMonth(1)
-//                        .withHourOfDay(7)
-//                        .withMinuteOfHour(1)
-//                        .withSecondOfMinute(0);
 
-                if(directionWay.isInHome()){
-                    //Morning screen
-                    saveToFileLocalization("Morning");
-                    DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
-                    morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+                if(session.getTypeWork() == TypeWork.STANDARD_TYPE.getStatusCode()){
 
-                } else if(directionWay.isInWayToWork()){
-//                    TravelToWorkScreen
-                    saveToFileLocalization("TravelToWork");
-                    DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
-                    TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
-                    travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+//                    todo: uncomment and create screen for days without work
+//                    WorkWeek workWeek = WorkWeek.createWorkWeekFromString(session.getWorkWeek());
+//                    if(workWeek.checkIsDayEnable(new LocalDateTime().getDayOfWeek())){
+//                        saveToFile("Today is day of work", "WorkWeek.txt");
 
-                } else if(directionWay.isInWork()){
-                    //WorkScreen
-                    saveToFileLocalization("Work ");
-                    DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
-                    WorkScreen workScreen = new WorkScreen();
-                    workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
+                        if(directionWay.isInHome()){
+                            //Morning screen
+                            saveToFileLocalization("Morning");
+                            DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
+                            morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
 
-                } else if(directionWay.isInWayToHome()){
-//                    //TravelToHomeScreen
-                    saveToFileLocalization("TravelToHome");
-                    DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
-                    TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-                    travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-//
-                } else if(directionWay.getIsInHome()){
-                    saveToFileLocalization("Home screen");
-                    DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
-                    HomeScreen homeScreen = new HomeScreen();
-                    homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
-                } else {
-                    saveToFileLocalization("Not Found yet");
-                    DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
-                    view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
+                        } else if(directionWay.isInWayToWork()){
+                            //TravelToWorkScreen
+                            saveToFileLocalization("TravelToWork");
+                            DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
+                            TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
+                            travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+
+                        } else if(directionWay.isInWork()){
+                            //WorkScreen
+                            saveToFileLocalization("Work ");
+                            DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
+                            WorkScreen workScreen = new WorkScreen();
+                            workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
+
+                        } else if(directionWay.isInWayToHome()){
+                            //TravelToHomeScreen
+                            saveToFileLocalization("TravelToHome");
+                            DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
+                            TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
+                            travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+
+                        } else if(directionWay.getIsInHome()){
+                            saveToFileLocalization("Home screen");
+                            DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
+                            HomeScreen homeScreen = new HomeScreen();
+                            homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+                        } else {
+                            saveToFileLocalization("Not Found yet");
+                            DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
+                            view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
+                        }
+//                    } else {
+//                        saveToFile("Today is not a day of work ", "WorkWeek.txt");
+//                    }
                 }
+
             }else{
-                saveToFileLocalization("Not Founded");
-                view.setTextViewText(R.id.title, "NOT FOUNDED " + time);
+                saveToFileLocalization("Not Permissions granded");
+                view.setTextViewText(R.id.title, "Not Permissions granded " + time);
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
             }
@@ -305,7 +301,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }
     }
 
-    public static void saveToFile(String content) {
+    public static void saveToFile(String content, String fileName) {
         try{
             File sdCard = Environment.getExternalStorageDirectory();
             File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
@@ -314,7 +310,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 dir.mkdirs();
             }
 
-            File file = new File(dir, "DirectionWay.txt");
+            File file = new File(dir, fileName);
             LocalDateTime currentLocalDateTime = new LocalDateTime();
             //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
 
@@ -339,20 +335,27 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             dir.mkdirs();
         }
 
-        File file = new File(dir, "MYTWAY_LOCALIZATION_LOGS_2.txt");
         LocalDateTime currentLocalDateTime = new LocalDateTime();
 
+        File file;
+        if(currentLocalDateTime.getHourOfDay() < 14){
+            file = new File(dir, "MYTWAY_LOCALIZATION_MORNING.txt");
+        }else{
+            file = new File(dir, "MYTWAY_LOCALIZATION_AFTERNOON.txt");
+        }
+
         FileOutputStream fop = new FileOutputStream(file, true);
-        String pointXml = "<Placemark>\n" +
+        StringBuilder pointXml = new StringBuilder();
+
+        pointXml.append("<Placemark>\n" +
                 "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</name>\n" +
                 "        <description> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
                 "        <Point>\n" +
-//                        "            <coordinates> "+ location.getLongitude() + " , " + location.getLatitude() + " </coordinates>\n" +
-                "            <coordinates> "+ longitude + " , " + latitude + " </coordinates>\n" +
+                "            <coordinates> "+ getLongitude() + " , " + getLatitude() + " </coordinates>\n" +
                 "        </Point>\n" +
-                "    </Placemark>\n\n";
+                "    </Placemark>\n\n");
 
-        fop.write(pointXml.getBytes());
+        fop.write(pointXml.toString().getBytes());
         fop.flush();
         fop.close();
 
