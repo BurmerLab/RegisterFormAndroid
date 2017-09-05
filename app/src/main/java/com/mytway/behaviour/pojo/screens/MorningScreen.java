@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
@@ -11,8 +12,10 @@ import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
+import com.mytway.pojo.Duration;
 import com.mytway.pojo.Position;
 import com.mytway.utility.DisplayMessageStyle;
+import com.mytway.utility.GraphUtil;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 
@@ -78,12 +81,14 @@ public class MorningScreen implements Screen {
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
 
         //progressBars
-        int fullTravelTime = Integer.getInteger(session.getFullTimeTravelHomeToWork());
-        int currentTravelTime = Integer.getInteger(travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getDurationTime());
+        int fullTravelTimeSeconds = Integer.parseInt(session.getFullTimeTravelHomeToWork()); //8:00
+        int currentTravelTimeSeconds = travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue();
+       
+        int timeToLeftHomeInSeconds = GraphUtil.calculateProgressBar(fullTravelTimeSeconds, currentTravelTimeSeconds);
 
-        view.setProgressBar(R.id.firstProgressBar, , 3, false);
-        view.setProgressBar(R.id.secondProgressBar, 10, 8, false);
-        view.setProgressBar(R.id.thirdProgressBar, 10, 5, false);
+        view.setProgressBar(R.id.firstProgressBar, fullTravelTimeSeconds, timeToLeftHomeInSeconds, false);
+        view.setViewVisibility(R.id.secondProgressBar, View.INVISIBLE);
+        view.setViewVisibility(R.id.thirdProgressBar, View.INVISIBLE);
 
         //icons:
         view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);

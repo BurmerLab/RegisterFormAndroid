@@ -21,6 +21,7 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
+import com.mytway.behaviour.pojo.AProcessingTime;
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.screens.HomeScreen;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
@@ -37,6 +38,7 @@ import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
 
+import org.joda.time.Hours;
 import org.joda.time.LocalDateTime;
 
 import java.io.File;
@@ -62,6 +64,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private AppWidgetManager manager;
     private ComponentName thisWidget;
     private RemoteViews view;
+    private LocalDateTime currentTime = new LocalDateTime();
 
     // The minimum distance to change updates in metters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
@@ -237,7 +240,10 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeTime();//directionWay.getLeaveHomeTime()
-                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //directionWay.getStartWorkTIme
+                //todo: trzeba ustawiac gdzies start work time bo jest nullem teraz
+                //pobierac z sesji
+                LocalDateTime startStandardTimeWork = AProcessingTime.prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());//8:00
+                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //null
 
                 if(session.getTypeWork() == TypeWork.STANDARD_TYPE.getStatusCode()){
 
@@ -247,11 +253,22 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                        saveToFile("Today is day of work", "WorkWeek.txt");
 
                         if(directionWay.isInHome()){
-                            //Morning screen
-                            saveToFileLocalization("Morning");
-                            DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
-                            morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
-
+                            LocalDateTime timeToStartMorningScreen =
+                                    AProcessingTime.subtractTimeTo(currentTime, startStandardTimeWork.getHourOfDay(),
+                                            startStandardTimeWork.getMinuteOfHour(),
+                                            startStandardTimeWork.getSecondOfMinute());
+                              //todo: correct code, commented only for testing
+//                            if(timeToStartMorningScreen.getHourOfDay() < Hours.FIVE.getHours()){
+                                //Morning screen
+                                saveToFileLocalization("Morning");
+                                DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
+                                morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+//                            }else{
+//                                saveToFileLocalization("Home screen");
+//                                DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
+//                                HomeScreen homeScreen = new HomeScreen();
+//                                homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+//                            }
                         } else if(directionWay.isInWayToWork()){
                             //TravelToWorkScreen
                             saveToFileLocalization("TravelToWork");
@@ -273,11 +290,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
                             travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
 
-                        } else if(directionWay.getIsInHome()){
-                            saveToFileLocalization("Home screen");
-                            DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
-                            HomeScreen homeScreen = new HomeScreen();
-                            homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
                         } else {
                             saveToFileLocalization("Not Found yet");
                             DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");

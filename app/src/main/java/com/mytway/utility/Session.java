@@ -337,7 +337,7 @@ public class Session {
         Position workPosition = new Position(Double.parseDouble(workLatitude), Double.parseDouble(workLongitude));
 
         GoogleMapsDirectionJson googleMapsDirectionJson = travelTime.getTravelTimeBetweenTwoPositions(context, homePosition, workPosition);
-        String fullTimeTravelHomeToWork = googleMapsDirectionJson.getLegs().getDuration().getText();
+        String fullTimeTravelHomeToWork = "" + googleMapsDirectionJson.getLegs().getDuration().getValue();
 
         sharedPreferences.edit().putString("fullTimeTravelHomeToWork", fullTimeTravelHomeToWork).commit();
     }

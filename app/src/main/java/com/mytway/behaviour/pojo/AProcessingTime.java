@@ -20,12 +20,12 @@ public abstract class AProcessingTime {
     public AProcessingTime() {
     }
 
-    public LocalDateTime dateToLocalDateTime(String timeString){
+    public static LocalDateTime dateToLocalDateTime(String timeString){
         LocalDateTime localDate = LocalDateTime.parse(timeString, DateTimeFormat.forPattern("HH:mm"));
         return localDate;
     }
 
-    public LocalDateTime prepareTimeFromStringToCalendar(String startStandardTimeWork) {
+    public static LocalDateTime prepareTimeFromStringToCalendar(String startStandardTimeWork) {
 
         LocalDateTime localDateTime = dateToLocalDateTime(startStandardTimeWork);
         return localDateTime;
@@ -58,7 +58,7 @@ public abstract class AProcessingTime {
         return timeAfterSum;
     }
 //6.00 - 13:00 = 17:00
-    public LocalDateTime subtractTimeTo(LocalDateTime basedTime, int hourToAdd, int minutesToAdd, int secondsToAdd){
+    public static LocalDateTime subtractTimeTo(LocalDateTime basedTime, int hourToAdd, int minutesToAdd, int secondsToAdd){
         LocalDateTime timeAfterSubtract = new LocalDateTime()
                 .withYear(basedTime.getYear())
                 .withMonthOfYear(basedTime.getMonthOfYear())
