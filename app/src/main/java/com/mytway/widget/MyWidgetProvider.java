@@ -8,13 +8,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.mytway.activity.R;
 import com.mytway.activity.utils.NoPermissionsActivity;
-import com.mytway.activity.utils.SettingsActivity;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.permission.PermissionUtil;
@@ -65,7 +62,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		//http://www.parallelrealities.co.uk/2011/09/using-alarmmanager-for-updating-android.html
 		manager.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(),
-				PropertiesValues.INTERVAL_TO_REPEAT_SERVICE_METHOD_IN_SECONDS, service);
+				PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET, service);
 
 		// after click, move to permission activity:
 //		openNewActivity(context, appWidgetManager, appWidgetIds, remoteViews, R.id.refreshImage, new String[0]);

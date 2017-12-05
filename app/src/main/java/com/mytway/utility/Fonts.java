@@ -18,17 +18,17 @@ public class Fonts extends TextView{
     }
 
     public void setTypeface(Typeface tf, int style) {
-        if (style == Typeface.BOLD) {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(),    "/fonts/ANA_I_L.ttf"));
-        }
-        else if(style == Typeface.ITALIC)
-        {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/ANA_I_L.ttf"));
-        }
-        else
-        {
-            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/ANA_I_L.ttf"));
-        }
+//        if (style == Typeface.BOLD) {
+//            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(),    "/fonts/ANA_I_L.ttf"));
+//        }
+//        else if(style == Typeface.ITALIC)
+//        {
+//            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/ANA_I_L.ttf"));
+//        }
+//        else
+//        {
+//            super.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "/fonts/ANA_I_L.ttf"));
+//        }
     }
 
 }

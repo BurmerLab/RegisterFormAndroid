@@ -23,8 +23,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.DriverManager;
-import java.util.Calendar;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Log.class)
 public class TimeToDepartureTest extends TestCase {
@@ -45,6 +44,19 @@ public class TimeToDepartureTest extends TestCase {
         System.out.println("time :" + time3.getHourOfDay() + "_" + time3.getMinuteOfHour());
         System.out.println("time :" + time4.getHourOfDay() + "_" + time4.getMinuteOfHour());
 
+    }
+
+    @Test
+    public void testObtainTimeToDepartureInSeconds(){
+        //given
+        LocalDateTime toDeparture =
+                LocalDateTime.parse("T053015", DateTimeFormat.forPattern("'T'HHmmss"));
+
+        //when
+        Integer result = timeToDeparture.obtainTimeInSeconds(toDeparture);
+
+        //then
+        assertEquals(19815, result.intValue());
     }
 
     @Test

@@ -1,0 +1,50 @@
+1) For now travelTime is based on google distance API- add option when Distance API not working,
+    based on historic statistic how long user treveled.
+
+2) Font change
+
+3) Zwiekszyc probkowanie
+4) zmniejszyc zasieg work zones - DONE
+5) Zmniejszyc czestosc odpytywan google o czas do celu.
+    Zrobic zeby np. raz w dniu odpytywalo i zapisywalo do bazy- way_distance, way_duration
+
+
+6) Zrobic blokade TravelToWOrk- czyli ustawiac TravelToWOrk status tylko jak uzytkownik DWA razy pod rzad oddali sie od pracy,
+czyli 1) - jest 2km od dmu, 2) - jest np. 4 km od domu
+
+
+7) INTERVALS:
+Problem: zle sampluje intervaly, od 16.00 (w miare ok,) ale konczy o 17.20
+
+23-11-2017 03:55:12 PM: RARELY
+23-11-2017 04:00:01 PM: RARELY
+23-11-2017 04:29:29 PM: OFTEN
+23-11-2017 04:57:14 PM: OFTEN
+23-11-2017 05:00:01 PM: OFTEN
+23-11-2017 05:00:01 PM: OFTEN
+23-11-2017 05:00:02 PM: OFTEN
+23-11-2017 05:00:03 PM: OFTEN
+23-11-2017 05:02:14 PM: OFTEN
+23-11-2017 05:02:16 PM: OFTEN
+23-11-2017 05:03:15 PM: OFTEN
+23-11-2017 05:06:00 PM: OFTEN
+23-11-2017 05:06:01 PM: OFTEN
+23-11-2017 05:06:02 PM: OFTEN
+23-11-2017 05:07:12 PM: OFTEN
+23-11-2017 05:10:00 PM: OFTEN
+23-11-2017 05:10:01 PM: OFTEN
+23-11-2017 05:16:01 PM: OFTEN
+23-11-2017 05:16:02 PM: OFTEN
+23-11-2017 05:16:02 PM: OFTEN
+23-11-2017 05:16:03 PM: OFTEN
+23-11-2017 05:16:04 PM: OFTEN
+23-11-2017 05:18:41 PM: OFTEN
+23-11-2017 05:18:49 PM: OFTEN
+23-11-2017 05:19:50 PM: OFTEN
+23-11-2017 05:20:38 PM: RARELY
+23-11-2017 05:24:03 PM: RARELY
+23-11-2017 05:24:03 PM: RARELY
+
+Ustawic zeby rano probkowal godzine przed wyjazdem,
+Powrot zeby probkowal godzine przed wyjsciem z pracy, a probkowanie zeby sie wylaczylo dopiero jak dojedzie do domu
+

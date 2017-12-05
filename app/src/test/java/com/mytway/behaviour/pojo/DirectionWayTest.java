@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 
 import junit.framework.TestCase;
 
@@ -24,61 +25,61 @@ public class DirectionWayTest extends TestCase {
     private DirectionWay directionWay = new DirectionWay();
 
 
-    @Test
-    public void testDecideDirectionShouldChooseWayToWork() throws Exception {
-        //given
-        PowerMockito.mockStatic(Log.class);
-        Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
-        Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
-        Position workPosition = new Position(50.032492, 19.940118);//Wadowicka 6, Krakow
-        // home vs current = 5.890494509956249
-
-        List<Double> previousDistancesToHome = new LinkedList<>();
-        previousDistancesToHome.add(14.3);
-        previousDistancesToHome.add(16.4);
-        previousDistancesToHome.add(12.1);
-        previousDistancesToHome.add(20.1);
-        previousDistancesToHome.add(25.1);
-        directionWay.setDistancesToHomeList(previousDistancesToHome);
-
-        List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
-        isInWayToHomePreviousDecisions.add(false);
-        isInWayToHomePreviousDecisions.add(true);
-        isInWayToHomePreviousDecisions.add(false);
-        isInWayToHomePreviousDecisions.add(false);
-        isInWayToHomePreviousDecisions.add(false);
-        isInWayToHomePreviousDecisions.add(false);
-        isInWayToHomePreviousDecisions.add(false);
-        directionWay.setIsInWayToHomePreviousDecisions(isInWayToHomePreviousDecisions);
-
-        List<Double> previousDistancesToWork = new LinkedList<>();
-        previousDistancesToWork.add(66700.1);
-        previousDistancesToWork.add(66600.1);
-        previousDistancesToWork.add(66500.1);
-        previousDistancesToWork.add(66400.1);
-        previousDistancesToWork.add(66300.1);
-        directionWay.setDistancesToWorkList(previousDistancesToWork);
-
-        List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        isInWayToWorkPreviousDecisions.add(true);
-        directionWay.setIsInWayToWorkPreviousDecisions(isInWayToWorkPreviousDecisions);
-
-        Distance fullDistanceBetweenHomeAndWork = new Distance("40 km", 40);
-        directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
-
-        //when
-        directionWay.decideDirection(currentPosition, homePosition, workPosition);
-
-        //then
-        assertEquals(Boolean.FALSE, directionWay.isWayToHome());
-        assertEquals(Boolean.TRUE, directionWay.isWayToWork());
-    }
+//    @Test
+//    public void testDecideDirectionShouldChooseWayToWork() throws Exception {
+//        //given
+//        PowerMockito.mockStatic(Log.class);
+//        Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
+//        Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+//        Position workPosition = new Position(50.032492, 19.940118);//Wadowicka 6, Krakow
+//        // home vs current = 5.890494509956249
+//
+//        List<Double> previousDistancesToHome = new LinkedList<>();
+//        previousDistancesToHome.add(14.3);
+//        previousDistancesToHome.add(16.4);
+//        previousDistancesToHome.add(12.1);
+//        previousDistancesToHome.add(20.1);
+//        previousDistancesToHome.add(25.1);
+//        directionWay.setDistancesToHomeList(previousDistancesToHome);
+//
+//        List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
+//        isInWayToHomePreviousDecisions.add(false);
+//        isInWayToHomePreviousDecisions.add(true);
+//        isInWayToHomePreviousDecisions.add(false);
+//        isInWayToHomePreviousDecisions.add(false);
+//        isInWayToHomePreviousDecisions.add(false);
+//        isInWayToHomePreviousDecisions.add(false);
+//        isInWayToHomePreviousDecisions.add(false);
+//        directionWay.setIsInWayToHomePreviousDecisions(isInWayToHomePreviousDecisions);
+//
+//        List<Double> previousDistancesToWork = new LinkedList<>();
+//        previousDistancesToWork.add(66700.1);
+//        previousDistancesToWork.add(66600.1);
+//        previousDistancesToWork.add(66500.1);
+//        previousDistancesToWork.add(66400.1);
+//        previousDistancesToWork.add(66300.1);
+//        directionWay.setDistancesToWorkList(previousDistancesToWork);
+//
+//        List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        isInWayToWorkPreviousDecisions.add(true);
+//        directionWay.setIsInWayToWorkPreviousDecisions(isInWayToWorkPreviousDecisions);
+//
+//        Distance fullDistanceBetweenHomeAndWork = new Distance("40 km", 40);
+//        directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
+//
+//        //when
+//        directionWay.decideDirection(currentPosition, homePosition, workPosition);
+//
+//        //then
+//        assertEquals(Boolean.FALSE, directionWay.isWayToHome());
+//        assertEquals(Boolean.TRUE, directionWay.isWayToWork());
+//    }
 
     @Test
     public void testOfDesignateDistanceBetween(){
@@ -281,6 +282,62 @@ public class DirectionWayTest extends TestCase {
             elements.subList(0,3).clear();
         }
 
+    }
+
+    @Test
+    //case when user is in travel to work, and is 1,5 to work place;
+    public void testDecideDirectionNew_inHome(){
+        //przypadek Kosciol Lagiewniki - powinno byc Travel To Work bo jest jescze 1,5 km od pracy
+
+        //given
+        PropertiesValues.SAVE_TO_FILE_ENABLE = false;
+        DirectionWay directionWay = new DirectionWay();
+
+        Position currentPosition = new Position(50.019351, 19.9437808);
+        Position homePosition = new Position(50.056891, 20.8945914);
+        Position workPosition = new Position(50.032661, 19.939811);
+
+        directionWay.setWayToWork(Boolean.TRUE);
+        // potrzebne pola
+        Distance fullDistanceBetweenHomeAndWork = new Distance("82km", 82006.0);
+        directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
+//        directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
+//        directionWay.percentageDistanceBtwHomeAndWork
+
+        //when
+        directionWay.decideDirectionNew(currentPosition, homePosition, workPosition);
+
+        //then
+        assertEquals(Boolean.FALSE, directionWay.getIsInWork());
+        assertEquals(Boolean.FALSE, directionWay.getIsInHome());
+        assertEquals(Boolean.FALSE, directionWay.isWayToHome());
+        assertEquals(Boolean.TRUE, directionWay.isWayToWork());
+    }
+
+    //case when user is in travel to work, and is 0,5km to work place;
+    public void testDecideDirectionNew_isInTravelToWork_200mToWOrk(){
+        //przypadek skrzyzowanie lagiewnicka zakopianska - powinno byc Travel To Work bo jest jescze 0,5 km od pracy
+        //given
+        PropertiesValues.SAVE_TO_FILE_ENABLE = false;
+        DirectionWay directionWay = new DirectionWay();
+
+        Position currentPosition = new Position(50.0289214, 19.9374749);
+        Position homePosition = new Position(50.056891, 20.8945914);
+        Position workPosition = new Position(50.032661, 19.939811);
+
+        directionWay.setWayToWork(Boolean.TRUE);
+        // potrzebne pola
+        Distance fullDistanceBetweenHomeAndWork = new Distance("82km", 82006.0);
+        directionWay.setDistanceBetweenHomeAndWork(fullDistanceBetweenHomeAndWork);
+
+        //when
+        directionWay.decideDirectionNew(currentPosition, homePosition, workPosition);
+
+        //then
+        assertEquals(Boolean.FALSE, directionWay.getIsInWork());
+        assertEquals(Boolean.FALSE, directionWay.getIsInHome());
+        assertEquals(Boolean.FALSE, directionWay.isWayToHome());
+        assertEquals(Boolean.TRUE, directionWay.isWayToWork());
     }
 
 }

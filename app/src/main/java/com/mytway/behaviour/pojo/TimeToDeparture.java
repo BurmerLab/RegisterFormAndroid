@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.mytway.pojo.Position;
 import com.mytway.pojo.TypeWork;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.CurrentTime;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
@@ -92,7 +93,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
-    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 
@@ -102,7 +103,7 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
-    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+    public void fullProcessTime(Context context, Position currentPosition, Session session, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 
@@ -145,4 +146,5 @@ public class TimeToDeparture extends AProcessingTime implements IDisplayedTime{
     public void setTimeToDeparture(LocalDateTime timeToDeparture) {
         this.timeToDeparture = timeToDeparture;
     }
+
 }

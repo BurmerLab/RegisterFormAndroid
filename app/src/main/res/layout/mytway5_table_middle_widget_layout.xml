@@ -231,7 +231,12 @@
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="4dp"
-                        android:id="@+id/firstProgressBar" />
+                        android:id="@+id/firstProgressBar"
+                        android:progressTint="#3bff34"
+                        android:progressBackgroundTint="#4d34ff"
+                        android:elevation="9dp"
+                        android:backgroundTint="@color/application_button_color"
+                        android:background="@color/common_google_signin_btn_text_dark_pressed" />
 
                     <TextView
                         android:layout_width="wrap_content"

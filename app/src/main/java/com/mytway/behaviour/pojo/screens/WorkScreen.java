@@ -25,32 +25,24 @@ public class WorkScreen implements Screen {
 
     @Override
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext,
-                              Position currentPosition, LocalDateTime startWorkTime)
-            throws Exception {
-
-        Position currentPositionMocked = new Position(50.02999195226106, 19.945344775915146);
-
-
+                              Position currentPosition, LocalDateTime startWorkTime, TravelTime travelTime, boolean useEstimate)
+                              throws Exception {
         //1) TimeToEndWork = startWorkParameter  + session.workLength
         //(startWorkParameter  + session.workLength)  - currentTime =
         // (12.00 + 8.00) - 14.00 = 16.00 - 14.00 = 02:00 (koniec pracy)
         TimeToEndWork timeToEndWork = new TimeToEndWork();
-        timeToEndWork.processTime(mContext, currentPosition, session, startWorkTime);
+        timeToEndWork.processTime(mContext, currentPosition, session, startWorkTime, useEstimate);
         setTimeToEndWork(timeToEndWork);
 
         //2) TravelTimeBackToHome  = travelTime (toHome)
-        TravelTime travelTimeOnRoadToHome = new TravelTime();
-        travelTimeOnRoadToHome.setDirectionWay(directionWay);
-//        travelTimeOnRoadToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
-        travelTimeOnRoadToHome.obtainTravelTimeBasedOnDirectonWay(mContext, currentPositionMocked, session);
-        setTravelTimeOnRoadToHome(travelTimeOnRoadToHome);
+        setTravelTimeOnRoadToHome(travelTime);
         travelTimeOnRoadToHome.processTime();
 
 
         //3) TimeArriveToHome - o ktorej dojedziemy do domu (TimeToEndWork + travelTime(ToHome)
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
         timeArriveToHome.setTravelTime(travelTimeOnRoadToHome);
-        timeArriveToHome.processTime(mContext, currentPosition, session, startWorkTime);
+        timeArriveToHome.processTime(mContext, currentPosition, session, startWorkTime, useEstimate);
         setTimeArriveToHome(timeArriveToHome);
 
         //times:
@@ -62,20 +54,19 @@ public class WorkScreen implements Screen {
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
 
         //icons:
-        view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_to_departure_white);
-        view.setImageViewResource(R.id.secondImageView, R.drawable.ic_time_in_road_white);
-        view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_arrive_to_home_white);
+        view.setImageViewResource(R.id.firstWidgetImageView, R.drawable.ic_time_to_departure_white);
+        view.setImageViewResource(R.id.secondWidgetImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.thirdWidgetImageView, R.drawable.ic_arrive_to_home_white);
 
         //small titles:
         view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_to_end_work));
         view.setTextViewText(R.id.secondTimeSmallTitle, mContext.getString(R.string.time_in_road_small_titles));
         view.setTextViewText(R.id.thirdTimeSmallTitle, mContext.getString(R.string.time_arrive_to_home_small_titles));
-
-
     }
 
     @Override
-    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition) throws Exception {
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext,
+                              Position currentPosition, TravelTime travelTime, boolean useEstimate) throws Exception {
         throw new Exception("Not implemented method prepareScreen in " + TAG);
     }
 

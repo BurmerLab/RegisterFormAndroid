@@ -29,7 +29,7 @@ public class SumTimeSpentUserForWork extends AProcessingTime implements IDisplay
 
     @Override
     public void processTime(Context context, Position currentPosition, Session session,
-                            LocalDateTime startWorkTime) throws Exception {
+                            LocalDateTime startWorkTime, boolean useEstimate) throws Exception {
         Log.i(TAG, "Starting processing of SumTimeSpentUserForWork");
         Log.i(TAG, "Current time: " + getCurrentTime());
         if(session.isUserLogged()){
@@ -56,7 +56,7 @@ public class SumTimeSpentUserForWork extends AProcessingTime implements IDisplay
     }
 
     @Override
-    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+    public void fullProcessTime(Context context, Position currentPosition, Session session, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 

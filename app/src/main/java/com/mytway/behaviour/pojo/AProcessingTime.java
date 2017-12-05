@@ -46,7 +46,7 @@ public abstract class AProcessingTime {
         return differenceHour;
     }
 //
-    public LocalDateTime addTimeTo(LocalDateTime basedTime, int hourToAdd, int minutesToAdd, int secondsToAdd){
+    public static LocalDateTime addTimeTo(LocalDateTime basedTime, int hourToAdd, int minutesToAdd, int secondsToAdd){
         LocalDateTime timeAfterSum = new LocalDateTime()
             .withYear(basedTime.getYear())
             .withMonthOfYear(basedTime.getMonthOfYear())
@@ -83,6 +83,37 @@ public abstract class AProcessingTime {
         }
 
         return timeLeft.toString();
+    }
+
+    public Integer obtainTimeInSeconds(LocalDateTime time){
+        if(time != null){
+            int hours = time.getHourOfDay();
+            int minutes = time.getMinuteOfHour();
+            int seconds = time.getSecondOfMinute();
+
+            int sumHours = (hours * PropertiesValues.MINUTES_IN_HOUR) * PropertiesValues.SECONDS_IN_HOUR;
+            int sumMinutes = minutes * PropertiesValues.SECONDS_IN_HOUR;
+
+            return sumHours + sumMinutes + seconds;
+        }
+
+        return null;
+    }
+
+    public static LocalDateTime calendarToLocalDateTime(Calendar calendar) {
+        if (calendar == null) {
+            return null;
+        }
+        return LocalDateTime.fromCalendarFields(calendar);
+    }
+
+    public static LocalDateTime getCurrentLocalDateTime() {
+        Calendar calendar = Calendar.getInstance();
+
+        if (calendar == null) {
+            return null;
+        }
+        return LocalDateTime.fromCalendarFields(calendar);
     }
 
 }

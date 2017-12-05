@@ -80,9 +80,6 @@ public class MytwayActivity extends Activity {
         Boolean isUserLogged = sharedPreferences.getBoolean("isUserLogged", false);
         String userName = sharedPreferences.getString("userName", "");
 
-//        double workLat = (double) sharedPreferences.getFloat("workLatitude", 2);
-//        double workLon = (double) sharedPreferences.getFloat("workLongitude", 2);
-
 //        Toast.makeText(MytwayActivity.this, "Work: " + workLat, Toast.LENGTH_SHORT).show();
 
         TextView userTextView = (TextView) findViewById(R.id.textView7);

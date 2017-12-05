@@ -33,7 +33,7 @@ public class TimeArriveToWork extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
-    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 
@@ -59,7 +59,7 @@ public class TimeArriveToWork extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
-    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+    public void fullProcessTime(Context context, Position currentPosition, Session session, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 

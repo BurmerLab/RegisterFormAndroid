@@ -33,7 +33,7 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
 
     @Override
     public void processTime(Context context, Position currentPosition, Session session,
-                            LocalDateTime startWorkTime) throws Exception{
+                            LocalDateTime startWorkTime, boolean useEstimate) throws Exception{
         Log.i(TAG, "Starting processing of TimeArriveToHome");
         Log.i(TAG, "Current time: " + getCurrentTime());
         if(session.isUserLogged()){
@@ -66,15 +66,19 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
 
     //Full time, from current by travelToWork by WorkLength to travelBackToHome
     @Override
-    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+    public void fullProcessTime(Context context, Position currentPosition, Session session, boolean useEstimate) throws Exception {
 //      TimeArriveToHome = CurrentTime + TravelTimeToWork (toWork) + workLength + travelTimeToHome (back)
         if(session.isUserLogged()){
             LocalDateTime lenghtWorkTime = prepareTimeFromStringToCalendar(session.getLengthTimeWork());
 
             GoogleMapsDirectionJson currentTravelTimeToWork =
-                    travelTimeToWork.obtainCurrentTravelTimeToWork(context, currentPosition, session);
+                    travelTimeToWork.obtainCurrentTravelTimeToWork(context, currentPosition, session, useEstimate);
+
+            //Travel Time took from session to catch full time
+            //todo: replace currentTravelTimeToHome by full travel Time from session
+            // BRAC CZAS CALEJ TRASY POWROTNEJ A NIE TAK JAK TERAZ ZE OBLICZA DO MIEJSCVA GDZIE SIE ZNAJDUJE
             GoogleMapsDirectionJson currentTravelTimeToHome =
-                    travelTimeToHome.obtainCurrentTravelTimeToHome(context, currentPosition, session);
+                    travelTimeToHome.obtainCurrentTravelTimeToHome(context, currentPosition, session, useEstimate);
 
             LocalDateTime currentAndTravelTime = addTimeTo(currentTime.getCurrentTime(),
                     currentTravelTimeToWork.getLegs().getDuration().getHour(),
@@ -114,7 +118,10 @@ public class TimeArriveToHome extends AProcessingTime implements IDisplayedTime{
             //TimeArriveToHome = currentTime + travelTime
             TravelTime travelTime = new TravelTime();
             travelTime.setDirectionWay(directionWay);
-            travelTime.obtainTravelTimeBasedOnDirectonWay(context, currentPosition, session);
+            travelTime.obtainEstimationByStaticTravelTimeBasedOnDirectonWay(context, currentPosition, session);
+            //todo: commented request for google travel time:
+//            travelTime.obtainTravelTimeBasedOnDirectonWay(context, currentPosition, session);
+//            --------
 
             LocalDateTime timeArriveToHome = addTimeTo(currentTime.getCurrentTime(),
                     travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getHour(),

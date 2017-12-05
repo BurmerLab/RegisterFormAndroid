@@ -12,8 +12,8 @@ import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.TimeArriveToHome;
 import com.mytway.behaviour.pojo.TimeInRoad;
 import com.mytway.behaviour.pojo.TimeToDeparture;
-import com.mytway.pojo.Duration;
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.DisplayMessageStyle;
 import com.mytway.utility.GraphUtil;
 import com.mytway.utility.Session;
@@ -26,21 +26,14 @@ import java.util.Calendar;
 public class MorningScreen implements Screen {
 
     private static final String TAG = "MorningScreen";
-
     private TimeToDeparture timeToDeparture;
     private TimeInRoad timeInRoad;
     private TimeArriveToHome timeArriveToHome;
-    private int mProgressStatus = 0;
-    private Handler mHandler = new Handler();
 
     @Override
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
-                              Context mContext, Position currentPosition)
+                              Context mContext, Position currentPosition, TravelTime travelTime, boolean useEstimate)
                               throws Exception {
-        TravelTime travelTime = new TravelTime();
-        travelTime.setDirectionWay(directionWay);
-        travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
-
         //1st Time- time to departure
         TimeToDeparture timeToDeparture = new TimeToDeparture();
         timeToDeparture.setSession(session);
@@ -62,7 +55,7 @@ public class MorningScreen implements Screen {
         timeArriveToHome.setTravelTimeToWork(travelTime);//travel time To work
         timeArriveToHome.setSession(session);
         timeArriveToHome.setTravelTimeToHome(travelTime);//travel time to home
-        timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
+        timeArriveToHome.fullProcessTime(mContext, currentPosition, session, useEstimate);
         setTimeArriveToHome(timeArriveToHome);
         Log.i(TAG, "timeArriveToHome: " + timeArriveToHome.displayMessage());
 
@@ -75,26 +68,23 @@ public class MorningScreen implements Screen {
         //times:
         view.setTextViewText(R.id.title, "Morning Screen: " + time);
 
-
         DisplayMessageStyle.displayLeftTime(view, R.id.firstTimeTextView, this.getTimeToDeparture().displayMessage());
         DisplayMessageStyle.displayLeftTime(view, R.id.secondTimeTextView, this.getTimeInRoad().displayMessage());
         view.setTextViewText(R.id.thirdTimeTextView, this.getTimeArriveToHome().displayMessage());
 
         //progressBars
-        int fullTravelTimeSeconds = Integer.parseInt(session.getFullTimeTravelHomeToWork()); //8:00
-        int currentTravelTimeSeconds = travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getValue();
-       
-        int timeToLeftHomeInSeconds = GraphUtil.calculateProgressBar(fullTravelTimeSeconds, currentTravelTimeSeconds);
+        int timeToLeftHomeInSeconds = timeToDeparture.obtainTimeInSeconds(timeToDeparture.getTimeToDeparture());
+//        int timeToLeftHomeInSeconds = 1200;
+        recalibrateTimeToLeftForDisplayingInProgressBar(view, timeToLeftHomeInSeconds, mContext);
 
-        view.setProgressBar(R.id.firstProgressBar, fullTravelTimeSeconds, timeToLeftHomeInSeconds, false);
         view.setViewVisibility(R.id.secondProgressBar, View.INVISIBLE);
         view.setViewVisibility(R.id.thirdProgressBar, View.INVISIBLE);
 
         //icons:
         view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);
-        view.setImageViewResource(R.id.firstImageView, R.drawable.ic_time_to_departure_white);
-        view.setImageViewResource(R.id.secondImageView, R.drawable.ic_time_in_road_white);
-        view.setImageViewResource(R.id.thirdImageView, R.drawable.ic_arrive_to_home_white);
+        view.setImageViewResource(R.id.firstWidgetImageView, R.drawable.ic_time_to_departure_white);
+        view.setImageViewResource(R.id.secondWidgetImageView, R.drawable.ic_time_in_road_white);
+        view.setImageViewResource(R.id.thirdWidgetImageView, R.drawable.ic_arrive_to_home_white);
 
         //small titles:
         view.setTextViewText(R.id.firstTimeSmallTitle, mContext.getString(R.string.time_to_departure_small_titles));
@@ -105,8 +95,18 @@ public class MorningScreen implements Screen {
     }
 
     @Override
-    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime) throws Exception {
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition, LocalDateTime startWorkTime, TravelTime travelTime, boolean useEstimate) throws Exception {
         throw new Exception("Not implemented method prepareScreen in " + TAG);
+    }
+
+    public void recalibrateTimeToLeftForDisplayingInProgressBar(RemoteViews view, int timeToLeftHomeInSeconds, Context context) {
+        if(timeToLeftHomeInSeconds < PropertiesValues.SECONDS_IN_FOUR_HOURS){
+            int graphicalRepresentTimeToLeftHome  = GraphUtil.calculateProgressBar(PropertiesValues.SECONDS_IN_FOUR_HOURS, timeToLeftHomeInSeconds);
+            view.setProgressBar(R.id.firstProgressBar, PropertiesValues.SECONDS_IN_FOUR_HOURS, graphicalRepresentTimeToLeftHome, false);
+
+        }else{
+            view.setViewVisibility(R.id.firstProgressBar, View.INVISIBLE);
+        }
     }
 
     public TimeToDeparture getTimeToDeparture() {

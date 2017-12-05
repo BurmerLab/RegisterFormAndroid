@@ -29,12 +29,9 @@ public class TravelToWorkScreen implements Screen{
 
     @Override
     public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session,
-                              Context mContext, Position currentPosition) throws Exception {
+                              Context mContext, Position currentPosition, TravelTime travelTime, boolean useEstimate) throws Exception {
 
         //1st time in road (S&F)
-        TravelTime travelTime = new TravelTime();
-        travelTime.setDirectionWay(directionWay);
-        travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
         setTravelTime(travelTime);
 
         //2nd time Arrive To Work = currentTime + travelTime (S&F)
@@ -47,9 +44,11 @@ public class TravelToWorkScreen implements Screen{
         //3rd timeArriveToHome (S&F)
         TimeArriveToHome timeArriveToHome = new TimeArriveToHome();
         timeArriveToHome.setSession(session);
+
+        //todo: cos tu jest nie tak, dodaje ta sama wartosc mimo ze moge byc blizej pracy... przeanalizowac!!
         timeArriveToHome.setTravelTimeToHome(travelTime);
         timeArriveToHome.setTravelTimeToWork(travelTime);
-        timeArriveToHome.fullProcessTime(mContext, currentPosition, session);
+        timeArriveToHome.fullProcessTime(mContext, currentPosition, session, useEstimate);
         setTimeArriveToHome(timeArriveToHome);
 
         String time = Calendar.getInstance().getTime().toString();
@@ -74,8 +73,8 @@ public class TravelToWorkScreen implements Screen{
     }
 
     @Override
-    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext,
-                              Position currentPosition, LocalDateTime startWorkTime) throws Exception {
+    public void prepareScreen(RemoteViews view, DirectionWay directionWay, Session session, Context mContext, Position currentPosition,
+                              LocalDateTime startWorkTime, TravelTime travelTime, boolean useEstimate) throws Exception {
         throw new Exception("Not implemented method prepareScreen in " + TAG);
     }
 

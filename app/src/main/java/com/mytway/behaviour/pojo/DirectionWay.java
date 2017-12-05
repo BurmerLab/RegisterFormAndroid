@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
 
 import org.joda.time.LocalDateTime;
@@ -23,7 +24,6 @@ public class DirectionWay {
     private static final String TAG = "DirectionWay";
     private static final int THREE_DISTANCES = 3;
     private static final double HOME_OR_WORK_ZONE = 300.0;
-    private static final int METERS_IN_KILOMETER = 1000;
     private Boolean wayToWork = FALSE;
     private Boolean wayToHome = FALSE;
     private Boolean isInWork = FALSE;
@@ -67,23 +67,6 @@ public class DirectionWay {
         this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
-    public static double designateDistanceBetween(Position startPosition, Position endPosition){
-        // HAVERSINE FORMULA- to designate distanceBetweenHomeAndWork between points
-        double R = 6371; // [km] promien od centrum do powierzchni ziemi
-        double dLatitude = (startPosition.getLatitude() - endPosition.getLatitude()) * Math.PI / 180;
-        double dLongitude = (startPosition.getLongitude() - endPosition.getLongitude()) * Math.PI / 180;
-        double latitudeFirst = startPosition.getLatitude() * Math.PI / 180;
-        double latitudeSecond = endPosition.getLatitude() * Math.PI / 180;
-
-        double a = Math.sin(dLatitude / 2) * Math.sin(dLatitude / 2) +
-                Math.sin(dLongitude / 2) * Math.sin(dLongitude / 2) *
-                Math.cos(latitudeFirst) * Math.cos(latitudeSecond);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c;
-        return distance;
-    }
-
     public void decideDirectionNew(Position currentPosition, Position homePosition, Position workPosition) {
         double currentDistToHomeInM = obtainDistanceBetweenInMeters(currentPosition, homePosition);
         double currentDistToWorkInM = obtainDistanceBetweenInMeters(currentPosition, workPosition);
@@ -92,33 +75,28 @@ public class DirectionWay {
 
         if(isInHome()) {
             //can be isInHome or wayToWork
-            if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())){
+            if(isInHome(currentDistToHomeInM)){
                 inHomeOperations();
-                saveToFileDirections("IS IN HOME");
             }else {
                 inWayToWorkOperations();
                 saveToFileDirections("IS IN WAY TO WORK");
             }
         }else if(isInWayToWork()){
             //can be wayToWork or isInWork or isInHome
-            if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+            if(isInWork(currentDistToWorkInM)){
                 inWorkOperations();
                 saveToFileDirections("IS IN WORK");
 
-            }else if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())){
+            }else if(isInHome(currentDistToHomeInM)){
                 inHomeOperations();
                 saveToFileDirections("IS IN HOME");
-
             }else{
                 inWayToWorkOperations();
-                saveToFileDirections("IS IN WAY TO WORK");
             }
         }else if(isInWork()){
             //can be isInWork or wayToHome
-            if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+            if(isInWork(currentDistToWorkInM)){
                 inWorkOperations();
-                saveToFileDirections("IS IN WORK");
-
             }else{
                 inWayToHomeOperations();
                 saveToFileDirections("IS IN WAY TO HOME");
@@ -126,23 +104,21 @@ public class DirectionWay {
             }
         }else if(isInWayToHome()){
             //can be isInHome or wayToHome or isInWork
-            if(isInHome(currentDistToHomeInM, getPercentageDistanceBtwHomeAndWork())) {
+            if(isInHome(currentDistToHomeInM)) {
                 inHomeOperations();
                 saveToFileDirections("IS IN HOME");
 
-            }else if(isInWork(currentDistToWorkInM, getPercentageDistanceBtwHomeAndWork())){
+            }else if(isInWork(currentDistToWorkInM)){
                 inWorkOperations();
                 saveToFileDirections("IS IN WORK");
 
             }else{
                 inWayToHomeOperations();
-                saveToFileDirections("IS WAY TO HOME");
             }
         }else{
             saveToFile("NIE ZNALAZLEM KIERUNKU :(");
             saveToFileDirections("NIE ZNALAZLEM KIERUNKU ");
         }
-
     }
 
     public void inWayToHomeOperations() {
@@ -189,21 +165,21 @@ public class DirectionWay {
         saveToFileTime("Save Got Home time on current time");
     }
 
-    public boolean isInWork(double currentDistanceToWorkInMeters, double percentageOfDistanceBtwHomeAndWorkInMeters) {
-        return percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToWorkInMeters;
+    public boolean isInWork(double currentDistanceToWorkInMeters) {
+        return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToWorkInMeters;
     }
 
-    public boolean isInHome(double currentDistanceToHomeInMeters, double percentageOfDistanceBtwHomeAndWorkInMeters) {
-        return percentageOfDistanceBtwHomeAndWorkInMeters > currentDistanceToHomeInMeters;
+    public boolean isInHome(double currentDistanceToHomeInMeters) {
+        return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToHomeInMeters;
     }
 
-    public void getPercentageOfDistanceBtwHomeAndWorkInMeters() {
-        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-            setPercentageDistanceBtwHomeAndWork(distanceBetweenHomeAndWork.obtainSevenPercentFromDistance());
-        }else{
-            setPercentageDistanceBtwHomeAndWork(1000d);
-        }
-    }
+//    public void getPercentageOfDistanceBtwHomeAndWorkInMeters() {
+//        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
+//            setPercentageDistanceBtwHomeAndWork(distanceBetweenHomeAndWork.obtainSevenPercentFromDistance());
+//        }else{
+//            setPercentageDistanceBtwHomeAndWork(PropertiesValues.THREE_HOUNDRED_METERS);
+//        }
+//    }
 
     public void setFirstDirections(Position currentPosition, Position homePosition, Position workPosition, double currentDistanceToHomeInMeters) {
         if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
@@ -249,142 +225,93 @@ public class DirectionWay {
         }
     }
 
-
-
-    //work on the same instances of DirectionWay because in distancesToHomeList is saved previous distances
-    public void decideDirection(Position currentPosition, Position homePosition, Position workPosition){
-        double currentDistanceToHomeInMeters = obtainDistanceBetweenInMeters(currentPosition, homePosition);
-        double currentDistanceToWorkInMeters = obtainDistanceBetweenInMeters(currentPosition, workPosition);
-
-        if(distancesToHomeList.size() > 0){
-            Boolean isInWayToHome = obtainDirection(distancesToHomeList, currentDistanceToHomeInMeters);
-            isInWayToHomePreviousDecisions.add(isInWayToHome);
-        }
-
-        if(distancesToWorkList.size() > 0){
-            Boolean isInWayToWork = obtainDirection(distancesToWorkList, currentDistanceToWorkInMeters);
-            isInWayToWorkPreviousDecisions.add(isInWayToWork);
-        }
-
-        distancesToHomeList.add(currentDistanceToHomeInMeters);
-        distancesToWorkList.add(currentDistanceToWorkInMeters);
-
-        double sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = 0;
-        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-            sevenPercentageOfDistanceBetweenHomeAndWorkInMeters = distanceBetweenHomeAndWork.obtainSevenPercentFromDistance();
-        }
-
-//        saveToFile("===================decideDirection()============================");
-//        saveToFile("currentPosition: " + currentPosition.getLongitude() + " , " + currentPosition.getLatitude());
-//        saveToFile("currentDistanceToHomeInMeters: " + currentDistanceToHomeInMeters);
-//        saveToFile("currentDistanceToWorkInMeters: " + currentDistanceToWorkInMeters);
-//        saveToFile("sevenPercentageOfDistanceBetweenHomeAndWorkInMeters: " + sevenPercentageOfDistanceBetweenHomeAndWorkInMeters);
-//        saveToFile("===============================================");
-
-        if(sevenPercentageOfDistanceBetweenHomeAndWorkInMeters < currentDistanceToHomeInMeters){
-            wayToHome = decideIsMoveWayToHomeBasedOnPreviousDecisions(isInWayToHomePreviousDecisions);
-            wayToWork = decideIsMoveWayToWorkBasedOnPreviousDecisions(isInWayToWorkPreviousDecisions);
-            saveToFile("decideDirection: ");
-            saveToFile("wayToHome: " + wayToHome);
-            saveToFile("wayToWork: " + wayToWork);
-        }else{
-            saveToFile("--------------Way to HOME FALSE, Way to Work FALSE------------------");
-            wayToHome = FALSE;
-            wayToWork = FALSE;
-        }
-
-        //commented for test
-        stayOnlyNewestDistances(distancesToHomeList);
-        stayOnlyNewestDistances(distancesToWorkList);
-//        stayOnlyNewestDecisions(isInWayToHomePreviousDecisions);
-//        stayOnlyNewestDecisions(isInWayToWorkPreviousDecisions);
-    }
-
     public void stayOnlyNewestDecisions(List<Double> elements) {
         while(elements.size() >= 5){
             elements.subList(Math.max(elements.size() - 3, 0), elements.size()).clear();
         }
     }
 
-    private void stayOnlyNewestDistances(List<Double> elements) {
-        while(elements.size() >= 5){
-            elements.subList(Math.max(elements.size() - 3, 0), elements.size()).clear();
-        }
-    }
-
     public static void saveToFile(String content) {
-        try{
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+        if(PropertiesValues.SAVE_TO_FILE_ENABLE){
+            try{
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
 
-            if(!dir.exists()){
-                dir.mkdirs();
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "DirectionWay.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+                //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            File file = new File(dir, "DirectionWay.txt");
-            LocalDateTime currentLocalDateTime = new LocalDateTime();
-            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
-
-            FileOutputStream fop = new FileOutputStream(file, true);
-            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
-
-
-            fop.write(pointXml.getBytes());
-            fop.flush();
-            fop.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
     }
 
     public static void saveToFileDirections(String content) {
-        try{
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+        if(PropertiesValues.SAVE_TO_FILE_ENABLE){
+            try{
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
 
-            if(!dir.exists()){
-                dir.mkdirs();
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "DIRECTIONS_AFTER_CHANGE.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+                //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            File file = new File(dir, "DIRECTIONS.txt");
-            LocalDateTime currentLocalDateTime = new LocalDateTime();
-            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
-
-            FileOutputStream fop = new FileOutputStream(file, true);
-            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
-
-
-            fop.write(pointXml.getBytes());
-            fop.flush();
-            fop.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     public static void saveToFileTime(String content) {
-        try{
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+        if(PropertiesValues.SAVE_TO_FILE_ENABLE){
+            try{
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
 
-            if(!dir.exists()){
-                dir.mkdirs();
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "TIMES.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+                //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            File file = new File(dir, "TIMES.txt");
-            LocalDateTime currentLocalDateTime = new LocalDateTime();
-            //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
-
-            FileOutputStream fop = new FileOutputStream(file, true);
-            String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
-
-
-            fop.write(pointXml.getBytes());
-            fop.flush();
-            fop.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
     }
 
     private boolean decideIsMoveWayToHomeBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToHomeList) {
@@ -452,10 +379,9 @@ public class DirectionWay {
         }
     }
 
-
     public double obtainDistanceBetweenInMeters(Position currentPosition, Position secondPlace){
         double distanceBetween = Distance.designateDistanceBetween(currentPosition, secondPlace);
-        return distanceBetween * METERS_IN_KILOMETER;
+        return distanceBetween * PropertiesValues.METERS_IN_KILOMETER;
     }
 
     public int obtainDistanceToWork(Position currentPosition, Position workPlace){

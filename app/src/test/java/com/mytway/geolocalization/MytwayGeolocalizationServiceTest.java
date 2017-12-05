@@ -12,6 +12,7 @@ import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.pojo.Position;
 import com.mytway.utility.Session;
+import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
 
 import junit.framework.TestCase;
@@ -70,6 +71,8 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         sessionMock = Mockito.mock(Session.class);
         MytwayGeolocalizationService serviceMock = Mockito.mock(MytwayGeolocalizationService.class);
 
+        TravelTime travelTime = new TravelTime();
+
         Mockito.when(sessionMock.isUserLogged()).thenReturn(true);
         Mockito.when(sessionMock.getWayDistance()).thenReturn(DISTANCE_BETWEEN_HOME_AND_WORK);
 
@@ -102,9 +105,9 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         serviceInjectMocks.computeMytwayWidget();
 
         //then
-        Mockito.doNothing().when(MorningScreenMock).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition);
+        Mockito.doNothing().when(MorningScreenMock).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime);
         Mockito.doNothing().when(managerMock).updateAppWidget(thisWidget, viewMock);
-        Mockito.verify(MorningScreenMock, Mockito.times(1)).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition);
+        Mockito.verify(MorningScreenMock, Mockito.times(1)).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime);
     }
 
     private Location createCurrentLocation() {

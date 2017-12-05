@@ -30,7 +30,7 @@ public class TimeToEndWork extends AProcessingTime implements IDisplayedTime{
     //3) TimeArriveToHome - o ktorej dojedziemy do domu (TimeToEndWork + travelTime(ToHome)
 
     @Override
-    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime) throws Exception {
+    public void processTime(Context context, Position currentPosition, Session session, LocalDateTime startWorkTime, boolean useEstimate) throws Exception {
         Log.i(TAG, "Starting processing of TimeToEndWork");
         Log.i(TAG, "TimeToEndWork current time: " + getCurrentTime());
         if(session.isUserLogged()){
@@ -70,7 +70,7 @@ public class TimeToEndWork extends AProcessingTime implements IDisplayedTime{
     }
 
     @Override
-    public void fullProcessTime(Context context, Position currentPosition, Session session) throws Exception {
+    public void fullProcessTime(Context context, Position currentPosition, Session session, boolean useEstimate) throws Exception {
         throw new Exception("Not supported processTime here, in " + TAG);
     }
 

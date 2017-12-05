@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.mytway.activity.R;
 import com.mytway.behaviour.pojo.AProcessingTime;
 import com.mytway.behaviour.pojo.DirectionWay;
-import com.mytway.behaviour.pojo.screens.HomeScreen;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
@@ -31,14 +30,15 @@ import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.TypeWork;
-import com.mytway.pojo.WorkWeek;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
+import com.mytway.utility.TravelTime;
+import com.mytway.utility.TravelTimeGogDirectionRequest;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
+import com.mytway.widget.utils.StandardRepeatIntervalProcessor;
 
-import org.joda.time.Hours;
 import org.joda.time.LocalDateTime;
 
 import java.io.File;
@@ -79,7 +79,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public MytwayGeolocalizationService(Context context) {
         this.mContext = context;
-//        getLocalization();
     }
 
     public MytwayGeolocalizationService() {
@@ -166,22 +165,12 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//            if(action.equals("DUPKA")){
-//                //action for sms received
-//                WidgetUtils.location = getLocalization();
-//            }
-//            /
         }
     };
 
     @Override
     public void onCreate(){
         IntentFilter filter = new IntentFilter();
-        filter.addAction("DUPKA");
-        filter.addAction("your_action_strings"); //further more
-        filter.addAction("your_action_strings"); //further more
-
         registerReceiver(receiver, filter);
     }
 
@@ -215,6 +204,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, mContext)
                     && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, mContext)) {
 
+                updateDBTravelTimeFromGoogleDirections();
+
                 getLocalization();
 
                 Position currentPosition = new Position(latitude, longitude);
@@ -229,7 +220,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
-                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
+//                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
                 directionWay.decideTravelDirectionsAre(currentPosition, session);
 
                 saveToFile("--------------------AFTER-------------------------", "DirectionWay.txt");
@@ -240,10 +231,24 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
                 LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeTime();//directionWay.getLeaveHomeTime()
+
                 //todo: trzeba ustawiac gdzies start work time bo jest nullem teraz
                 //pobierac z sesji
                 LocalDateTime startStandardTimeWork = AProcessingTime.prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());//8:00
                 LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //null
+
+                //for future to remove or repleace in one place here not in every line MorningScreen :)
+                TravelTime travelTime = new TravelTime();
+                travelTime.setDirectionWay(directionWay);
+
+                //--------------------------------------------------
+                //todo: commented to test static obtaining (added below)
+//                travelTime.obtainTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
+                travelTime.obtainEstimationByStaticTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
+                //--------------------------------------------------
+
+                //for now it is only for standard user time
+                StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeat(session, travelTime);
 
                 if(session.getTypeWork() == TypeWork.STANDARD_TYPE.getStatusCode()){
 
@@ -251,6 +256,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                    WorkWeek workWeek = WorkWeek.createWorkWeekFromString(session.getWorkWeek());
 //                    if(workWeek.checkIsDayEnable(new LocalDateTime().getDayOfWeek())){
 //                        saveToFile("Today is day of work", "WorkWeek.txt");
+
+                    boolean useEstimate = true;
 
                         if(directionWay.isInHome()){
                             LocalDateTime timeToStartMorningScreen =
@@ -260,10 +267,18 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                               //todo: correct code, commented only for testing
 //                            if(timeToStartMorningScreen.getHourOfDay() < Hours.FIVE.getHours()){
                                 //Morning screen
-                                saveToFileLocalization("Morning");
+                                saveToFileLocalization("Morning",
+                                        travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                        travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                        travelTime.getDisplayTimeMessage());
                                 DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
-                                morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
-//                            }else{
+                                morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
+
+                                PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
+                                PropertiesValues.INTERVAL_TYPE = "RARELY";
+//
+//
+// }else{
 //                                saveToFileLocalization("Home screen");
 //                                DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
 //                                HomeScreen homeScreen = new HomeScreen();
@@ -271,27 +286,48 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                            }
                         } else if(directionWay.isInWayToWork()){
                             //TravelToWorkScreen
-                            saveToFileLocalization("TravelToWork");
+                            saveToFileLocalization("TravelToWork",
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                    travelTime.getDisplayTimeMessage());
                             DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
                             TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
-                            travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition);
+                            travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
+
+                            PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
+                            PropertiesValues.INTERVAL_TYPE = "OFTEN";
 
                         } else if(directionWay.isInWork()){
                             //WorkScreen
-                            saveToFileLocalization("Work ");
+                            saveToFileLocalization("Work ",
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                    travelTime.getDisplayTimeMessage());
                             DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
                             WorkScreen workScreen = new WorkScreen();
-                            workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime);
+                            workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime, travelTime, useEstimate);
+
+                            PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
+                            PropertiesValues.INTERVAL_TYPE = "RARELY";
 
                         } else if(directionWay.isInWayToHome()){
                             //TravelToHomeScreen
-                            saveToFileLocalization("TravelToHome");
+                            saveToFileLocalization("TravelToHome",
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                    travelTime.getDisplayTimeMessage());
                             DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
                             TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-                            travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
+                            travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome, travelTime, useEstimate);
+
+                            PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
+                            PropertiesValues.INTERVAL_TYPE = "OFTEN";
 
                         } else {
-                            saveToFileLocalization("Not Found yet");
+                            saveToFileLocalization("Not Found yet",
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                    travelTime.getDisplayTimeMessage());
                             DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
                             view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
                         }
@@ -301,7 +337,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 }
 
             }else{
-                saveToFileLocalization("Not Permissions granded");
+                saveToFileLocalization("Not Permissions granded", "", "", "");
                 view.setTextViewText(R.id.title, "Not Permissions granded " + time);
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
@@ -311,6 +347,11 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }else{
             Log.i(TAG, "User is not logged");
         }
+    }
+
+    private void updateDBTravelTimeFromGoogleDirections() {
+        TravelTimeGogDirectionRequest directionRequest = new TravelTimeGogDirectionRequest();
+        directionRequest.refreshTravelTimeBasedOnGogDirections(mContext, session);
     }
 
     public static void saveToFile(String content, String fileName) {
@@ -338,7 +379,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         }
     }
 
-    public void saveToFileLocalization(String screenTitle) throws IOException {
+    public void saveToFileLocalization(String screenTitle, String duration, String distance, String remainTime) throws IOException {
         //-----------Only for saving current Localization to file-------
         File sdCard = Environment.getExternalStorageDirectory();
         File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
@@ -360,7 +401,11 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         StringBuilder pointXml = new StringBuilder();
 
         pointXml.append("<Placemark>\n" +
-                "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</name>\n" +
+                "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") +
+                                ",duration: " + duration +
+                                ",distance: " + distance +
+                                ",time: " + remainTime +
+                         "</name>\n" +
                 "        <description> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
                 "        <Point>\n" +
                 "            <coordinates> "+ getLongitude() + " , " + getLatitude() + " </coordinates>\n" +

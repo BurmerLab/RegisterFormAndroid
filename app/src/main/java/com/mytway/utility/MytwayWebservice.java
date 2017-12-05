@@ -53,7 +53,6 @@ public class MytwayWebservice {
                 in.close();
             } catch (Exception e) {
                 Log.i(TAG, "Mytway Error while calling Crunchify REST Service", e);
-
                 System.out.println(e);
             }
 

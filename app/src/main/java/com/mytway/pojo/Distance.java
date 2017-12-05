@@ -1,12 +1,14 @@
 package com.mytway.pojo;
 
+import com.mytway.properties.PropertiesValues;
+
 public class Distance {
 
     private static final int KILOMETER_IN_METERS = 1000;
     private String text = "";
     private double valueInMeters = 0; //kilometers (double)
     private double valueInKilometers = 0;
-    private final static int PERCENTAGE = 7;
+
 
     public Distance(String text, double valueInMeters) {
         this.text = text;
@@ -35,7 +37,7 @@ public class Distance {
     }
 
     public double obtainSevenPercentFromDistance(){
-        double percentageFromDistance = (PERCENTAGE * valueInMeters) / 100;
+        double percentageFromDistance = (PropertiesValues.PERCENTAGE_DISTANCE_AROUND_PLACE * valueInMeters) / 100;
         return percentageFromDistance;
     }
 
