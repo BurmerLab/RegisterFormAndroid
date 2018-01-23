@@ -11,6 +11,8 @@ import com.mytway.properties.SharedPreferencesNames;
 public class Session {
 
     public String userName;
+    public String password;
+    public String email;
     public Boolean isUserLogged;
     public int typeWork;
     public String lengthTimeWork;
@@ -48,6 +50,8 @@ public class Session {
     public Session sessionStandardUserMock() {
         Session session = new Session();
         session.userName = "mike";
+        session.password = "password";
+        session.email = "mike@mytway.com";
         session.isUserLogged = Boolean.TRUE;
         session.typeWork = 2;
         session.lengthTimeWork = "8:0";
@@ -63,6 +67,8 @@ public class Session {
     public Session sessionFlexibleUserMock() {
         Session session = new Session();
         session.userName = "mike";
+        session.password = "password";
+        session.email = "mike@mytway.com";
         session.isUserLogged = Boolean.TRUE;
         session.typeWork = 1;
         session.lengthTimeWork = "8:0";
@@ -80,6 +86,8 @@ public class Session {
         }else{
             sharedPreferences = context.getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, 1);
             getUserName();
+            getPassword();
+            getEmail();
             isUserLogged();
             getTypeWork();
             getLengthTimeWork();
@@ -108,6 +116,38 @@ public class Session {
             this.userName = userName;
         }
         return userName;
+    }
+
+    //------- Password ---------------
+    public void setPassword(String password) {
+        sharedPreferences.edit().putString("password", password).commit();
+    }
+
+    public String getPassword() {
+        String password;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            password = "password";
+        }else{
+            password = sharedPreferences.getString("password","");
+            this.password = password;
+        }
+        return password;
+    }
+
+    //------- Email ---------------
+    public void setEmail(String email) {
+        sharedPreferences.edit().putString("email", email).commit();
+    }
+
+    public String getEmail() {
+        String email;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            email = "mike@mytway.com";
+        }else{
+            email = sharedPreferences.getString("email","");
+            this.email = email;
+        }
+        return email;
     }
 
     //------- isUserLogged ---------------

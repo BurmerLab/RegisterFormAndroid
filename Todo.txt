@@ -48,3 +48,19 @@ Problem: zle sampluje intervaly, od 16.00 (w miare ok,) ale konczy o 17.20
 Ustawic zeby rano probkowal godzine przed wyjazdem,
 Powrot zeby probkowal godzine przed wyjsciem z pracy, a probkowanie zeby sie wylaczylo dopiero jak dojedzie do domu
 
+
+
+Do przetestowania:
+1) Intervals, zrobione zostaly zmiany, lepiej powinny one pokryc godziny jechania i wracania z pracy
+2) Sprawdzic logowanie intervals do pliku textowego.
+
+Todo:
+1) Czasy, zapisywac czasy do bazy:
+    - utworzyc tabele w bazie, z modelem danych
+    - utworzyc processor zapisywania czasu, interesuje nas tylko czas:
+        * timeLeaveHome
+        * timeStartWork
+        * timeSpentInTravelToWork
+        * timeLeaveWork
+        * time spentInTravelToHome
+        * timeArriveToHome

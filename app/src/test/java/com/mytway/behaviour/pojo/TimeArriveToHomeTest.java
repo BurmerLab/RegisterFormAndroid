@@ -71,11 +71,11 @@ public class TimeArriveToHomeTest extends TestCase {
 
         GoogleMapsDirectionJson gMapsDirectionToWork = creategMapsDirectionJson("100km", 600);//600s - 10min
         GoogleMapsDirectionJson gMapsDirectionToHome = creategMapsDirectionJson("100km", 1200);//1200s - 20min
-        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToWork);
-        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session)).thenReturn(gMapsDirectionToHome);
+        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToWork(contextMock, currentPosition, session, false)).thenReturn(gMapsDirectionToWork);
+        Mockito.when(travelTimeMock.obtainCurrentTravelTimeToHome(contextMock, currentPosition, session, false)).thenReturn(gMapsDirectionToHome);
 
         //When
-        timeArriveToHomeWithInjectMock.fullProcessTime(contextMock, currentPosition, session);
+        timeArriveToHomeWithInjectMock.fullProcessTime(contextMock, currentPosition, session, false);
 
         //Then
         //05:30 + 10 min + 8h + 20min = 14.00?

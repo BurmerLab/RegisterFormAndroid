@@ -8,6 +8,7 @@ import com.mytway.properties.PropertiesValues;
 
 import junit.framework.TestCase;
 
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -338,6 +339,21 @@ public class DirectionWayTest extends TestCase {
         assertEquals(Boolean.FALSE, directionWay.getIsInHome());
         assertEquals(Boolean.FALSE, directionWay.isWayToHome());
         assertEquals(Boolean.TRUE, directionWay.isWayToWork());
+    }
+
+    public void testLeaveHomeTimeSetUp(){
+        //given
+        DirectionWay directionWay = new DirectionWay();
+        UserDailyTimes userDailyTimes = new UserDailyTimes();
+
+        //when
+        // first setting leaveHome (by mistake)
+        userDailyTimes.setLeaveHomeTime(new LocalDateTime(2017,11,28,7,35));
+        directionWay.leaveHomeTimeSetUp();
+
+        //then
+        directionWay.getUserDailyTimes().getLeaveHomeTime();
+
     }
 
 }

@@ -105,9 +105,9 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         serviceInjectMocks.computeMytwayWidget();
 
         //then
-        Mockito.doNothing().when(MorningScreenMock).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime);
+        Mockito.doNothing().when(MorningScreenMock).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime, false);
         Mockito.doNothing().when(managerMock).updateAppWidget(thisWidget, viewMock);
-        Mockito.verify(MorningScreenMock, Mockito.times(1)).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime);
+        Mockito.verify(MorningScreenMock, Mockito.times(1)).prepareScreen(viewMock, directionWayMock,sessionMock, contextMock, mockedCurrentPosition, travelTime, false);
     }
 
     private Location createCurrentLocation() {

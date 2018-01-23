@@ -62,7 +62,44 @@ public class MytwayWebservice {
         }
     }
 
-    public boolean checkIsUserNameExistInExternalDatabaseByMytwayWebservice(String userName) throws JSONException {
+    public void updateUserToMytwayWebservice(String jsonMessage){
+        try {
+            JSONObject jsonObject = new JSONObject(jsonMessage);
+            System.out.println(jsonObject);
+
+            try {
+//                URL url = new URL("http://localhost:8084/MytwayWebServiceApplication/rest/database/insertUser");
+                URL url = new URL(MYTWAY_WEBSERVICE_ADDRESS + "database/updateUser");
+
+                URLConnection connection = url.openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setConnectTimeout(PropertiesValues.WEBSERVICE_CONNECTION_TIMEOUT);
+                connection.setReadTimeout(PropertiesValues.WEBSERVICE_READ_TIMEOUT);
+
+                OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+                out.write(jsonObject.toString());
+                out.close();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+                while (in.readLine() != null) {
+                    System.out.println("");
+                }
+                Log.i(TAG, "Mytway REST Service updateUserToMytwayWebservice invoked Successfully..");
+                in.close();
+            } catch (Exception e) {
+                Log.i(TAG, "Mytway Error while calling updateUserToMytwayWebservice REST Service", e);
+                System.out.println(e);
+            }
+
+        } catch (Exception e) {
+            Log.i(TAG, "Mytway Error: ", e);
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkIsUserNameExistInExternalDatabaseByMytwayWebservice(String userName){
         String result = "";
         try {
             String userNameForJson = "{userName : " + userName + "}";
@@ -71,7 +108,7 @@ public class MytwayWebservice {
 
             try {
                 URL url = new URL(MYTWAY_WEBSERVICE_ADDRESS + "database/checkUserName");
-
+//                http://michalburmz5.nazwa.pl/MytwayWebServiceApplication/rest/database/checkUserName
                 URLConnection connection = url.openConnection();
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type", "application/json");
@@ -101,8 +138,15 @@ public class MytwayWebservice {
             e.printStackTrace();
         }
 
-        JSONObject jsonResult = new JSONObject(result);
-        boolean isUserNameExistInExternalDatabase = jsonResult.getBoolean("isUserNameExistInTable");
+        JSONObject jsonResult;
+        boolean isUserNameExistInExternalDatabase = false;
+        try {
+            jsonResult = new JSONObject(result);
+            isUserNameExistInExternalDatabase = jsonResult.getBoolean("isUserNameExistInTable");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.i("Problem with checkIsUserNameExistInExternalDatabaseByMytwayWebservice", e+"");
+        }
 
         return isUserNameExistInExternalDatabase;
     }

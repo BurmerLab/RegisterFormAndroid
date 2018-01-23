@@ -88,8 +88,29 @@ public class UserRepo {
         values.put(UserTable.WAY_DISTANCE, userTable.wayDistance);
         values.put(UserTable.WAY_DURATION, userTable.wayDuration);
 
-        // It's a good practice to use parameter ?, instead of concatenate string
         db.update(UserTable.TABLE, values, UserTable.KEY_ID + "= ?", new String[] { String.valueOf(userTable.userId) });
+        db.close(); // Closing database connection
+    }
+
+    public void updateByUserName(UserTable userTable) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(UserTable.KEY_USER_NAME, userTable.userName);
+        values.put(UserTable.EMAIL,userTable.email);
+        values.put(UserTable.PASSWORD, userTable.password);
+        values.put(UserTable.TYPE_WORK, userTable.typeWork);
+        values.put(UserTable.LENGTH_TIME_WORK, userTable.lengthTimeWork);
+        values.put(UserTable.START_STANDARD_TIME, userTable.startStandardTimeWork);
+        values.put(UserTable.WORK_PLACE_LATITUDE, userTable.workPlaceLatitude);
+        values.put(UserTable.HOME_PLACE_LATITUDE, userTable.homePlaceLatitude);
+        values.put(UserTable.HOME_PLACE_LONGITUDE, userTable.homePlaceLongitude);
+        values.put(UserTable.WORK_WEEK, userTable.workWeek);
+        values.put(UserTable.WAY_DISTANCE, userTable.wayDistance);
+        values.put(UserTable.WAY_DURATION, userTable.wayDuration);
+
+        db.update(UserTable.TABLE, values, UserTable.KEY_USER_NAME + "= ?", new String[] { String.valueOf(userTable.userName) });
         db.close(); // Closing database connection
     }
 

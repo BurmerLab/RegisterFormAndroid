@@ -4,14 +4,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mytway.activity.HandShakeActivity;
 import com.mytway.activity.R;
+import com.mytway.activity.registerformactivity.RegistrationActivity;
 import com.mytway.database.UserRepo;
-import com.mytway.database.UserTable;
+
+import com.mytway.properties.PropertiesValues;
 import com.mytway.properties.SharedPreferencesNames;
 import com.mytway.utility.Session;
 
@@ -22,11 +29,13 @@ public class MytwayActivity extends Activity {
     private Button mDeleteDbButton;
     private Button mDropTableDbButton;
     private Session session;
-
+    private ListView listView;
+    private ArrayAdapter<CharSequence> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mytway);
+
         session = new Session(getApplicationContext());
 
         mSignOutButton = (Button) findViewById(R.id.signOutButton);
@@ -135,4 +144,38 @@ public class MytwayActivity extends Activity {
 //        workLongitudeTextView.setText("workLongitudeTextView: " + sharedPreferences.getFloat("workLongitude", 2F));
 
     }
+
+
+//    ------------------THREE DOTS MENU--------------------------------------
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_three_dots, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        Intent intent;
+        switch(itemId){
+            case R.id.homeScreen:
+                Toast.makeText(this, "home clicked", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, MytwayActivity.class);
+                this.startActivity(intent);
+                break;
+            case R.id.updateUserScreen:
+                Toast.makeText(this, "update user clicked", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, RegistrationActivity.class);
+                intent.putExtra(PropertiesValues.UPDATE_ACCOUNT_INTENT, PropertiesValues.UPDATE_ACCOUNT_INTENT);
+                this.startActivity(intent);
+                break;
+//            case R.id.homeScreen:
+//                Toast.makeText(this, "home clicked", Toast.LENGTH_SHORT).show();
+        }
+
+
+        return true;
+    }
+
+//    --------------------------------------------------------------------------
 }

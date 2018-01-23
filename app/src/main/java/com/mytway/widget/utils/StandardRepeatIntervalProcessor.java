@@ -3,6 +3,7 @@ package com.mytway.widget.utils;
 import android.os.Environment;
 
 import com.mytway.behaviour.pojo.AProcessingTime;
+import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
@@ -17,7 +18,7 @@ import java.util.Calendar;
 public class StandardRepeatIntervalProcessor {
     private static final int ONE_HOUR = 1;
 
-    public static void calculateSamplingTimeOfWidgetRepeat(Session session, TravelTime travelTime){
+    public static void calculateSamplingTimeOfWidgetRepeatForStandardUser(Session session, TravelTime travelTime, DirectionWay directionWay){
         LocalDateTime lenghtWorkTime = AProcessingTime.prepareTimeFromStringToCalendar(session.getLengthTimeWork());
 
         LocalDateTime currentTime = new LocalDateTime()
@@ -57,17 +58,31 @@ public class StandardRepeatIntervalProcessor {
         // E- end work time
         //-----------|---C----S---C---|------------------------------------|---C-----E-----C----|---------
 
-        if(currentTime.isAfter(timeLeaveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(timeLeaveHome.plusHours(ONE_HOUR))
-                || (currentTime.isAfter(timeArriveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(timeArriveHome.plusHours(ONE_HOUR)))) {
+        if((directionWay.isInWayToWork() || directionWay.isInWayToHome()) ||
+                (currentTime.isAfter(timeLeaveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(startWorkTime.plusHours(ONE_HOUR)))
+                || (currentTime.isAfter(timeArriveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(timeArriveHome.plusHours(ONE_HOUR)))
+                ) {
             //set to small sampling - 30s
             PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
             PropertiesValues.INTERVAL_TYPE = "OFTEN";
+            saveToFileIntervals("-----------------------------------");
+            saveToFileIntervals("startWorkTime: " + startWorkTime);
+            saveToFileIntervals("timeLeaveHome: " + timeLeaveHome);
+            saveToFileIntervals("endWorkTime: " + endWorkTime);
+            saveToFileIntervals("timeArriveHome: " + timeArriveHome);
             saveToFileIntervals("OFTEN");
+            saveToFileIntervals("-----------------------------------");
         }else{
             //set to normal sampling - 5m
             PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
             PropertiesValues.INTERVAL_TYPE = "RARELY";
+            saveToFileIntervals("-----------------------------------");
+            saveToFileIntervals("startWorkTime: " + startWorkTime);
+            saveToFileIntervals("timeLeaveHome: " + timeLeaveHome);
+            saveToFileIntervals("endWorkTime: " + endWorkTime);
+            saveToFileIntervals("timeArriveHome: " + timeArriveHome);
             saveToFileIntervals("RARELY");
+            saveToFileIntervals("-----------------------------------");
         }
     }
 

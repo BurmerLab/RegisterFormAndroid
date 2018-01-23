@@ -35,12 +35,6 @@ public class DirectionWay {
     private List<Double> distancesToHomeList = new LinkedList<>();
     private List<Double> distancesToWorkList = new LinkedList<>();
 
-    private LocalDateTime leaveHomeTime;
-    private LocalDateTime startWorkTime;
-
-    private LocalDateTime leaveWorkTime;
-    private LocalDateTime gotHomeTime;
-
     private List<Boolean> isInWayToHomePreviousDecisions = new LinkedList<>();
     private List<Boolean> isInWayToWorkPreviousDecisions = new LinkedList<>();
 
@@ -121,6 +115,25 @@ public class DirectionWay {
         }
     }
 
+    public void inHomeOperations() {
+        saveToFile("SETUP IS IN HOME");
+        setIsInHome(TRUE);
+        setIsInWork(FALSE);
+        setWayToHome(FALSE);
+        setWayToWork(FALSE);
+
+
+        //check leave work time and clear it
+        saveToFileDatabaseTimes("LeaveWork - " + userDailyTimes.getLeaveHomeTime());
+        clearLeaveWorkTime();
+        saveToFileDatabaseTimes("LeaveWork after clear - " + userDailyTimes.getLeaveWorkTime());
+
+        //Setup leaveWorkTime
+        arriveToHomeTimeSetUp();
+
+        saveToFileTime("Save Got Home time on current time - " + userDailyTimes.getArriveToHomeTime());
+    }
+
     public void inWayToHomeOperations() {
         saveToFile("SETUP IS IN WAY TO HOME");
         setIsInHome(FALSE);
@@ -128,7 +141,13 @@ public class DirectionWay {
         setWayToHome(TRUE);
         setWayToWork(FALSE);
 
-        setLeaveWorkTimeOnCurrentTime();
+        //check start work time and clear it
+        saveToFileDatabaseTimes("StartWork - " + userDailyTimes.getStartWorkTime());
+        clearStartWorkTime();
+        saveToFileDatabaseTimes("startWork after clear - " + userDailyTimes.getStartWorkTime());
+
+        //Setup leaveWorkTime
+        leaveWorkTimeSetUp();
         saveToFileTime("Save Leave Work time on current time");
     }
 
@@ -139,8 +158,14 @@ public class DirectionWay {
         setWayToHome(FALSE);
         setWayToWork(FALSE);
 
-        setStartWorkTimeOnCurrentTime();
-        saveToFileTime("Save Start Work time on current time");
+        //save leaveHomeTime and clear it
+        saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveHomeTime());
+        clearLeaveHomeTime();
+        saveToFileDatabaseTimes("LeaveHome after clear - " + userDailyTimes.getLeaveHomeTime());
+
+        //set start work time
+        startWorkTimeSetUp();
+        saveToFileTime("Save Start Work time on current time: " + userDailyTimes.getStartWorkTime());
     }
 
     public void inWayToWorkOperations() {
@@ -150,19 +175,55 @@ public class DirectionWay {
         setWayToHome(FALSE);
         setWayToWork(TRUE);
 
-        setLeaveHomeTimeOnCurrentTime();
-        saveToFileTime("Save Leave Home time on current time");
+        //save arriveToHome and clear it
+        saveToFileDatabaseTimes("ArriveToHome - " + userDailyTimes.getArriveToHomeTime());
+        clearArriveToHomeTime();
+        saveToFileDatabaseTimes("ArriveToHome after clear - " + userDailyTimes.getArriveToHomeTime());
+
+        //setup leave home time
+        leaveHomeTimeSetUp();
+        saveToFileTime("Save Leave Home time on current time: " + userDailyTimes.getLeaveHomeTime());
     }
 
-    public void inHomeOperations() {
-        saveToFile("SETUP IS IN HOME");
-        setIsInHome(TRUE);
-        setIsInWork(FALSE);
-        setWayToHome(FALSE);
-        setWayToWork(FALSE);
+    public void leaveHomeTimeSetUp(){
+        //if leave home is not set
+        if(userDailyTimes.getLeaveHomeTime() == null){
+            userDailyTimes.setLeaveHomeTimeToCurrent();
+        }
+    }
 
-        setGotHomeTimeOnCurrentTime();
-        saveToFileTime("Save Got Home time on current time");
+    public void startWorkTimeSetUp(){
+        if(userDailyTimes.getStartWorkTime() == null){
+            userDailyTimes.setStartWorkTime(new LocalDateTime());
+        }
+    }
+
+    public void leaveWorkTimeSetUp(){
+        if(userDailyTimes.getLeaveWorkTime() == null){
+            userDailyTimes.setLeaveWorkTime(new LocalDateTime());
+        }
+    }
+
+    public void arriveToHomeTimeSetUp(){
+        if(userDailyTimes.getArriveToHomeTime() == null){
+            userDailyTimes.setArriveToHomeTime(new LocalDateTime());
+        }
+    }
+
+    public void clearArriveToHomeTime(){
+        userDailyTimes.setArriveToHomeTime(null);
+    }
+
+    public void clearLeaveWorkTime(){
+        userDailyTimes.setLeaveHomeTime(null);
+    }
+
+    public void clearLeaveHomeTime(){
+        userDailyTimes.setLeaveHomeTime(null);
+    }
+
+    public void clearStartWorkTime(){
+        userDailyTimes.setStartWorkTime(null);
     }
 
     public boolean isInWork(double currentDistanceToWorkInMeters) {
@@ -211,8 +272,6 @@ public class DirectionWay {
                     setWayToHome(TRUE);
                     setWayToWork(FALSE);
                 }else{
-                    setLeaveHomeTimeOnCurrentTime();
-
                     saveToFile("KIERUNEK ELSE: SETUP way to work");
                     setIsInHome(FALSE);
                     setIsInWork(FALSE);
@@ -314,6 +373,34 @@ public class DirectionWay {
 
     }
 
+    public static void saveToFileDatabaseTimes(String content) {
+        if(PropertiesValues.SAVE_TO_FILE_ENABLE){
+            try{
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "DATABASE_TIMES.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+                //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     private boolean decideIsMoveWayToHomeBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToHomeList) {
         saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
         saveToFile(" previousBooleansIsWayToHomeList.size(): " + previousBooleansIsWayToHomeList.size());
@@ -396,15 +483,12 @@ public class DirectionWay {
             setWayToHome(FALSE);
             setWayToWork(FALSE);
 
-            startWorkTime = null;
-
             saveToFile("\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
             saveToFile("<<<<<<<<<<<<<<<< IS IN HOME DECISION TRUE >>>>>>>>>>>>>>>>>>");
         }else{
             saveToFile("<<<<<<<<<<<<<<<< NOT IN HOME >>>>>>>>>>>>>>>>>>");
             setIsInHome(FALSE);
 
-            setLeaveHomeTimeOnCurrentTime();
         }
     }
 
@@ -416,15 +500,9 @@ public class DirectionWay {
                 setWayToHome(FALSE);
                 setWayToWork(FALSE);
 
-                leaveHomeTime = null;
-
                 saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
                 saveToFile("<<<<<<<<<<<<<<<< IS IN WORK >>>>>>>>>>>>>>>>>>");
 
-                //if is no start work time, then insert current because user arrived to work
-                if(startWorkTime == null){
-                    startWorkTime = new LocalDateTime();
-                }
             }else{
                 saveToFile("<<<<<<<<<<<<<<<< NOT IN WORK >>>>>>>>>>>>>>>>>>");
                 setIsInWork(FALSE);
@@ -481,14 +559,6 @@ public class DirectionWay {
         this.distanceBetweenHomeAndWork = distanceBetweenHomeAndWork;
     }
 
-    public LocalDateTime getLeaveHomeTime() {
-        return leaveHomeTime;
-    }
-
-    public void setLeaveHomeTime(LocalDateTime leaveHomeTime) {
-        this.leaveHomeTime = leaveHomeTime;
-    }
-
     public Boolean getIsInWork() {
         return isInWork;
     }
@@ -503,14 +573,6 @@ public class DirectionWay {
 
     public void setIsInHome(Boolean isInHome) {
         this.isInHome = isInHome;
-    }
-
-    public LocalDateTime getStartWorkTime() {
-        return startWorkTime;
-    }
-
-    public void setStartWorkTime(LocalDateTime startWorkTime) {
-        this.startWorkTime = startWorkTime;
     }
 
     public boolean isInHome() {
@@ -561,61 +623,7 @@ public class DirectionWay {
         this.wayToHome = wayToHome;
     }
 
-    public LocalDateTime getGotHomeTime() {
-        return gotHomeTime;
-    }
 
-    public void setGotHomeTime(LocalDateTime gotHomeTime) {
-        this.gotHomeTime = gotHomeTime;
-    }
-
-    public LocalDateTime getLeaveWorkTime() {
-        return leaveWorkTime;
-    }
-
-    public void setLeaveWorkTime(LocalDateTime leaveWorkTime) {
-        this.leaveWorkTime = leaveWorkTime;
-    }
-
-    public void setLeaveHomeTimeOnCurrentTime() {
-        if(leaveHomeTime == null){
-            leaveHomeTime = new LocalDateTime();
-        }
-    }
-
-    public void resetLeaveHomeTime() {
-        leaveHomeTime = null;
-    }
-
-    public void setStartWorkTimeOnCurrentTime() {
-        if(startWorkTime == null){
-            startWorkTime = new LocalDateTime();
-        }
-    }
-
-    public void resetStartWorkTime() {
-        startWorkTime = null;
-    }
-
-    public void setLeaveWorkTimeOnCurrentTime() {
-        if(leaveWorkTime == null){
-            leaveWorkTime = new LocalDateTime();
-        }
-    }
-
-    public void resetLeaveWorkTime() {
-        leaveWorkTime = null;
-    }
-
-    public void setGotHomeTimeOnCurrentTime() {
-        if(gotHomeTime == null){
-            gotHomeTime = new LocalDateTime();
-        }
-    }
-
-    public void resetGotHomeTime() {
-        gotHomeTime = null;
-    }
 
     public double getPercentageDistanceBtwHomeAndWork() {
         return percentageDistanceBtwHomeAndWork;
@@ -624,4 +632,15 @@ public class DirectionWay {
     public void setPercentageDistanceBtwHomeAndWork(double percentageDistanceBtwHomeAndWork) {
         this.percentageDistanceBtwHomeAndWork = percentageDistanceBtwHomeAndWork;
     }
+
+    public UserDailyTimes getUserDailyTimes() {
+        return userDailyTimes;
+    }
+
+    public void setUserDailyTimes(UserDailyTimes userDailyTimes) {
+        this.userDailyTimes = userDailyTimes;
+    }
+
+    private UserDailyTimes userDailyTimes = new UserDailyTimes();
+
 }

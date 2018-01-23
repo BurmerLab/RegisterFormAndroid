@@ -3,6 +3,15 @@ package com.mytway.properties;
 public class PropertiesValues {
 
     public static final int METERS_IN_KILOMETER = 1000;
+
+
+    //Registration
+    //registrationFunction - REGISTER_NEW_USER or UPDATE_USER
+    public static final String PROCESSING_ACCOUNT = "processingAccount";
+    public static final String REGISTER_NEW_USER = "REGISTER_NEW_USER";
+    public static final String UPDATE_USER = "UPDATE_USER";
+    //------------------------
+
     public static boolean MOCK_APP_TO_TESTS = false;
     //safe zone around home or work
     public static final double SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS = 250.0;
@@ -45,6 +54,10 @@ public class PropertiesValues {
     public static final int SECONDS_IN_HOUR = 60;
 
     public static  final int PERCENTAGE_DISTANCE_AROUND_PLACE = 2;
+
+    //redirectingFrom screens
+    public final static String UPDATE_ACCOUNT_INTENT = "UPDATE_ACCOUNT_INTENT";
+    public static final String UPDATE_ACCOUNT_BUTTON_TEXT = "UPDATE ACCOUNT";
 
 
 }

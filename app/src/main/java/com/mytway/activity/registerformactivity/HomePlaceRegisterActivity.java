@@ -2,17 +2,17 @@ package com.mytway.activity.registerformactivity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
-import android.util.Log;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mytway.activity.R;
@@ -24,7 +24,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.activity.application.MytwayActivity;
-import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.database.DBHelper;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
@@ -35,10 +34,11 @@ import com.mytway.pojo.Position;
 import com.mytway.pojo.User;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.EthernetConnectivity;
-import com.mytway.utility.MytwayWebservice;
+import com.mytway.utility.ScheduledProcess;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
+import com.mytway.utility.webservice.WebServiceUtility;
 import com.mytway.validation.Validation;
 
 public class HomePlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -49,10 +49,11 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
     private int userId = 0;
     private GoogleMap mMap;
 
-    private String jsonMessage = "";
+    private String jsonUserDataMessage = "";
 
     private double latitudeLocalization;
     private double longitudeLocalization;
+    private SharedPreferences sharedPreferences;
     protected Button registerHomeLocalizationButton;
 
     @Override
@@ -77,6 +78,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 
         Intent intent = getIntent();
         final User user = intent.getParcelableExtra("user");
+        Intent intentFromRegistrationActivity = getIntent();
+        final String processingAccount = intentFromRegistrationActivity.getStringExtra(PropertiesValues.PROCESSING_ACCOUNT);
 
         registerHomeLocalizationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +91,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
 
-                    //todo: add wayDistance and wayDuration parameter into DB
                     TravelTime travelTime = new TravelTime();
                     GoogleMapsDirectionJson gMapsDirection =
                             travelTime.getTravelTimeBetweenTwoPositions(getApplicationContext(), homePosition, workPosition);
@@ -126,6 +128,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     Session session = new Session(getApplicationContext());
                     session.setIsUserLogged(true);
                     session.setUserName(user.getUserName());
+                    session.setPassword(user.getPassword());
+                    session.setEmail(user.getEmail());
                     session.setLengthTimeWork(user.getLengthTimeWork());
                     session.setStartStandardTimeWork(user.getStartStandardTimeWork());
                     session.setWorkWeek(user.decodeWorkWeekToString(user.getWorkWeek()));
@@ -138,20 +142,36 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
 
                     Toast.makeText(HomePlaceRegisterActivity.this, "Shared WorkLat: " + user.getWorkPlace().getLatitude().floatValue(), Toast.LENGTH_SHORT).show();
 
-                    if (userId == 0) {
-                        if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
+                    setJsonUserDataMessage(userTable.createJson());
 
-                            userId = userRepo.insert(userTable);
-
-                            setJsonMessage(userTable.createJson());
-
-                            if(EthernetConnectivity.isEthernetOnline(HomePlaceRegisterActivity.this)){
-                                Toast.makeText(HomePlaceRegisterActivity.this, "Insert to External DB", Toast.LENGTH_SHORT).show();
-                                new MytwayWebserviceInsertUser().execute();
+                    //UPDATE ACCOUNT
+                    if(processingAccount.equals(PropertiesValues.UPDATE_USER)){
+                        //update local user account
+                        if(userRepo.isUserExistInLocalDatabase(user.getUserName())){
+                            UserTable userFromDatabase = userRepo.getUserByUserName(user.getUserName());
+                            if(userFromDatabase.password.equals(user.getPassword())){
+                                userRepo.updateByUserName(userTable);
+                            }else{
+                                Toast.makeText(HomePlaceRegisterActivity.this, R.string.password_is_not_correct, Toast.LENGTH_SHORT).show();
                             }
+                        }else{
+                            Toast.makeText(HomePlaceRegisterActivity.this, R.string.inserted_user_not_exist, Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        userRepo.update(userTable);
+
+                        updateUserAccountInExternalDatabase(userTable);
+
+                    }else{
+                        //INSERT USER ACCOUNT
+                        if (userId == 0) {
+
+                            insertUserAccountToExternalDatabase(userTable);
+
+                            if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
+                                userId = userRepo.insert(userTable);
+                            }
+                        } else {
+                            userRepo.update(userTable);
+                        }
                     }
 
                     Intent intent = new Intent(HomePlaceRegisterActivity.this, MytwayActivity.class);
@@ -160,11 +180,25 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivity(intent);
                     }
-                } else {
-                    Toast.makeText(HomePlaceRegisterActivity.this, "THE SAME", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    public void updateUserAccountInExternalDatabase(UserTable userTable) {
+        if(WebServiceUtility.updateUserAccountInExternalDatabase(getApplicationContext(), userTable, getJsonUserDataMessage())){
+            Log.i(TAG, "Correctly updated user account to external database");
+        }else{
+            sharedPreferences.edit().putString(ScheduledProcess.UPDATE_ACCOUNT_USER_IN_EXTERNAL_DB, ScheduledProcess.UPDATE_ACCOUNT_USER_IN_EXTERNAL_DB).commit();
+        }
+    }
+
+    public void insertUserAccountToExternalDatabase(UserTable userTable) {
+        if(WebServiceUtility.insertUserAccountToExternalDatabase(getApplicationContext(), userTable, getJsonUserDataMessage())){
+            Log.i(TAG, "Correctly inserted user account to external database");
+        }else{
+            sharedPreferences.edit().putString(ScheduledProcess.INSERT_ACCOUNT_USER_TO_EXTERNAL_DB, ScheduledProcess.INSERT_ACCOUNT_USER_TO_EXTERNAL_DB).commit();
+        }
     }
 
     @Override
@@ -189,7 +223,6 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
     }
 
     private void fetchLocationData() {
-//        Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "FETCH DATA",Toast.LENGTH_LONG).show();
         setUpMap();
     }
 
@@ -197,10 +230,20 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(HomePlaceRegisterActivity.this);
-        geolocalization.getLocalization();
-        latitudeLocalization = geolocalization.getLatitude();
-        longitudeLocalization = geolocalization.getLongitude();
+        Intent intentFromRegistrationActivity = getIntent();
+        final String processingAccount = intentFromRegistrationActivity.getStringExtra(PropertiesValues.PROCESSING_ACCOUNT);
+        final Session session = new Session(getApplicationContext());
+
+        if(processingAccount.equals(PropertiesValues.UPDATE_USER)){
+            latitudeLocalization = Double.parseDouble(session.getHomeLatitude());
+            longitudeLocalization = Double.parseDouble(session.getHomeLongitude());
+        }else{
+            MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(HomePlaceRegisterActivity.this);
+            geolocalization.getLocalization();
+            latitudeLocalization = geolocalization.getLatitude();
+            longitudeLocalization = geolocalization.getLongitude();
+        }
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -287,25 +330,11 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         }
     }
 
-    private class MytwayWebserviceInsertUser extends AsyncTask {
-
-        @Override
-        protected Object doInBackground(Object... arg0) {
-            MytwayWebservice mytwayWebservice = new MytwayWebservice();
-            if(!getJsonMessage().equals("")){
-                mytwayWebservice.insertUserToMytwayWebservice(getJsonMessage());
-            }else{
-                Log.i(TAG, "JsonMessage is empty");
-            }
-            return null;
-        }
+    public String getJsonUserDataMessage() {
+        return jsonUserDataMessage;
     }
 
-    public String getJsonMessage() {
-        return jsonMessage;
-    }
-
-    public void setJsonMessage(String jsonMessage) {
-        this.jsonMessage = jsonMessage;
+    public void setJsonUserDataMessage(String jsonUserDataMessage) {
+        this.jsonUserDataMessage = jsonUserDataMessage;
     }
 }

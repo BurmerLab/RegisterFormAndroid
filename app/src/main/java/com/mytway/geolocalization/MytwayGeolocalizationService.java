@@ -27,13 +27,17 @@ import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.behaviour.pojo.screens.TravelToHomeScreen;
 import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
+import com.mytway.database.UserRepo;
+import com.mytway.database.UserTable;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.TypeWork;
 import com.mytway.properties.PropertiesValues;
+import com.mytway.utility.ScheduledProcess;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 import com.mytway.utility.TravelTimeGogDirectionRequest;
+import com.mytway.utility.Utility;
 import com.mytway.utility.permission.PermissionUtil;
 import com.mytway.widget.MyWidgetProvider;
 import com.mytway.widget.WidgetUtils;
@@ -206,6 +210,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 updateDBTravelTimeFromGoogleDirections();
 
+                runScheduledProcessOncePerDay(mContext);
+
                 getLocalization();
 
                 Position currentPosition = new Position(latitude, longitude);
@@ -230,12 +236,11 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
-                LocalDateTime whenUserLeaveHome = directionWay.getLeaveHomeTime();//directionWay.getLeaveHomeTime()
 
-                //todo: trzeba ustawiac gdzies start work time bo jest nullem teraz
+                //todo: b rac startWork time i startStandardTimeWork from directionWay.getUser... .getStartWOrk....
                 //pobierac z sesji
                 LocalDateTime startStandardTimeWork = AProcessingTime.prepareTimeFromStringToCalendar(session.getStartStandardTimeWork());//8:00
-                LocalDateTime startWorkTime = directionWay.getStartWorkTime(); //null
+                LocalDateTime startWorkTime = new LocalDateTime(); //null
 
                 //for future to remove or repleace in one place here not in every line MorningScreen :)
                 TravelTime travelTime = new TravelTime();
@@ -247,9 +252,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 travelTime.obtainEstimationByStaticTravelTimeBasedOnDirectonWay(mContext, currentPosition, session);
                 //--------------------------------------------------
 
-                //for now it is only for standard user time
-                StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeat(session, travelTime);
-
                 if(session.getTypeWork() == TypeWork.STANDARD_TYPE.getStatusCode()){
 
 //                    todo: uncomment and create screen for days without work
@@ -260,6 +262,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                     boolean useEstimate = true;
 
                         if(directionWay.isInHome()){
+                            //for now it is only for standard user time
+                            StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeatForStandardUser(session, travelTime, directionWay);
+
                             LocalDateTime timeToStartMorningScreen =
                                     AProcessingTime.subtractTimeTo(currentTime, startStandardTimeWork.getHourOfDay(),
                                             startStandardTimeWork.getMinuteOfHour(),
@@ -276,6 +281,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                                 PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
                                 PropertiesValues.INTERVAL_TYPE = "RARELY";
+                                StandardRepeatIntervalProcessor.saveToFileIntervals("RARELY - IS IN HOME");
 //
 //
 // }else{
@@ -286,6 +292,10 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                            }
                         } else if(directionWay.isInWayToWork()){
                             //TravelToWorkScreen
+
+                            //for now it is only for standard user time
+                            StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeatForStandardUser(session, travelTime, directionWay);
+
                             saveToFileLocalization("TravelToWork",
                                     travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
                                     travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
@@ -296,6 +306,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                             PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
                             PropertiesValues.INTERVAL_TYPE = "OFTEN";
+                            StandardRepeatIntervalProcessor.saveToFileIntervals("OFTEN - IS IN WAY TO WORK");
 
                         } else if(directionWay.isInWork()){
                             //WorkScreen
@@ -309,6 +320,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                             PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
                             PropertiesValues.INTERVAL_TYPE = "RARELY";
+                            StandardRepeatIntervalProcessor.saveToFileIntervals("RARELY - IS IN WORK");
 
                         } else if(directionWay.isInWayToHome()){
                             //TravelToHomeScreen
@@ -318,10 +330,13 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                                     travelTime.getDisplayTimeMessage());
                             DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
                             TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
-                            travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome, travelTime, useEstimate);
+
+                            //todo: new LocalDateTime() zastapic prawidlowym whenUserLeaveHome
+                            travelToHomeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, new LocalDateTime(), travelTime, useEstimate);
 
                             PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
                             PropertiesValues.INTERVAL_TYPE = "OFTEN";
+                            StandardRepeatIntervalProcessor.saveToFileIntervals("OFTEN - IS IN WAY TO HOME");
 
                         } else {
                             saveToFileLocalization("Not Found yet",
@@ -352,6 +367,20 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     private void updateDBTravelTimeFromGoogleDirections() {
         TravelTimeGogDirectionRequest directionRequest = new TravelTimeGogDirectionRequest();
         directionRequest.refreshTravelTimeBasedOnGogDirections(mContext, session);
+    }
+
+    private void runScheduledProcessOncePerDay(Context context){
+        ScheduledProcess scheduledProcess = new ScheduledProcess();
+        UserRepo userRepo = new UserRepo(context);
+        UserTable userTable = userRepo.getUserByUserName(session.getUserName());
+
+        saveToFile("------runScheduledProcessOncePerDay------", "scheduled.txt");
+
+        if(Utility.shouldDoRefreshInThisDay(context)){
+            saveToFile("shouldDoRefreshInThisDay = true", "scheduled.txt");
+            scheduledProcess.runScheduledProcess(context, userTable, userTable.createJson());
+        }
+        saveToFile("------END------", "scheduled.txt");
     }
 
     public static void saveToFile(String content, String fileName) {

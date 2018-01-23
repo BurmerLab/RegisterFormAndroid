@@ -1,6 +1,5 @@
 package com.mytway.activity.loginactivity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,16 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mytway.activity.R;
@@ -25,14 +21,9 @@ import com.mytway.activity.application.MytwayActivity;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
 import com.mytway.pojo.User;
-import com.mytway.utility.EthernetConnectivity;
-import com.mytway.utility.MytwayWebservice;
 import com.mytway.utility.Session;
+import com.mytway.utility.webservice.WebServiceUtility;
 import com.mytway.validation.Validation;
-
-import org.json.JSONException;
-
-import java.util.concurrent.ExecutionException;
 
 public class LoginActivity extends Activity {
 
@@ -61,8 +52,7 @@ public class LoginActivity extends Activity {
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if(isUserPasswordCorrectInExternalDatabase(mLoginUserName, mLoginPassword)){
+                if(WebServiceUtility.isUserPasswordCorrectInExternalDatabase(getApplicationContext(), mLoginUserName, mLoginPassword)){
 
                     if (checkValidation()) {
                         mLoginUserName = (EditText) findViewById(R.id.loginUserName);
@@ -83,6 +73,8 @@ public class LoginActivity extends Activity {
 
                             session.setIsUserLogged(true);
                             session.setUserName(userTable.userName);
+                            session.setPassword(userTable.password);
+                            session.setEmail(userTable.email);
                             session.setTypeWork(userTable.typeWork);
                             session.setLengthTimeWork(userTable.lengthTimeWork);
                             session.setStartStandardTimeWork(userTable.startStandardTimeWork);
@@ -158,116 +150,4 @@ public class LoginActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    public boolean isUserPasswordCorrectInExternalDatabase(TextView textViewUserName, TextView textViewPassword) {
-        Boolean isExternalPasswordCorrect = false;
-        Boolean isLocalPasswordCorrect = false;
-        Boolean isPasswordsCorrect = false;
-        UserTable userTable = new UserTable();
-        UserRepo userRepository = new UserRepo(LoginActivity.this);
-
-        String userName = textViewUserName.getText().toString();
-        String userPassword = textViewPassword.getText().toString();
-
-        if(EthernetConnectivity.isEthernetOnline(LoginActivity.this)){
-            MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase webServiceCheckIsPasswordIsCorrect = new MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase();
-            MytwayWebserviceGetUserFromExternalDatabase webServiceGetUser = new MytwayWebserviceGetUserFromExternalDatabase();
-            try {
-                userTable = webServiceGetUser.execute(userName, userPassword).get();
-                userTable.password = userPassword;
-            } catch (InterruptedException | ExecutionException e) {
-                Log.i(TAG, "Problem with getting user paramters from external databases ", e);
-                e.printStackTrace();
-            }
-
-            try {
-                isExternalPasswordCorrect = webServiceCheckIsPasswordIsCorrect.execute(userName, userPassword).get();
-            } catch (InterruptedException | ExecutionException e) {
-                Log.i(TAG, "Problem with obtaining isPasswordCorrectInExternalDatabase ", e);
-                e.printStackTrace();
-            }
-
-            if(!isExternalPasswordCorrect){
-                Log.i(TAG, "External Password is not correct");
-                return false;
-            }
-
-            if(userRepository.isUserExistInLocalDatabase(userName)){
-                isLocalPasswordCorrect = userRepository.isUserNameAndPasswordIsCorrect(userName, userPassword);
-
-                if(isExternalPasswordCorrect && isLocalPasswordCorrect){
-                    //user exist in local database and in external database
-                    isPasswordsCorrect = true;
-                }else{
-                    //override local user
-                    userRepository.update(userTable);
-                    isPasswordsCorrect = true;
-                }
-
-            }else{
-                Log.i(TAG,"External and Local Password is not equals, I will insert external user parameters to local user database");
-
-
-                int insertResult = userRepository.insert(userTable);
-                Log.i(TAG, "Added user to local DataBase because not existed, datas I got from external Database");
-                Toast.makeText(LoginActivity.this, "Dodalem uzytkownika do lokalnej DB bo nie istnial, dane pobralem z external DB", Toast.LENGTH_SHORT).show();
-
-                if(insertResult > 0) {
-                    Log.i(TAG , "After adding to local database new user, insert result return value grater than zero");
-                    isPasswordsCorrect = true;
-                }else{
-                    Log.i(TAG, "After adding to local database new user, insert result return value lesser than zero- it seems to be problem");
-                }
-            }
-        }
-
-        return isPasswordsCorrect;
-    }
-
-    private class MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... arg0) {
-            Boolean webServiceResult = null;
-            String userName = arg0[0];
-            String userPassword = arg0[1];
-
-            MytwayWebservice mytwayWebservice = new MytwayWebservice();
-            if(userName != null){
-                try {
-                    webServiceResult  = mytwayWebservice.checkIsPasswordIsCorrectInExternalDatabaseByMytwayWebservice(userName, userPassword);
-                } catch (JSONException e) {
-                    Log.i(TAG, "Problem with checking user name in external database", e);
-                    e.printStackTrace();
-                }
-            }else{
-                Log.i(TAG, "UserName is empty, mytway can't check duplicate in external database");
-            }
-            return webServiceResult;
-        }
-    }
-
-    private class MytwayWebserviceGetUserFromExternalDatabase extends AsyncTask<String, Void, UserTable> {
-
-        @Override
-        protected UserTable doInBackground(String... arg0) {
-            UserTable userTable = new UserTable();
-            String userName = arg0[0];
-            String userPassword = arg0[1];
-
-            MytwayWebservice mytwayWebservice = new MytwayWebservice();
-            if(userName != null){
-                try {
-                    userTable  = mytwayWebservice.getUserFromExternalDatabaseByMytwayWebservice(userName, userPassword);
-                } catch (JSONException e) {
-                    Log.i(TAG, "Problem with getting user paramters from external database", e);
-                    e.printStackTrace();
-                }
-            }else{
-                Log.i(TAG, "UserName is empty, mytway can't check duplicate in external database");
-            }
-            return userTable;
-        }
-    }
-
 }

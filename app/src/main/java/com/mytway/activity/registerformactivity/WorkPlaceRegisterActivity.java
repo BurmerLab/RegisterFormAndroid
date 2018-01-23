@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.EthernetConnectivity;
+import com.mytway.utility.Session;
 import com.mytway.utility.permission.PermissionUtil;
 
 public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMapReadyCallback{
@@ -58,11 +59,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
         Intent intent = getIntent();
         final User user = intent.getParcelableExtra("user");
-//        Toast.makeText(WorkPlaceRegisterActivity.this, "User: "
-//                + user.getUserName() +
-//                " email:" + user.getEmail() +
-//                " start:" + user.getStartStandardTimeWork()
-//                , Toast.LENGTH_LONG).show();
+        final String processingAccount = intent.getStringExtra(PropertiesValues.PROCESSING_ACCOUNT);
 
         registerWorkLocalizationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +72,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
                 Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);
                 intent.putExtra("user", user);
+                intent.putExtra(PropertiesValues.PROCESSING_ACCOUNT, processingAccount);
                 startActivity(intent);
             }
         });
@@ -84,10 +82,10 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+//        googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
         if (PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getApplicationContext())
                 && PermissionUtil.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getApplicationContext())) {
@@ -111,10 +109,20 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
         // Enable MyLocation Layer of Google Map
         mMap.setMyLocationEnabled(true);
 
-        MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(WorkPlaceRegisterActivity.this);
-        geolocalization.getLocalization();
-        latitudeLocalization = geolocalization.getLatitude();
-        longitudeLocalization = geolocalization.getLongitude();
+        Intent intentFromRegistrationActivity = getIntent();
+        final String processingAccount = intentFromRegistrationActivity.getStringExtra(PropertiesValues.PROCESSING_ACCOUNT);
+        final Session session = new Session(getApplicationContext());
+
+
+        if(processingAccount.equals(PropertiesValues.UPDATE_USER)){
+            latitudeLocalization = Double.parseDouble(session.getWorkLatitude());
+            longitudeLocalization = Double.parseDouble(session.getWorkLongitude());
+        }else{
+            MytwayGeolocalizationService geolocalization = new MytwayGeolocalizationService(WorkPlaceRegisterActivity.this);
+            geolocalization.getLocalization();
+            latitudeLocalization = geolocalization.getLatitude();
+            longitudeLocalization = geolocalization.getLongitude();
+        }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
