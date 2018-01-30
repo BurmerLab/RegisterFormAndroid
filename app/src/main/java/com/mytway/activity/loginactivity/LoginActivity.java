@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ public class LoginActivity extends Activity {
     private static final String TAG = "LoginActivity";
 
     private Session session;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private EditText mLoginUserName;
     private EditText mLoginPassword;
@@ -44,6 +47,22 @@ public class LoginActivity extends Activity {
         session = new Session(getApplicationContext());
 
         //initialize
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(R.color.application_button_color, R.color.application_background_color);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    }
+                },1000);
+            }
+        });
+
         mLoginUserName = (EditText) findViewById(R.id.loginUserName);
         mLoginPassword = (EditText) findViewById(R.id.loginPassword);
         mLoginButton = (Button) findViewById(R.id.loginButton);
