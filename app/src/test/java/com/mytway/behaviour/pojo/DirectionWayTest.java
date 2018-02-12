@@ -15,7 +15,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -349,11 +348,23 @@ public class DirectionWayTest extends TestCase {
         //when
         // first setting leaveHome (by mistake)
         userDailyTimes.setLeaveHomeTime(new LocalDateTime(2017,11,28,7,35));
-        directionWay.leaveHomeTimeSetUp();
+        directionWay.setUpLeaveHomeTime();
 
         //then
         directionWay.getUserDailyTimes().getLeaveHomeTime();
 
+    }
+
+    public void testSaveToDatabaseIfNeeded(){
+        //given
+        PropertiesValues.SAVE_TO_FILE_ENABLE = false;
+        directionWay.isSavedArriveToHomeTimeExecuted = false;
+
+        //when
+        directionWay.saveToDatabaseIfNeeded(directionWay.isSavedArriveToHomeTimeExecuted, "Dupa - ", new LocalDateTime(2017,11,28,7,35));
+
+        //then
+        assertEquals(true, directionWay.isSavedArriveToHomeTimeExecuted);
     }
 
 }

@@ -64,3 +64,19 @@ Todo:
         * timeLeaveWork
         * time spentInTravelToHome
         * timeArriveToHome
+
+Operations:
+ /*I am saving startWorkTime to database because user arrived to work
+        Possibles:
+        1) User arrived to work and will work 8h in same places
+        2) User arrived to work, moved from work for lunch - then startWorkTime should cleaning and start again when he back
+        3) User arrived to work, moved for 2 hours OOO (private stuff) - then those 2 hours shouldn't be counting to work time
+            - then option with changing  time based on status isInWayToHomeOperations() will clear startWorkTime
+ */
+ 
+ 
+ Bugi: 
+ 1) 12-02-2018 Work Screen - to end work (time1) pokazuje czas od TERAZ + 8h (jest 8.47 aktualnie, a pokazuje 14.47 to end work)
+ Prawdopodobnie przez to ze jeszcze czasy startWorkTime nie sa sprwadzone i wdrozone 
+ 
+ 

@@ -139,7 +139,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
             }
         } catch (Exception e) {
              e.printStackTrace();
-            Log.e("Error : Location", "Impossible to connect to LocationManager", e);
+            Log.e("Error : Location", "Impossible to connect to LocationManager ", e);
         }
 
         return location;
@@ -222,8 +222,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("--------------------BEFORE-Decisions------------------------", "DirectionWay.txt");
                 saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
                 saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
 //                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
@@ -232,8 +232,8 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("--------------------AFTER-------------------------", "DirectionWay.txt");
                 saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
                 saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
 
@@ -265,23 +265,19 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             //for now it is only for standard user time
                             StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeatForStandardUser(session, travelTime, directionWay);
 
-                            LocalDateTime timeToStartMorningScreen =
-                                    AProcessingTime.subtractTimeTo(currentTime, startStandardTimeWork.getHourOfDay(),
-                                            startStandardTimeWork.getMinuteOfHour(),
-                                            startStandardTimeWork.getSecondOfMinute());
                               //todo: correct code, commented only for testing
 //                            if(timeToStartMorningScreen.getHourOfDay() < Hours.FIVE.getHours()){
-                                //Morning screen
-                                saveToFileLocalization("Morning",
-                                        travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
-                                        travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
-                                        travelTime.getDisplayTimeMessage());
-                                DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
-                                morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
+                            //Morning screen
+                            saveToFileLocalization("Morning",
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDuration().getText(),
+                                    travelTime.getGoogleMapsDirectionJson().getLegs().getDistance().getText(),
+                                    travelTime.getDisplayTimeMessage());
+                            DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
+                            morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
 
-                                PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
-                                PropertiesValues.INTERVAL_TYPE = "RARELY";
-                                StandardRepeatIntervalProcessor.saveToFileIntervals("RARELY - IS IN HOME");
+                            PropertiesValues.INTERVAL_TO_REPEAT_UPDATE_WIDGET = PropertiesValues.RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET;
+                            PropertiesValues.INTERVAL_TYPE = "RARELY";
+                            StandardRepeatIntervalProcessor.saveToFileIntervals("RARELY - IS IN HOME");
 //
 //
 // }else{

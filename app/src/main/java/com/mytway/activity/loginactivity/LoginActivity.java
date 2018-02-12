@@ -49,6 +49,7 @@ public class LoginActivity extends Activity {
         //initialize
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setColorSchemeColors(R.color.application_button_color, R.color.application_background_color);
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
@@ -56,8 +57,19 @@ public class LoginActivity extends Activity {
                 (new Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        boolean isNetwork = isNetworkAvailable();
+                        if(isNetworkAvailable()) {
+                            mLoginUserName.setEnabled(true);
+                            mLoginPassword.setEnabled(true);
+                            mLoginButton.setEnabled(true);
+                        }else{
+                            //If no internet connection, then Disable Login Form
+                            mLoginUserName.setEnabled(false);
+                            mLoginPassword.setEnabled(false);
+                            mLoginButton.setEnabled(false);
+                        }
+                        Toast.makeText(LoginActivity.this, "INTERNET = "+ isNetwork , Toast.LENGTH_LONG).show();
                         swipeRefreshLayout.setRefreshing(false);
-
                     }
                 },1000);
             }
@@ -66,6 +78,8 @@ public class LoginActivity extends Activity {
         mLoginUserName = (EditText) findViewById(R.id.loginUserName);
         mLoginPassword = (EditText) findViewById(R.id.loginPassword);
         mLoginButton = (Button) findViewById(R.id.loginButton);
+
+        //todo: on tutaj sprawdza czy net sie zminil?/ moze zmienic na inny filter?? ---> SPRAWDZIC
         this.registerReceiver(this.mConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +134,12 @@ public class LoginActivity extends Activity {
 
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {

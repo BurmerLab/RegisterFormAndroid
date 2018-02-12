@@ -6,7 +6,7 @@
     android:layout_height="@dimen/main_relative_layout_height_medium"
     android:layout_margin="@dimen/main_relative_layout_margin_medium"
     android:orientation="vertical"
-
+    android:id="@+id/widget"
     android:background="@color/widget_relative_layout_background_color"
     android:paddingTop="@dimen/main_relative_padding_top_medium">
 

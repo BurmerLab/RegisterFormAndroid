@@ -2,6 +2,7 @@ package com.mytway.behaviour.pojo.screens;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -81,7 +82,8 @@ public class MorningScreen implements Screen {
         view.setViewVisibility(R.id.thirdProgressBar, View.INVISIBLE);
 
         //icons:
-        view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);
+//        view.setInt(R.id.contentContainer, "setBackgroundColor", 0x00E676);
+
         view.setImageViewResource(R.id.firstWidgetImageView, R.drawable.ic_time_to_departure_white);
         view.setImageViewResource(R.id.secondWidgetImageView, R.drawable.ic_time_in_road_white);
         view.setImageViewResource(R.id.thirdWidgetImageView, R.drawable.ic_arrive_to_home_white);

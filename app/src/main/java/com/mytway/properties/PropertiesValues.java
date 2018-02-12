@@ -35,7 +35,10 @@ public class PropertiesValues {
     //widget sampling update
     public static int INTERVAL_TO_REPEAT_UPDATE_WIDGET = 1000 * 60;//1000 * 30 = 30sek
     public static int OFTEN_INTERVAL_REPEATS_TO_UPDATE_WIDGET = 1000 * 30;//30 sek
-    public static int RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET = 1000 * 3600;// 1 hour
+    public static int RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET = 1000 * 60;// 1 min
+//    public static int RARELY_INTERVAL_REPEATS_TO_UPDATE_WIDGET = 1000 * 3600;// 1 hour
+
+
     public static String INTERVAL_TYPE = "DEFAULT";
 
     public static final int HOUR_BEFORE_DEPARTURE_TO_START_REPEATING_WIDGET = 1;//ONE_HOUR

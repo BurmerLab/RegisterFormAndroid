@@ -41,6 +41,11 @@ public class DirectionWay {
     private List<Double> previousDistancesToHome = new LinkedList<>();
     private List<Double> previousDistancesToWork = new LinkedList<>();
 
+    boolean isSavedArriveToHomeTimeExecuted = false;
+    boolean isSavedLeaveHomeTimeExecuted = false;
+    boolean isSavedStartWorkTimeExecuted = false;
+    boolean isSavedLeaveWorkTimeExecuted = false;
+
     public DirectionWay() {
     }
 
@@ -68,28 +73,28 @@ public class DirectionWay {
         setFirstDirections(currentPosition, homePosition, workPosition, currentDistToHomeInM);
 
         if(isInHome()) {
-            //can be isInHome or wayToWork
-            if(isInHome(currentDistToHomeInM)){
+            //can be isStillInHome or wayToWork
+            if(isStillInHome(currentDistToHomeInM)){
                 inHomeOperations();
-            }else {
+            }else{
                 inWayToWorkOperations();
                 saveToFileDirections("IS IN WAY TO WORK");
             }
         }else if(isInWayToWork()){
-            //can be wayToWork or isInWork or isInHome
-            if(isInWork(currentDistToWorkInM)){
+            //can be wayToWork or isStillInWork or isStillInHome
+            if(isStillInWork(currentDistToWorkInM)){
                 inWorkOperations();
                 saveToFileDirections("IS IN WORK");
 
-            }else if(isInHome(currentDistToHomeInM)){
+            }else if(isStillInHome(currentDistToHomeInM)){
                 inHomeOperations();
                 saveToFileDirections("IS IN HOME");
             }else{
                 inWayToWorkOperations();
             }
         }else if(isInWork()){
-            //can be isInWork or wayToHome
-            if(isInWork(currentDistToWorkInM)){
+            //can be isStillInWork or wayToHome
+            if(isStillInWork(currentDistToWorkInM)){
                 inWorkOperations();
             }else{
                 inWayToHomeOperations();
@@ -97,12 +102,12 @@ public class DirectionWay {
 
             }
         }else if(isInWayToHome()){
-            //can be isInHome or wayToHome or isInWork
-            if(isInHome(currentDistToHomeInM)) {
+            //can be isStillInHome or wayToHome or isStillInWork
+            if(isStillInHome(currentDistToHomeInM)) {
                 inHomeOperations();
                 saveToFileDirections("IS IN HOME");
 
-            }else if(isInWork(currentDistToWorkInM)){
+            }else if(isStillInWork(currentDistToWorkInM)){
                 inWorkOperations();
                 saveToFileDirections("IS IN WORK");
 
@@ -122,33 +127,33 @@ public class DirectionWay {
         setWayToHome(FALSE);
         setWayToWork(FALSE);
 
-
-        //check leave work time and clear it
-        saveToFileDatabaseTimes("LeaveWork - " + userDailyTimes.getLeaveHomeTime());
-        clearLeaveWorkTime();
-        saveToFileDatabaseTimes("LeaveWork after clear - " + userDailyTimes.getLeaveWorkTime());
+        if(userDailyTimes.getLeaveWorkTime() != null && !isSavedLeaveWorkTimeExecuted){
+            saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveWorkTime());
+            clearLeaveWorkTime();
+        }
 
         //Setup leaveWorkTime
-        arriveToHomeTimeSetUp();
+        setUpArriveToHomeTime();
 
-        saveToFileTime("Save Got Home time on current time - " + userDailyTimes.getArriveToHomeTime());
+        //dla kazdego tak zrobic ?
+        if(!isSavedArriveToHomeTimeExecuted) {
+            saveToFileDatabaseTimes("ArriveToHome - " + userDailyTimes.getArriveToHomeTime());
+            isSavedArriveToHomeTimeExecuted = true;
+        }
+
     }
 
-    public void inWayToHomeOperations() {
-        saveToFile("SETUP IS IN WAY TO HOME");
+    public void inWayToWorkOperations() {
+        saveToFile("SETUP IS IN WAY TO WORK");
         setIsInHome(FALSE);
         setIsInWork(FALSE);
-        setWayToHome(TRUE);
-        setWayToWork(FALSE);
+        setWayToHome(FALSE);
+        setWayToWork(TRUE);
 
-        //check start work time and clear it
-        saveToFileDatabaseTimes("StartWork - " + userDailyTimes.getStartWorkTime());
-        clearStartWorkTime();
-        saveToFileDatabaseTimes("startWork after clear - " + userDailyTimes.getStartWorkTime());
+        clearArriveToHomeTime();
 
-        //Setup leaveWorkTime
-        leaveWorkTimeSetUp();
-        saveToFileTime("Save Leave Work time on current time");
+        //setup leave home time
+        setUpLeaveHomeTime();
     }
 
     public void inWorkOperations() {
@@ -159,52 +164,56 @@ public class DirectionWay {
         setWayToWork(FALSE);
 
         //save leaveHomeTime and clear it
-        saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveHomeTime());
-        clearLeaveHomeTime();
-        saveToFileDatabaseTimes("LeaveHome after clear - " + userDailyTimes.getLeaveHomeTime());
+        if(userDailyTimes.getLeaveHomeTime() != null && !isSavedLeaveHomeTimeExecuted){
+            saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveHomeTime());
+            isSavedLeaveHomeTimeExecuted = true;
+            clearLeaveHomeTime();
+        }
 
         //set start work time
-        startWorkTimeSetUp();
-        saveToFileTime("Save Start Work time on current time: " + userDailyTimes.getStartWorkTime());
-    }
-
-    public void inWayToWorkOperations() {
-        saveToFile("SETUP IS IN WAY TO WORK");
-        setIsInHome(FALSE);
-        setIsInWork(FALSE);
-        setWayToHome(FALSE);
-        setWayToWork(TRUE);
-
-        //save arriveToHome and clear it
-        saveToFileDatabaseTimes("ArriveToHome - " + userDailyTimes.getArriveToHomeTime());
-        clearArriveToHomeTime();
-        saveToFileDatabaseTimes("ArriveToHome after clear - " + userDailyTimes.getArriveToHomeTime());
-
-        //setup leave home time
-        leaveHomeTimeSetUp();
-        saveToFileTime("Save Leave Home time on current time: " + userDailyTimes.getLeaveHomeTime());
-    }
-
-    public void leaveHomeTimeSetUp(){
-        //if leave home is not set
-        if(userDailyTimes.getLeaveHomeTime() == null){
-            userDailyTimes.setLeaveHomeTimeToCurrent();
+        setUpStartWorkTime();
+        if(userDailyTimes.getStartWorkTime() != null && !isSavedStartWorkTimeExecuted){
+            saveToFileDatabaseTimes("StartWorkTime - " + userDailyTimes.getStartWorkTime());
+            isSavedStartWorkTimeExecuted = true;
         }
     }
 
-    public void startWorkTimeSetUp(){
+    public void inWayToHomeOperations() {
+        saveToFile("SETUP IS IN WAY TO HOME");
+        setIsInHome(FALSE);
+        setIsInWork(FALSE);
+        setWayToHome(TRUE);
+        setWayToWork(FALSE);
+
+        clearStartWorkTime();
+
+        //Setup leaveWorkTime
+        setUpLeaveWorkTime();
+    }
+
+
+
+
+
+    public void setUpLeaveHomeTime(){
+        if(userDailyTimes.getLeaveHomeTime() == null){
+            userDailyTimes.setLeaveHomeTime(new LocalDateTime());
+        }
+    }
+
+    public void setUpStartWorkTime(){
         if(userDailyTimes.getStartWorkTime() == null){
             userDailyTimes.setStartWorkTime(new LocalDateTime());
         }
     }
 
-    public void leaveWorkTimeSetUp(){
+    public void setUpLeaveWorkTime(){
         if(userDailyTimes.getLeaveWorkTime() == null){
             userDailyTimes.setLeaveWorkTime(new LocalDateTime());
         }
     }
 
-    public void arriveToHomeTimeSetUp(){
+    public void setUpArriveToHomeTime(){
         if(userDailyTimes.getArriveToHomeTime() == null){
             userDailyTimes.setArriveToHomeTime(new LocalDateTime());
         }
@@ -212,25 +221,29 @@ public class DirectionWay {
 
     public void clearArriveToHomeTime(){
         userDailyTimes.setArriveToHomeTime(null);
+        isSavedArriveToHomeTimeExecuted = false;
     }
 
     public void clearLeaveWorkTime(){
-        userDailyTimes.setLeaveHomeTime(null);
+        userDailyTimes.setLeaveWorkTime(null);
+        isSavedLeaveWorkTimeExecuted = false;
     }
 
     public void clearLeaveHomeTime(){
         userDailyTimes.setLeaveHomeTime(null);
+        isSavedLeaveHomeTimeExecuted = false;
     }
 
     public void clearStartWorkTime(){
         userDailyTimes.setStartWorkTime(null);
+        isSavedStartWorkTimeExecuted = false;
     }
 
-    public boolean isInWork(double currentDistanceToWorkInMeters) {
+    public boolean isStillInWork(double currentDistanceToWorkInMeters) {
         return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToWorkInMeters;
     }
 
-    public boolean isInHome(double currentDistanceToHomeInMeters) {
+    public boolean isStillInHome(double currentDistanceToHomeInMeters) {
         return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToHomeInMeters;
     }
 

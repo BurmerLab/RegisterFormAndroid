@@ -27,10 +27,6 @@ public class UserDailyTimes {
         return leaveHomeTime;
     }
 
-    public void setLeaveHomeTimeToCurrent() {
-        this.leaveHomeTime = new LocalDateTime();
-    }
-
     public void setLeaveHomeTime(LocalDateTime leaveHomeTime) {
         this.leaveHomeTime = leaveHomeTime;
     }
