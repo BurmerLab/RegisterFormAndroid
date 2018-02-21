@@ -62,5 +62,8 @@ public class PropertiesValues {
     public final static String UPDATE_ACCOUNT_INTENT = "UPDATE_ACCOUNT_INTENT";
     public static final String UPDATE_ACCOUNT_BUTTON_TEXT = "UPDATE ACCOUNT";
 
+    public static final int MINUTES_FOR_WALK_TO_PLACE = 4; // minutes will be added to start work time, to let user walk to office
+    public static final int MINUTES_FOR_RECOGNITION_LEAVED_PLACE = 2; // minutes will be deducted from recognition that user leaved home
+
 
 }

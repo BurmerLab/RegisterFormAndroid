@@ -1,5 +1,6 @@
 package com.mytway.behaviour.pojo;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.mytway.pojo.Distance;
@@ -9,6 +10,8 @@ import com.mytway.properties.PropertiesValues;
 import junit.framework.TestCase;
 
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -21,8 +24,8 @@ import java.util.List;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Log.class)
 public class DirectionWayTest extends TestCase {
-
-    private DirectionWay directionWay = new DirectionWay();
+    private Context contextMock = null;
+    private DirectionWay directionWay = new DirectionWay(contextMock);
 
 
 //    @Test
@@ -132,7 +135,8 @@ public class DirectionWayTest extends TestCase {
     public void testOfDecideIsNotInHome(){
         //given
         PowerMockito.mockStatic(Log.class);
-        DirectionWay directionWay = new DirectionWay();
+        Context contextMock = null;
+        DirectionWay directionWay = new DirectionWay(contextMock);
         Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
         Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
 
@@ -147,7 +151,7 @@ public class DirectionWayTest extends TestCase {
     public void testOfDecideIsInHome(){
         //given
         PowerMockito.mockStatic(Log.class);
-        DirectionWay directionWay = new DirectionWay();
+        DirectionWay directionWay = new DirectionWay(contextMock);
         Position currentPosition = new Position(50.055475, 20.895955);// BobrownikiMale, crossroad near home
         Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
 
@@ -291,7 +295,7 @@ public class DirectionWayTest extends TestCase {
 
         //given
         PropertiesValues.SAVE_TO_FILE_ENABLE = false;
-        DirectionWay directionWay = new DirectionWay();
+        DirectionWay directionWay = new DirectionWay(contextMock);
 
         Position currentPosition = new Position(50.019351, 19.9437808);
         Position homePosition = new Position(50.056891, 20.8945914);
@@ -319,7 +323,7 @@ public class DirectionWayTest extends TestCase {
         //przypadek skrzyzowanie lagiewnicka zakopianska - powinno byc Travel To Work bo jest jescze 0,5 km od pracy
         //given
         PropertiesValues.SAVE_TO_FILE_ENABLE = false;
-        DirectionWay directionWay = new DirectionWay();
+        DirectionWay directionWay = new DirectionWay(contextMock);
 
         Position currentPosition = new Position(50.0289214, 19.9374749);
         Position homePosition = new Position(50.056891, 20.8945914);
@@ -340,31 +344,42 @@ public class DirectionWayTest extends TestCase {
         assertEquals(Boolean.TRUE, directionWay.isWayToWork());
     }
 
-    public void testLeaveHomeTimeSetUp(){
-        //given
-        DirectionWay directionWay = new DirectionWay();
-        UserDailyTimes userDailyTimes = new UserDailyTimes();
+//    public void testLeaveHomeTimeSetUp(){
+//        //given
+//        DirectionWay directionWay = new DirectionWay();
+//        UserDailyTimes userDailyTimes = new UserDailyTimes();
+//
+//        //when
+//        // first setting leaveHome (by mistake)
+//        userDailyTimes.setLeaveHomeTime(new LocalDateTime(2017,11,28,7,35));
+//        directionWay.setUpLeaveHomeTime();
+//
+//        //then
+//        directionWay.getUserDailyTimes().getLeaveHomeTime();
+//
+//    }
+//
+//    public void testSaveToDatabaseIfNeeded(){
+//        //given
+//        PropertiesValues.SAVE_TO_FILE_ENABLE = false;
+//        directionWay.isSavedArriveToHomeTimeExecuted = false;
+//
+//        //when
+//        directionWay.saveToDatabaseIfNeeded(directionWay.isSavedArriveToHomeTimeExecuted, "Dupa - ", new LocalDateTime(2017,11,28,7,35));
+//
+//        //then
+//        assertEquals(true, directionWay.isSavedArriveToHomeTimeExecuted);
+//    }
 
-        //when
-        // first setting leaveHome (by mistake)
-        userDailyTimes.setLeaveHomeTime(new LocalDateTime(2017,11,28,7,35));
-        directionWay.setUpLeaveHomeTime();
+    @Test
+    public void testLocalDateTime(){
+//        LocalDateTime leaveWorkTime = new LocalDateTime(2017,11,28,7,00).plusMinutes(PropertiesValues.MINUTES_FOR_WALK_TO_PLACE);
+//        System.out.println(leaveWorkTime.toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
 
-        //then
-        directionWay.getUserDailyTimes().getLeaveHomeTime();
+        String arriveToHomeTimeString = "2017-11-28 07:04";
+        DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime arriveToHomeTime = LocalDateTime.parse(arriveToHomeTimeString, format);
 
-    }
-
-    public void testSaveToDatabaseIfNeeded(){
-        //given
-        PropertiesValues.SAVE_TO_FILE_ENABLE = false;
-        directionWay.isSavedArriveToHomeTimeExecuted = false;
-
-        //when
-        directionWay.saveToDatabaseIfNeeded(directionWay.isSavedArriveToHomeTimeExecuted, "Dupa - ", new LocalDateTime(2017,11,28,7,35));
-
-        //then
-        assertEquals(true, directionWay.isSavedArriveToHomeTimeExecuted);
     }
 
 }

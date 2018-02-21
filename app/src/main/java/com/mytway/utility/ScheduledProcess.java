@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import com.mytway.database.UserTable;
 import com.mytway.geolocalization.MytwayGeolocalizationService;
+import com.mytway.properties.SharedPreferencesNames;
 import com.mytway.utility.webservice.WebServiceUtility;
 
 public class ScheduledProcess {
@@ -18,6 +19,8 @@ public class ScheduledProcess {
 
     public void runScheduledProcess(Context context, UserTable userTable, String jsonUserData){
 
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         if(!sharedPreferences.getString(INSERT_ACCOUNT_USER_TO_EXTERNAL_DB, EMPTY).equals(EMPTY)){
             //INSERT TO EXTERNAL DB
             MytwayGeolocalizationService.saveToFile("INSERT = true","scheduled.txt");

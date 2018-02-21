@@ -1,18 +1,12 @@
 package com.mytway.database;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.mytway.database.userLocalizations.UserLocalizationsTable;
+import com.mytway.database.userTimes.UserTimesTable;
+
 import java.sql.SQLException;
 
 //http://instinctcoder.com/android-studio-sqlite-database-example/
@@ -30,28 +24,54 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
+//    if not exists - only temporary
+    String CREATE_TABLE_USER = "CREATE TABLE if not exists " + UserTable.TABLE  + "("
+            + UserTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            + UserTable.KEY_USER_NAME + " TEXT not null unique, "
+            + UserTable.EMAIL + " TEXT, "
+            + UserTable.PASSWORD + " TEXT, "
+            + UserTable.TYPE_WORK + " TEXT, "
+            + UserTable.LENGTH_TIME_WORK + " TEXT, "
+            + UserTable.START_STANDARD_TIME + " TEXT, "
+            + UserTable.WORK_PLACE_LATITUDE + " INTEGER, "
+            + UserTable.WORK_PLACE_LONGITUDE + " INTEGER, "
+            + UserTable.HOME_PLACE_LATITUDE + " INTEGER, "
+            + UserTable.HOME_PLACE_LONGITUDE + " INTEGER, "
+            + UserTable.WORK_WEEK + " TEXT, "
+            + UserTable.WAY_DISTANCE + " TEXT, "
+            + UserTable.WAY_DURATION + " TEXT )";
+
+    String CREATE_TABLE_USER_TIMES = "CREATE TABLE if not exists " + UserTimesTable.TABLE  + "("
+            + UserTimesTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            + UserTimesTable.KEY_USER_NAME + " TEXT not null unique, "
+            + UserTimesTable.CREATION_DATE + " TEXT, "
+            + UserTimesTable.TIME_STATUS + " TEXT, "
+            + UserTimesTable.TIME + " TEXT )";
+
+    String CREATE_TABLE_USER_LOCALIZATIONS = "CREATE TABLE if not exists " + UserLocalizationsTable.TABLE  + "("
+            + UserLocalizationsTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            + UserLocalizationsTable.KEY_USER_NAME + " TEXT not null unique, "
+            + UserLocalizationsTable.CREATION_DATE + " TEXT, "
+            + UserLocalizationsTable.LATITUDE + " TEXT, "
+            + UserLocalizationsTable.LONGITUDE + " TEXT, "
+            + UserLocalizationsTable.TIME_STATUS + " TEXT )";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //temporary only for one time execution to create new table
+//        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
+//        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
+//        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
+
+
         //All necessary tables you like to create will create here
-        String CREATE_TABLE_USER = "CREATE TABLE " + UserTable.TABLE  + "("
-                + UserTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-                + UserTable.KEY_USER_NAME + " TEXT not null unique, "
-                + UserTable.EMAIL + " TEXT, "
-                + UserTable.PASSWORD + " TEXT, "
-                + UserTable.TYPE_WORK + " TEXT, "
-                + UserTable.LENGTH_TIME_WORK + " TEXT, "
-                + UserTable.START_STANDARD_TIME + " TEXT, "
-                + UserTable.WORK_PLACE_LATITUDE + " INTEGER, "
-                + UserTable.WORK_PLACE_LONGITUDE + " INTEGER, "
-                + UserTable.HOME_PLACE_LATITUDE + " INTEGER, "
-                + UserTable.HOME_PLACE_LONGITUDE + " INTEGER, "
-                + UserTable.WORK_WEEK + " TEXT, "
-                + UserTable.WAY_DISTANCE + " TEXT, "
-                + UserTable.WAY_DURATION + " TEXT )";
         db.execSQL(CREATE_TABLE_USER);
+        db.execSQL(CREATE_TABLE_USER_TIMES);
+        db.execSQL(CREATE_TABLE_USER_LOCALIZATIONS);
     }
 
-    public DBHelper open() throws SQLException {
+    public DBHelper open(Context context) throws SQLException {
 //        myDataBase = this.getWritableDatabase();
 //        myDataBase =  getWritableDatabase();
 //        Log.d(TAG, "DbHelper Opening Version: " + this.myDataBase.getVersion());
@@ -59,9 +79,9 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     //http://stackoverflow.com/questions/7647566/why-is-onupgrade-not-being-invoked-on-android-sqlite-database
-//    @Override
-//    public SQLiteDatabase getWritableDatabase() {
-//        SQLiteDatabase myDataBase = this.getWritableDatabase();
+//    public SQLiteDatabase getWritableDatabase(Context context) {
+//        SQLiteOpenHelper helper = new DBHelper(context);
+//        SQLiteDatabase myDataBase = helper.getWritableDatabase();
 //        int version = myDataBase.getVersion();
 //        if (version != DATABASE_VERSION) {
 //            myDataBase.beginTransaction();
@@ -90,6 +110,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed, all data will be gone!!!
         db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
+
+
         // Create tables again
         onCreate(db);
     }

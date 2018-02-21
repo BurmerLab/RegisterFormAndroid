@@ -79,4 +79,18 @@ Operations:
  1) 12-02-2018 Work Screen - to end work (time1) pokazuje czas od TERAZ + 8h (jest 8.47 aktualnie, a pokazuje 14.47 to end work)
  Prawdopodobnie przez to ze jeszcze czasy startWorkTime nie sa sprwadzone i wdrozone 
  
- 
+
+ 2) [Komentarz: Potencjalnie nie problem bo zaznaczyl WORK w miedzyczasiu ale pozniej sie sygnal GPS cofnal i algorytm uznal ze wracam do domu]
+  Jade do pracy, na estakadzie tischnera jestem TravelToWork, na skrzyzowaniu z wadowicka juz jestem w TravelToHome -
+ - nie wiem czy czasem nie rozpoznaje w tedy ze sie przez chwilke oddalam od pracy i mysli ze wracam do domu
+ Jezeli tak, to trzeba bedzie dodac jakichs offset, ze jezeli oddali sie tylko o kilka km to to nie jest problem .
+ Zagrozenie: w TravelToHome usuwa sie czas TravelToWork, i mozemy utracic ta informacje
+
+
+
+ DATABASE:
+ SQLiteOpenHelper onCreate() and onUpgrade() wytlumaczenie:
+ https://stackoverflow.com/questions/21881992/when-is-sqliteopenhelper-oncreate-onupgrade-run
+
+ onUpdate implementation:
+ https://thebhwgroup.com/blog/how-android-sqlite-onupgrade

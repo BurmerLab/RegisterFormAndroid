@@ -16,7 +16,7 @@ public class UserRepo {
     public UserRepo(Context context) {
         dbHelper = new DBHelper(context);
         try {
-            dbHelper.open();
+            dbHelper.open(context);
         } catch (SQLException e) {
             Log.i("Problem with dbHelper", String.valueOf(e));
             e.printStackTrace();

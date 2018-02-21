@@ -14,7 +14,7 @@ public class MytwayWebserviceCheckIsPasswordCorrectInExternalDatabase extends As
 
     @Override
     protected Boolean doInBackground(String... arg0) {
-        Boolean webServiceResult = null;
+        Boolean webServiceResult = new Boolean(false);
         String userName = arg0[0];
         String userPassword = arg0[1];
 

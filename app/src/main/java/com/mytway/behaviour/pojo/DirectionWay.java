@@ -1,5 +1,6 @@
 package com.mytway.behaviour.pojo;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -29,6 +30,8 @@ public class DirectionWay {
     private Boolean isInWork = FALSE;
     private Boolean isInHome = FALSE;
 
+    private Context context;
+
     private Distance distanceBetweenHomeAndWork;
     private double percentageDistanceBtwHomeAndWork;
 
@@ -46,7 +49,11 @@ public class DirectionWay {
     boolean isSavedStartWorkTimeExecuted = false;
     boolean isSavedLeaveWorkTimeExecuted = false;
 
-    public DirectionWay() {
+    private UserDailyTimes userDailyTimes;
+
+    public DirectionWay(Context context) {
+        setContext(context);
+        userDailyTimes =new UserDailyTimes(context);
     }
 
     public DirectionWay(boolean wayToWork, boolean wayToHome) {
@@ -127,20 +134,18 @@ public class DirectionWay {
         setWayToHome(FALSE);
         setWayToWork(FALSE);
 
-        if(userDailyTimes.getLeaveWorkTime() != null && !isSavedLeaveWorkTimeExecuted){
-            saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveWorkTime());
+        if(isLeaveWorkTimeNotNullAndWasntSavedBefore()){
+            saveToFileDatabaseTimes("IN HOME - LeaveWork - " + userDailyTimes.getLeaveWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
             clearLeaveWorkTime();
         }
 
-        //Setup leaveWorkTime
         setUpArriveToHomeTime();
 
-        //dla kazdego tak zrobic ?
-        if(!isSavedArriveToHomeTimeExecuted) {
-            saveToFileDatabaseTimes("ArriveToHome - " + userDailyTimes.getArriveToHomeTime());
+        if(isArriveToHomeTimeNotNullAndWasntSavedBefore()) {
+            saveToFileDatabaseTimes("IN HOME - ArriveToHome - " + userDailyTimes.getArriveToHomeTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
             isSavedArriveToHomeTimeExecuted = true;
+            clearArriveToHomeTime();
         }
-
     }
 
     public void inWayToWorkOperations() {
@@ -149,8 +154,6 @@ public class DirectionWay {
         setIsInWork(FALSE);
         setWayToHome(FALSE);
         setWayToWork(TRUE);
-
-        clearArriveToHomeTime();
 
         //setup leave home time
         setUpLeaveHomeTime();
@@ -163,17 +166,16 @@ public class DirectionWay {
         setWayToHome(FALSE);
         setWayToWork(FALSE);
 
-        //save leaveHomeTime and clear it
-        if(userDailyTimes.getLeaveHomeTime() != null && !isSavedLeaveHomeTimeExecuted){
-            saveToFileDatabaseTimes("LeaveHome - " + userDailyTimes.getLeaveHomeTime());
+        if(isLeaveHomeTimeNotNullAndWasntSavedBefore()){
+            saveToFileDatabaseTimes("IN WORK - LeaveHome - " + userDailyTimes.getLeaveHomeTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
             isSavedLeaveHomeTimeExecuted = true;
             clearLeaveHomeTime();
         }
 
-        //set start work time
         setUpStartWorkTime();
-        if(userDailyTimes.getStartWorkTime() != null && !isSavedStartWorkTimeExecuted){
-            saveToFileDatabaseTimes("StartWorkTime - " + userDailyTimes.getStartWorkTime());
+
+        if(isStartWorkTimeNotNullAndWasntSavedBefore()){
+            saveToFileDatabaseTimes("IN WORK - StartWorkTime - " + userDailyTimes.getStartWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
             isSavedStartWorkTimeExecuted = true;
         }
     }
@@ -191,51 +193,67 @@ public class DirectionWay {
         setUpLeaveWorkTime();
     }
 
+    public boolean isArriveToHomeTimeNotNullAndWasntSavedBefore() {
+        return userDailyTimes.getArriveToHomeTime() != null && !isSavedArriveToHomeTimeExecuted;
+    }
 
+    public boolean isLeaveWorkTimeNotNullAndWasntSavedBefore() {
+        return userDailyTimes.getLeaveWorkTime() != null && !isSavedLeaveWorkTimeExecuted;
+    }
 
+    public boolean isStartWorkTimeNotNullAndWasntSavedBefore() {
+        return userDailyTimes.getStartWorkTime() != null && !isSavedStartWorkTimeExecuted;
+    }
 
+    public boolean isLeaveHomeTimeNotNullAndWasntSavedBefore() {
+        return userDailyTimes.getLeaveHomeTime() != null && !isSavedLeaveHomeTimeExecuted;
+    }
 
     public void setUpLeaveHomeTime(){
         if(userDailyTimes.getLeaveHomeTime() == null){
-            userDailyTimes.setLeaveHomeTime(new LocalDateTime());
+            userDailyTimes.setLeaveHomeTime(new LocalDateTime().minusMinutes(PropertiesValues.MINUTES_FOR_RECOGNITION_LEAVED_PLACE));
+            saveToFileSetUpTimeFromNull("setUp LeaveHomeTime = " + userDailyTimes.getLeaveHomeTime());
         }
     }
 
     public void setUpStartWorkTime(){
         if(userDailyTimes.getStartWorkTime() == null){
-            userDailyTimes.setStartWorkTime(new LocalDateTime());
+            userDailyTimes.setStartWorkTime(new LocalDateTime().plusMinutes(PropertiesValues.MINUTES_FOR_WALK_TO_PLACE));
+            saveToFileSetUpTimeFromNull("setUp StartWorkTime = " + userDailyTimes.getStartWorkTime());
         }
     }
 
     public void setUpLeaveWorkTime(){
         if(userDailyTimes.getLeaveWorkTime() == null){
-            userDailyTimes.setLeaveWorkTime(new LocalDateTime());
+            userDailyTimes.setLeaveWorkTime(new LocalDateTime().minusMinutes(PropertiesValues.MINUTES_FOR_RECOGNITION_LEAVED_PLACE));
+            saveToFileSetUpTimeFromNull("setUp LeaveWorkTime = " + userDailyTimes.getLeaveWorkTime());
         }
     }
 
     public void setUpArriveToHomeTime(){
         if(userDailyTimes.getArriveToHomeTime() == null){
-            userDailyTimes.setArriveToHomeTime(new LocalDateTime());
+            userDailyTimes.setArriveToHomeTime(new LocalDateTime().plusMinutes(PropertiesValues.MINUTES_FOR_WALK_TO_PLACE));
+            saveToFileSetUpTimeFromNull("setUp ArriveToHomeTime = " + userDailyTimes.getArriveToHomeTime());
         }
     }
 
     public void clearArriveToHomeTime(){
-        userDailyTimes.setArriveToHomeTime(null);
+        userDailyTimes.clearArriveToHomeTime();
         isSavedArriveToHomeTimeExecuted = false;
     }
 
     public void clearLeaveWorkTime(){
-        userDailyTimes.setLeaveWorkTime(null);
+        userDailyTimes.clearLeaveWorkTime();
         isSavedLeaveWorkTimeExecuted = false;
     }
 
     public void clearLeaveHomeTime(){
-        userDailyTimes.setLeaveHomeTime(null);
+        userDailyTimes.clearLeaveHomeTime();
         isSavedLeaveHomeTimeExecuted = false;
     }
 
     public void clearStartWorkTime(){
-        userDailyTimes.setStartWorkTime(null);
+        userDailyTimes.clearStartWorkTime();
         isSavedStartWorkTimeExecuted = false;
     }
 
@@ -246,14 +264,6 @@ public class DirectionWay {
     public boolean isStillInHome(double currentDistanceToHomeInMeters) {
         return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToHomeInMeters;
     }
-
-//    public void getPercentageOfDistanceBtwHomeAndWorkInMeters() {
-//        if(distanceBetweenHomeAndWork != null && distanceBetweenHomeAndWork.getValueInMeters() != 0){
-//            setPercentageDistanceBtwHomeAndWork(distanceBetweenHomeAndWork.obtainSevenPercentFromDistance());
-//        }else{
-//            setPercentageDistanceBtwHomeAndWork(PropertiesValues.THREE_HOUNDRED_METERS);
-//        }
-//    }
 
     public void setFirstDirections(Position currentPosition, Position homePosition, Position workPosition, double currentDistanceToHomeInMeters) {
         if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
@@ -314,6 +324,34 @@ public class DirectionWay {
                 }
 
                 File file = new File(dir, "DirectionWay.txt");
+                LocalDateTime currentLocalDateTime = new LocalDateTime();
+                //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
+
+                FileOutputStream fop = new FileOutputStream(file, true);
+                String pointXml = "\n" + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + ": " + content;
+
+
+                fop.write(pointXml.getBytes());
+                fop.flush();
+                fop.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void saveToFileSetUpTimeFromNull(String content) {
+        if(PropertiesValues.SAVE_TO_FILE_ENABLE){
+            try{
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+                if(!dir.exists()){
+                    dir.mkdirs();
+                }
+
+                File file = new File(dir, "SETUP_TIME_FROM_NULL.txt");
                 LocalDateTime currentLocalDateTime = new LocalDateTime();
                 //currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa")
 
@@ -654,6 +692,11 @@ public class DirectionWay {
         this.userDailyTimes = userDailyTimes;
     }
 
-    private UserDailyTimes userDailyTimes = new UserDailyTimes();
+    public Context getContext() {
+        return context;
+    }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
 }

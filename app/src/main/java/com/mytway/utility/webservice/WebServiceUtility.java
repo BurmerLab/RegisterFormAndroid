@@ -36,7 +36,7 @@ public class WebServiceUtility {
                 userTable = webServiceGetUser.execute(userName, userPassword).get();
                 userTable.password = userPassword;
             } catch (InterruptedException | ExecutionException e) {
-                Log.i(TAG, "Problem with getting user paramters from external databases ", e);
+                Log.i(TAG, "Problem with getting user parameters from external databases ", e);
                 e.printStackTrace();
             }
 
