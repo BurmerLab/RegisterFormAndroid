@@ -86,7 +86,7 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
             public void onClick(View v) {
                 Toast.makeText(HomePlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
                 Position workPosition = user.getWorkPlace();
-                Position homePosition = new Position(latitudeLocalization, longitudeLocalization);
+                Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
 
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);

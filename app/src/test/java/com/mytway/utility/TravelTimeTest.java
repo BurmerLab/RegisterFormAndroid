@@ -37,9 +37,9 @@ public class TravelTimeTest extends TestCase {
         //distance: 62,5km
         //duration 2308 - 38min
 
-        Position currentPosition = new Position(50.0032076, 20.4857967);
-        Position homePosition = new Position(50.056891, 20.8945914);
-        Position workPosition = new Position(50.032661, 19.939811);
+        Position currentPosition = new Position(20.4857967, 50.0032076);
+        Position homePosition = new Position(20.8945914, 50.056891);
+        Position workPosition = new Position(19.939811, 50.032661);
 
         Mockito.when(sessionMock.isUserLogged()).thenReturn(true);
         Mockito.when(sessionMock.getWayDistance()).thenReturn("83683");//meters

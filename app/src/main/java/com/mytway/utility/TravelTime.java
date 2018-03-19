@@ -121,16 +121,16 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
     }
 
     public void obtainTravelTimeBasedOnDirectonWay(Context context, Position currentPosition, Session session) {
-        if(directionWay.isWayToHome()){
+        if(directionWay.getDirectionsStatus().isWayToHome()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace(), session);
 
-        }else if( directionWay.isWayToWork()){
+        }else if( directionWay.getDirectionsStatus().isWayToWork()){
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace(), session);
 
-        }else if(directionWay.isInHome()) {
+        }else if(directionWay.getDirectionsStatus().isInHome()) {
             setGoogleMapsDirectionJson(context, currentPosition, session.getWorkPlace(), session);
 
-        }else if(directionWay.isInWork()) {
+        }else if(directionWay.getDirectionsStatus().isInWork()) {
             setGoogleMapsDirectionJson(context, currentPosition, session.getHomePlace(), session);
 
         }else{
@@ -139,16 +139,16 @@ public class TravelTime extends AProcessingTime implements IDisplayedTime {
     }
 
     public void obtainEstimationByStaticTravelTimeBasedOnDirectonWay(Context context, Position currentPosition, Session session) {
-        if(directionWay.isWayToHome()){
+        if(directionWay.getDirectionsStatus().isWayToHome()){
             this.googleMapsDirectionJson = obtainStaticTravelTime(context, session, currentPosition, session.getHomePlace());
 
-        }else if( directionWay.isWayToWork()){
+        }else if( directionWay.getDirectionsStatus().isWayToWork()){
             this.googleMapsDirectionJson = obtainStaticTravelTime(context, session, currentPosition, session.getWorkPlace());
 
-        }else if(directionWay.isInHome()) {
+        }else if(directionWay.getDirectionsStatus().isInHome()) {
             this.googleMapsDirectionJson = obtainStaticTravelTime(context, session, currentPosition, session.getWorkPlace());
 
-        }else if(directionWay.isInWork()) {
+        }else if(directionWay.getDirectionsStatus().isInWork()) {
             this.googleMapsDirectionJson = obtainStaticTravelTime(context, session, currentPosition, session.getHomePlace());
 
         }else{

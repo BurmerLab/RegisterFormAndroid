@@ -1,14 +1,12 @@
 import com.mytway.pojo.Position;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import com.mytway.pojo.Position;
 
 public class PositionTest {
 
     @Test
     public void testTest(){
-        Position home = new Position(20.15, 50.15);
-        Position work = new Position(20.15, 50.15);
+        Position home = new Position(50.15, 20.15);
+        Position work = new Position(50.15, 20.15);
 
         if(home.equals(work)){
             System.out.println("To samo");

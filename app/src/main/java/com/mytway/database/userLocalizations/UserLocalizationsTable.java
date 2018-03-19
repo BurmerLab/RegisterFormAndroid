@@ -2,7 +2,7 @@ package com.mytway.database.userLocalizations;
 
 public class UserLocalizationsTable {
     // Labels table name
-    public static final String TABLE = "UserTimes";
+    public static final String TABLE = "UserLocalizations";
 
     // Labels Table Columns names
     public static final String KEY_ID = "id";
@@ -31,4 +31,51 @@ public class UserLocalizationsTable {
         return json.toString();
     }
 
+    public int getLocalizationId() {
+        return localizationId;
+    }
+
+    public void setLocalizationId(int localizationId) {
+        this.localizationId = localizationId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getTimeStatus() {
+        return timeStatus;
+    }
+
+    public void setTimeStatus(String timeStatus) {
+        this.timeStatus = timeStatus;
+    }
 }

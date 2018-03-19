@@ -49,7 +49,7 @@ public class Position implements Parcelable {
     public Position() {
     }
 
-    public Position(Double latitude, Double longitude) {
+    public Position(Double longitude, Double latitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

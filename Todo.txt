@@ -94,3 +94,22 @@ Operations:
 
  onUpdate implementation:
  https://thebhwgroup.com/blog/how-android-sqlite-onupgrade
+
+
+ ------
+ 28_02_2018 z danymi z 27_02_2018
+ Znalazlem blad,
+ w momencie kiedy:
+ isInWayToWork: false
+ isInWayToHome: false
+ isStillInWork: false
+ isStillInHome: false
+
+uruchamia sie wyszukiwanie sciezki jak za 1 razem
+ directionWay.obtainStartCurrentDirection
+ i bierze on tylko jedna odleglosc pomiedzy praca a domem przez co nie da sie ocenic czy jedzie do domu czy do pracy,
+
+ Solution:
+ 1) Zrobic isInWayToWOrk na sharedPreferences, zeby nie bylo przypadku ze robia sie na false przez GC chyba
+ 2) Ulepszyc directionWay.obtainStartCurrentDirection tak zeby pobieral kilka ostatnich odleglosci i na tej podstawie decydowal
+    czy jest coraz blizej domu czy coraz blizej pracy

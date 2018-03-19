@@ -29,6 +29,8 @@ import com.mytway.behaviour.pojo.screens.TravelToWorkScreen;
 import com.mytway.behaviour.pojo.screens.WorkScreen;
 import com.mytway.database.UserRepo;
 import com.mytway.database.UserTable;
+import com.mytway.database.userLocalizations.UserLocalizationsRepo;
+import com.mytway.database.userLocalizations.UserLocalizationsTable;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.pojo.TypeWork;
@@ -46,9 +48,11 @@ import com.mytway.widget.utils.StandardRepeatIntervalProcessor;
 import org.joda.time.LocalDateTime;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Scanner;
 
 public class MytwayGeolocalizationService extends Service implements LocationListener {
 
@@ -92,110 +96,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
     public MytwayGeolocalizationService() {
     }
 
-    public android.location.Location getLocalization() {
-
-        try {
-            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-
-            // getting GPS status
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            // getting network status
-            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                // location service disabled
-            } else {
-                this.canGetLocation = true;
-
-                // if GPS Enabled get lat/long using GPS Services
-                if (isGPSEnabled) {
-                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                            && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    }
-
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                    Log.d("GPS Enabled", "GPS Enabled");
-                    if (locationManager != null) {
-                        android.location.Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        updateGPSCoordinates(gpsLocation);
-                        location = gpsLocation;
-                    }
-                }
-
-                if (isNetworkEnabled) {
-                    if (location == null) {
-
-                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                        Log.d("Network", "Network");
-
-                        if (locationManager != null) {
-                            android.location.Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            updateGPSCoordinates(networkLocation);
-                            location = networkLocation;
-                        }
-                    }
-                }else{
-                    Toast.makeText(mContext, "NIMA NETWORKA", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (Exception e) {
-             e.printStackTrace();
-            Log.e("Error : Location", "Impossible to connect to LocationManager ", e);
-        }
-
-        return location;
-    }
-
-    public void updateGPSCoordinates(Location location) {
-        if (location != null) {
-            setLatitude(location.getLatitude());
-            setLongitude(location.getLongitude());
-        }
-    }
-
-    public boolean canGetLocation() {
-        return this.canGetLocation;
-    }
-
-    public void onLocationChanged(Location location) {
-//        Toast.makeText(mContext, "Localization Changed : lat:" + getLatitude() +" lon: "+ getLongitude(), Toast.LENGTH_SHORT).show();
-        updateGPSCoordinates(location);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        }
-    };
-
-    @Override
-    public void onCreate(){
-        IntentFilter filter = new IntentFilter();
-        registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId){
-        try {
-            computeMytwayWidget();
-        } catch (Exception e) {
-            Log.i(TAG, "Problem with method computeMytwayWidget in service", e);
-            e.printStackTrace();
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
 
     public void computeMytwayWidget() throws Exception {
-        mContext = getApplicationContext();
-        directionWay = new DirectionWay(mContext);
+
 
         if(!PropertiesValues.MOCK_APP_TO_TESTS){
             //remove in unit tests:
@@ -219,26 +122,26 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                 getLocalization();
 
-                Position currentPosition = new Position(latitude, longitude);
+                Position currentPosition = new Position(longitude, latitude);
 
                 Distance distanceBetweenHomeAndWork = new Distance("", Double.parseDouble(session.getWayDistance()));
                 directionWay.setDistanceBetweenHomeAndWork(distanceBetweenHomeAndWork);
 
                 saveToFile("--------------------BEFORE-Decisions------------------------", "DirectionWay.txt");
-                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
-                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isStillInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isStillInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToWork: " + directionWay.getDirectionsStatus().isInWayToWork() + " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToHome: " + directionWay.getDirectionsStatus().isInWayToHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInWork: " + directionWay.getDirectionsStatus().isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInHome: " + directionWay.getDirectionsStatus().isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
 //                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
                 directionWay.decideTravelDirectionsAre(currentPosition, session);
 
                 saveToFile("--------------------AFTER-------------------------", "DirectionWay.txt");
-                saveToFile("------isInWayToWork: " + directionWay.isInWayToWork() + " -------- ", "DirectionWay.txt");
-                saveToFile("------isInWayToHome: " + directionWay.isInWayToHome()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isStillInWork: " + directionWay.isInWork()+ " -------- ", "DirectionWay.txt");
-                saveToFile("------isStillInHome: " + directionWay.isInHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToWork: " + directionWay.getDirectionsStatus().isInWayToWork() + " -------- ", "DirectionWay.txt");
+                saveToFile("------isInWayToHome: " + directionWay.getDirectionsStatus().isInWayToHome()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInWork: " + directionWay.getDirectionsStatus().isInWork()+ " -------- ", "DirectionWay.txt");
+                saveToFile("------isStillInHome: " + directionWay.getDirectionsStatus().isInHome()+ " -------- ", "DirectionWay.txt");
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
 
@@ -266,7 +169,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                     boolean useEstimate = true;
 
-                        if(directionWay.isInHome()){
+                        if(directionWay.getDirectionsStatus().isInHome()){
                             //for now it is only for standard user time
                             StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeatForStandardUser(session, travelTime, directionWay);
 
@@ -274,6 +177,17 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                            if(timeToStartMorningScreen.getHourOfDay() < Hours.FIVE.getHours()){
                             //Morning screen
                             saveToFileLocalization("Morning");
+
+                            UserLocalizationsRepo localizationsRepo = new UserLocalizationsRepo(mContext);
+                            UserLocalizationsTable localizationsTable = new UserLocalizationsTable();
+                            localizationsTable.setCreationDate("2018-03-18");
+                            localizationsTable.setLatitude(String.valueOf(getLatitude()));
+                            localizationsTable.setLongitude(String.valueOf(getLongitude()));
+                            localizationsTable.setTimeStatus("Morning");
+                            localizationsTable.setUserName("Mike");
+                            localizationsRepo.insert(localizationsTable);
+
+
                             DirectionWay.saveToFile("-------------------MORNING SCREEN-----------------------");
                             morningScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
 
@@ -288,7 +202,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //                                HomeScreen homeScreen = new HomeScreen();
 //                                homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
 //                            }
-                        } else if(directionWay.isInWayToWork()){
+                        } else if(directionWay.getDirectionsStatus().isInWayToWork()){
                             //TravelToWorkScreen
 
                             //for now it is only for standard user time
@@ -303,7 +217,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             PropertiesValues.INTERVAL_TYPE = "OFTEN";
                             StandardRepeatIntervalProcessor.saveToFileIntervals("OFTEN - IS IN WAY TO WORK");
 
-                        } else if(directionWay.isInWork()){
+                        } else if(directionWay.getDirectionsStatus().isInWork()){
                             //WorkScreen
                             saveToFileLocalization("Work ");
                             DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
@@ -314,7 +228,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             PropertiesValues.INTERVAL_TYPE = "RARELY";
                             StandardRepeatIntervalProcessor.saveToFileIntervals("RARELY - IS IN WORK");
 
-                        } else if(directionWay.isInWayToHome()){
+                        } else if(directionWay.getDirectionsStatus().isInWayToHome()){
                             //TravelToHomeScreen
                             saveToFileLocalization("TravelToHome");
                             DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
@@ -405,6 +319,9 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
         LocalDateTime currentLocalDateTime = new LocalDateTime();
 
+
+
+
         File file;
         if(currentLocalDateTime.getHourOfDay() < 14){
             file = new File(dir, "MYTWAY_LOCALIZATION_MORNING.txt");
@@ -428,8 +345,223 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         fop.flush();
         fop.close();
 
+        saveToFileLocalizationNewVersion(screenTitle);
+
         System.out.println("Done");
     }
+
+    public void saveToFileLocalizationNewVersion(String screenTitle) throws IOException {
+        //-----------Only for saving current Localization to file-------
+//        File dir = new File ("c:/test/");
+        File sdCard = Environment.getExternalStorageDirectory();
+        File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
+
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+
+        LocalDateTime currentLocalDateTime = new LocalDateTime();
+        LocalDateTime yesterdayLocalDateTime = new LocalDateTime().minusDays(1);
+
+        File file;
+        if(currentLocalDateTime.getHourOfDay() < 14){
+            file = new File(dir, currentLocalDateTime.toString("dd-MM-yyyy") + "_MORNING.kml");
+        }else{
+            file = new File(dir, currentLocalDateTime.toString("dd-MM-yyyy") + "_AFTERNOON.kml");
+        }
+
+        if(!file.exists()){
+
+            File fileMorning = new File(dir, yesterdayLocalDateTime.toString("dd-MM-yyyy") + "_MORNING.kml");
+            File fileAfternoon = new File(dir, yesterdayLocalDateTime.toString("dd-MM-yyyy") + "_AFTERNOON.kml");
+
+            if(fileMorning.exists()){
+                if( ! isEndDocumentPutted("</Document>", fileMorning)){
+                    FileOutputStream fop = new FileOutputStream(fileMorning, true);
+                    StringBuilder yesterdayMorningXml = new StringBuilder();
+                    yesterdayMorningXml.append("  </Document>\n" + "</kml>");
+                    fop.write(yesterdayMorningXml.toString().getBytes());
+                    fop.flush();
+                    fop.close();
+                }
+            }
+
+            if(fileAfternoon.exists()){
+                if( ! isEndDocumentPutted("</Document>", fileAfternoon)){
+                    FileOutputStream fop = new FileOutputStream(fileAfternoon, true);
+                    StringBuilder yesterdayAfternoonXml = new StringBuilder();
+                    yesterdayAfternoonXml.append("  </Document>\n" + "</kml>");
+                    fop.write(yesterdayAfternoonXml.toString().getBytes());
+                    fop.flush();
+                    fop.close();
+                }
+            }
+
+            file.createNewFile();
+            FileOutputStream fop = new FileOutputStream(file, true);
+            StringBuilder pointXml = new StringBuilder();
+            pointXml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n" +
+                    "  <Document>\n" +
+                    "    <name>Paths</name>\n" +
+                    "    <description>Examples of paths. Note that the tessellate tag is by default\n" +
+                    "      set to 0. If you want to create tessellated lines, they must be authored\n" +
+                    "      (or edited) directly in KML.</description>\n" +
+                    "    <Style id=\"yellowLineGreenPoly\">\n" +
+                    "      <LineStyle>\n" +
+                    "        <color>7f00ffff</color>\n" +
+                    "        <width>4</width>\n" +
+                    "      </LineStyle>\n" +
+                    "      <PolyStyle>\n" +
+                    "        <color>7f00ff00</color>\n" +
+                    "      </PolyStyle>\n" +
+                    "    </Style>\n");
+            fop.write(pointXml.toString().getBytes());
+            fop.flush();
+            fop.close();
+        }
+
+        FileOutputStream fop = new FileOutputStream(file, true);
+        StringBuilder pointXml = new StringBuilder();
+
+        pointXml.append("\t<Placemark>\n" +
+                "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") +
+                "</name>\n" +
+                "        <description> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
+                "        <Point>\n" +
+                "            <coordinates> "+ getLongitude() + " , " + getLatitude() + " </coordinates>\n" +
+                "        </Point>\n" +
+                "    </Placemark>\n\n");
+
+        fop.write(pointXml.toString().getBytes());
+        fop.flush();
+        fop.close();
+
+        System.out.println("Done");
+    }
+
+    public boolean isEndDocumentPutted(String neededContent, File file){
+        try {
+            Scanner scanner = new Scanner(file);
+
+            int lineNum = 0;
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                lineNum++;
+                if(line.contains("</Document>")) {
+                    return true;
+                }
+            }
+        } catch(FileNotFoundException e) {
+            System.out.println("Problem with scanning file - " + e);
+        }
+
+        return false;
+    }
+
+    public android.location.Location getLocalization() {
+
+        try {
+            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+
+            // getting GPS status
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // getting network status
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                // location service disabled
+            } else {
+                this.canGetLocation = true;
+
+                // if GPS Enabled get lat/long using GPS Services
+                if (isGPSEnabled) {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    }
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                    Log.d("GPS Enabled", "GPS Enabled");
+                    if (locationManager != null) {
+                        android.location.Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        updateGPSCoordinates(gpsLocation);
+                        location = gpsLocation;
+                    }
+                }
+
+                if (isNetworkEnabled) {
+                    if (location == null) {
+
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                        Log.d("Network", "Network");
+
+                        if (locationManager != null) {
+                            android.location.Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            updateGPSCoordinates(networkLocation);
+                            location = networkLocation;
+                        }
+                    }
+                }else{
+                    Toast.makeText(mContext, "NIMA NETWORKA", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Error : Location", "Impossible to connect to LocationManager ", e);
+        }
+
+        return location;
+    }
+
+    public void updateGPSCoordinates(Location location) {
+        if (location != null) {
+            setLatitude(location.getLatitude());
+            setLongitude(location.getLongitude());
+        }
+    }
+
+    public boolean canGetLocation() {
+        return this.canGetLocation;
+    }
+
+    public void onLocationChanged(Location location) {
+//        Toast.makeText(mContext, "Localization Changed : lat:" + getLatitude() +" lon: "+ getLongitude(), Toast.LENGTH_SHORT).show();
+        updateGPSCoordinates(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        }
+    };
+
+    @Override
+    public void onCreate(){
+        IntentFilter filter = new IntentFilter();
+        mContext = getApplicationContext();
+        directionWay = new DirectionWay(mContext);
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        try {
+            computeMytwayWidget();
+        } catch (Exception e) {
+            Log.i(TAG, "Problem with method computeMytwayWidget in service", e);
+            e.printStackTrace();
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
 
     public void onDestroy(){
         unregisterReceiver(receiver);

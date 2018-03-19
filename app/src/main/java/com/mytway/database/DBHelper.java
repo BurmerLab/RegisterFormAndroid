@@ -3,6 +3,7 @@ package com.mytway.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.mytway.database.userLocalizations.UserLocalizationsTable;
 import com.mytway.database.userTimes.UserTimesTable;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 12;
     // Database Name
     private static final String DATABASE_NAME = "crud.db";
 
@@ -26,7 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 //    if not exists - only temporary
-    String CREATE_TABLE_USER = "CREATE TABLE if not exists " + UserTable.TABLE  + "("
+    String CREATE_TABLE_USER = "CREATE TABLE if not exists " + UserTable.TABLE  + "( "
             + UserTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
             + UserTable.KEY_USER_NAME + " TEXT not null unique, "
             + UserTable.EMAIL + " TEXT, "
@@ -55,7 +56,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + UserLocalizationsTable.CREATION_DATE + " TEXT, "
             + UserLocalizationsTable.LATITUDE + " TEXT, "
             + UserLocalizationsTable.LONGITUDE + " TEXT, "
-            + UserLocalizationsTable.TIME_STATUS + " TEXT )";
+            + UserLocalizationsTable.TIME_STATUS + " TEXT ) ";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -63,7 +64,6 @@ public class DBHelper extends SQLiteOpenHelper {
 //        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
 //        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
 //        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
-
 
         //All necessary tables you like to create will create here
         db.execSQL(CREATE_TABLE_USER);
@@ -73,49 +73,56 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper open(Context context) throws SQLException {
 //        myDataBase = this.getWritableDatabase();
-//        myDataBase =  getWritableDatabase();
-//        Log.d(TAG, "DbHelper Opening Version: " + this.myDataBase.getVersion());
+        myDataBase =  getMytwayWritableDatabase(context);
+        Log.d(TAG, "DbHelper Opening Version: " + this.myDataBase.getVersion());
         return this;
     }
 
     //http://stackoverflow.com/questions/7647566/why-is-onupgrade-not-being-invoked-on-android-sqlite-database
-//    public SQLiteDatabase getWritableDatabase(Context context) {
-//        SQLiteOpenHelper helper = new DBHelper(context);
-//        SQLiteDatabase myDataBase = helper.getWritableDatabase();
-//        int version = myDataBase.getVersion();
-//        if (version != DATABASE_VERSION) {
-//            myDataBase.beginTransaction();
-//            try {
-//                if (version == 0) {
-//                    onCreate(myDataBase);
-//                } else {
-//                    if (version > DATABASE_VERSION) {
-//                        onDowngrade(myDataBase, version, DATABASE_VERSION);
-//                    } else {
-//                        onUpgrade(myDataBase, version, DATABASE_VERSION);
-//                    }
-//                }
-//                myDataBase.setVersion(DATABASE_VERSION);
-//                myDataBase.setTransactionSuccessful();
-//            } finally {
-//                myDataBase.endTransaction();
-//            }
-//        }
-//        onOpen(myDataBase);
-//        return myDataBase;
-//    }
+    public SQLiteDatabase getMytwayWritableDatabase(Context context) {
+        SQLiteOpenHelper helper = new DBHelper(context);
+        SQLiteDatabase myDataBase = helper.getWritableDatabase();
+        int version = myDataBase.getVersion();
+        if (version != DATABASE_VERSION) {
+            myDataBase.beginTransaction();
+            try {
+                if (version == 0) {
+                    onCreate(myDataBase);
+                } else {
+                    if (version > DATABASE_VERSION) {
+                        onDowngrade(myDataBase, version, DATABASE_VERSION);
+                    } else {
+                        onUpgrade(myDataBase, version, DATABASE_VERSION);
+                    }
+                }
+                myDataBase.setVersion(DATABASE_VERSION);
+                myDataBase.setTransactionSuccessful();
+            } finally {
+                myDataBase.endTransaction();
+            }
+        }
+        onOpen(myDataBase);
+        return myDataBase;
+    }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed, all data will be gone!!!
-        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
+//        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
+//        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
+//        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
+
+        //ALTER TABLE foo ADD COLUMN new_column INTEGER DEFAULT 0
+        db.execSQL(CREATE_TABLE_USER_LOCALIZATIONS);
 
 
         // Create tables again
         onCreate(db);
     }
+
+//    SQLiteDatabase db = context.openOrCreateDatabase(mName, mEnableWriteAheadLogging ?
+//    Context.MODE_ENABLE_WRITE_AHEAD_LOGGING : 0,
+//    mFactory, mErrorHandler);
 
 }

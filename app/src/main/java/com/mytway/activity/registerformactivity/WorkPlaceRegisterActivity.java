@@ -67,7 +67,7 @@ public class WorkPlaceRegisterActivity extends FragmentActivity implements OnMap
 
                 Toast.makeText(WorkPlaceRegisterActivity.this.getApplicationContext(), "Latitude: " + latitudeLocalization +" Longitude: " + longitudeLocalization, Toast.LENGTH_LONG).show();
 
-                Position workPosition = new Position(latitudeLocalization, longitudeLocalization);
+                Position workPosition = new Position(longitudeLocalization, latitudeLocalization);
                 user.setWorkPlace(workPosition);
 
                 Intent intent = new Intent(WorkPlaceRegisterActivity.this, HomePlaceRegisterActivity.class);

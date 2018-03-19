@@ -315,7 +315,7 @@ public class Session {
 
     public Position getHomePlace() {
         if(getHomeLatitude() != null && getHomeLongitude() != null){
-            Position position = new Position(parseStringToDouble(getHomeLatitude()), parseStringToDouble(getHomeLongitude()));
+            Position position = new Position(parseStringToDouble(getHomeLongitude()), parseStringToDouble(getHomeLatitude()));
             this.homePlace = position;
         }
         return homePlace;
@@ -327,7 +327,7 @@ public class Session {
 
     public Position getWorkPlace() {
         if(getWorkLatitude() != null && getWorkLongitude() != null){
-            Position position = new Position(parseStringToDouble(getWorkLatitude()), parseStringToDouble(getWorkLongitude()));
+            Position position = new Position(parseStringToDouble(getWorkLongitude()), parseStringToDouble(getWorkLatitude()));
             this.workPlace = position;
         }
         return workPlace;
@@ -373,8 +373,8 @@ public class Session {
     public void setFullTimeTravelHomeToWork(Context context) {
         TravelTime travelTime = new TravelTime();
 
-        Position homePosition = new Position(Double.parseDouble(homeLatitude), Double.parseDouble(homeLongitude));
-        Position workPosition = new Position(Double.parseDouble(workLatitude), Double.parseDouble(workLongitude));
+        Position homePosition = new Position(Double.parseDouble(homeLongitude), Double.parseDouble(homeLatitude));
+        Position workPosition = new Position(Double.parseDouble(workLongitude), Double.parseDouble(workLatitude));
 
         GoogleMapsDirectionJson googleMapsDirectionJson = travelTime.getTravelTimeBetweenTwoPositions(context, homePosition, workPosition);
         String fullTimeTravelHomeToWork = "" + googleMapsDirectionJson.getLegs().getDuration().getValue();

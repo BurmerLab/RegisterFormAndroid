@@ -96,7 +96,7 @@ public class TimeToDepartureTest extends TestCase {
         timeToDeparture.setCurrentTime(currentTime);
         timeToDeparture.setTravelTime(travelTime);
 
-        Position currentPosition = new Position(10.00, 20.00);
+        Position currentPosition = new Position(20.00, 10.00);
 
         //When
         timeToDeparture.processTime(context, currentPosition, session);
@@ -141,7 +141,7 @@ public class TimeToDepartureTest extends TestCase {
         timeToDeparture.setCurrentTime(currentTime);
         timeToDeparture.setTravelTime(travelTime);
 
-        Position currentPosition = new Position(10.00, 20.00);
+        Position currentPosition = new Position(20.00, 10.00);
 
         //When
         timeToDeparture.processTime(context, currentPosition, session);

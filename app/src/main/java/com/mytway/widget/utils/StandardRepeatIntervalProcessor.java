@@ -58,7 +58,7 @@ public class StandardRepeatIntervalProcessor {
         // E- end work time
         //-----------|---C----S---C---|------------------------------------|---C-----E-----C----|---------
 
-        if((directionWay.isInWayToWork() || directionWay.isInWayToHome()) ||
+        if((directionWay.getDirectionsStatus().isInWayToWork() || directionWay.getDirectionsStatus().isInWayToHome()) ||
                 (currentTime.isAfter(timeLeaveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(startWorkTime.plusHours(ONE_HOUR)))
                 || (currentTime.isAfter(timeArriveHome.minusHours(ONE_HOUR)) && currentTime.isBefore(timeArriveHome.plusHours(ONE_HOUR)))
                 ) {

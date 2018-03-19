@@ -11,6 +11,7 @@ import android.widget.RemoteViews;
 import com.mytway.behaviour.pojo.DirectionWay;
 import com.mytway.behaviour.pojo.screens.MorningScreen;
 import com.mytway.pojo.Position;
+import com.mytway.properties.PropertiesValues;
 import com.mytway.utility.Session;
 import com.mytway.utility.TravelTime;
 import com.mytway.utility.permission.PermissionUtil;
@@ -29,6 +30,8 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Log.class, PermissionUtil.class})
@@ -82,8 +85,8 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         Mockito.when(locationMock.getLatitude()).thenReturn(22.0d);
         Mockito.when(locationMock.getLongitude()).thenReturn(33.0d);
 
-        Mockito.when(directionWayMock.isInHome()).thenReturn(true);
-        Position mockedCurrentPosition = new Position(22.0d, 33.0d);
+        Mockito.when(directionWayMock.getDirectionsStatus().isInHome()).thenReturn(true);
+        Position mockedCurrentPosition = new Position(33.0d, 22.0d);
 
         Mockito.doNothing().when(directionWayMock).decideTravelDirectionsAre(mockedCurrentPosition, sessionMock);
 
@@ -124,5 +127,23 @@ public class MytwayGeolocalizationServiceTest extends TestCase{
         System.out.println("TUTAJ: " + localDateTime.toString("dd-mm-yyyy MM:hh:ss"));
         System.out.println("TUTAJ2: " + localDateTime.toString("dd-mm-yyyy MM:hh:ss aa"));
         //TUTAJ: 2017-03-29T17:04:18.213
+    }
+
+    @Test
+    public void testOfScanner(){
+        //given
+        ClassLoader classLoader = getClass().getClassLoader();
+        PropertiesValues.MOCK_APP_TO_TESTS = true;
+        File fileWithDocumentEnd = new File(classLoader.getResource("kmls/14-03-2018_MORNING.kml").getFile());
+        File fileWthoutDocumentEnd = new File(classLoader.getResource("kmls/15-03-2018_MORNING.kml").getFile());
+
+        //when
+        boolean resultWithEnd = serviceInjectMocks.isEndDocumentPutted("</Document>", fileWithDocumentEnd);
+        boolean resultWithoutEnd = serviceInjectMocks.isEndDocumentPutted("</Document>", fileWthoutDocumentEnd);
+
+        //then
+        assertTrue(resultWithEnd);
+        assertFalse(resultWithoutEnd);
+
     }
 }

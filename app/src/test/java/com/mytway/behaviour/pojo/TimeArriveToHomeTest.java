@@ -66,8 +66,8 @@ public class TimeArriveToHomeTest extends TestCase {
         timeArriveToHomeWithInjectMock.setCurrentTime(currentTime);
 
         //Context context, Position currentPosition, Session session, LocalDateTime startWorkTime
-        Position currentPosition = new Position( 50.007520, 20.866382);//position1: Bogumilowice ~5km to home
-        Position homePosition = new Position(50.057135, 20.895283);//Bobrowniki Male 61
+        Position currentPosition = new Position(20.866382, 50.007520);//position1: Bogumilowice ~5km to home
+        Position homePosition = new Position(20.895283, 50.057135);//Bobrowniki Male 61
 
         GoogleMapsDirectionJson gMapsDirectionToWork = creategMapsDirectionJson("100km", 600);//600s - 10min
         GoogleMapsDirectionJson gMapsDirectionToHome = creategMapsDirectionJson("100km", 1200);//1200s - 20min

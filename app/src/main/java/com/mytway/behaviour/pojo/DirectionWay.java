@@ -14,6 +14,7 @@ import org.joda.time.LocalDateTime;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,10 +26,6 @@ public class DirectionWay {
     private static final String TAG = "DirectionWay";
     private static final int THREE_DISTANCES = 3;
     private static final double HOME_OR_WORK_ZONE = 300.0;
-    private Boolean wayToWork = FALSE;
-    private Boolean wayToHome = FALSE;
-    private Boolean isInWork = FALSE;
-    private Boolean isInHome = FALSE;
 
     private Context context;
 
@@ -44,21 +41,18 @@ public class DirectionWay {
     private List<Double> previousDistancesToHome = new LinkedList<>();
     private List<Double> previousDistancesToWork = new LinkedList<>();
 
-    boolean isSavedArriveToHomeTimeExecuted = false;
-    boolean isSavedLeaveHomeTimeExecuted = false;
-    boolean isSavedStartWorkTimeExecuted = false;
-    boolean isSavedLeaveWorkTimeExecuted = false;
-
     private UserDailyTimes userDailyTimes;
+    private DirectionsStatus directionsStatus;
 
     public DirectionWay(Context context) {
         setContext(context);
-        userDailyTimes =new UserDailyTimes(context);
+        userDailyTimes = new UserDailyTimes(context);
+        directionsStatus = new DirectionsStatus(context);
     }
 
     public DirectionWay(boolean wayToWork, boolean wayToHome) {
-        this.wayToWork = wayToWork;
-        this.wayToHome = wayToHome;
+        directionsStatus.setWayToWork(wayToWork);
+        directionsStatus.setWayToHome(wayToHome);
     }
 
     public void setPreviousDistancesToHome(List<Double> previousDistancesToHome) {
@@ -77,9 +71,9 @@ public class DirectionWay {
         double currentDistToHomeInM = obtainDistanceBetweenInMeters(currentPosition, homePosition);
         double currentDistToWorkInM = obtainDistanceBetweenInMeters(currentPosition, workPosition);
 
-        setFirstDirections(currentPosition, homePosition, workPosition, currentDistToHomeInM);
+        calculateFirstDirection(currentPosition, homePosition, workPosition, currentDistToHomeInM);
 
-        if(isInHome()) {
+        if(directionsStatus.isInHome()) {
             //can be isStillInHome or wayToWork
             if(isStillInHome(currentDistToHomeInM)){
                 inHomeOperations();
@@ -87,7 +81,8 @@ public class DirectionWay {
                 inWayToWorkOperations();
                 saveToFileDirections("IS IN WAY TO WORK");
             }
-        }else if(isInWayToWork()){
+
+        }else if(directionsStatus.isInWayToWork()){
             //can be wayToWork or isStillInWork or isStillInHome
             if(isStillInWork(currentDistToWorkInM)){
                 inWorkOperations();
@@ -99,16 +94,17 @@ public class DirectionWay {
             }else{
                 inWayToWorkOperations();
             }
-        }else if(isInWork()){
+
+        }else if(directionsStatus.isInWork()){
             //can be isStillInWork or wayToHome
             if(isStillInWork(currentDistToWorkInM)){
                 inWorkOperations();
             }else{
                 inWayToHomeOperations();
                 saveToFileDirections("IS IN WAY TO HOME");
-
             }
-        }else if(isInWayToHome()){
+
+        }else if(directionsStatus.isInWayToHome()){
             //can be isStillInHome or wayToHome or isStillInWork
             if(isStillInHome(currentDistToHomeInM)) {
                 inHomeOperations();
@@ -121,6 +117,7 @@ public class DirectionWay {
             }else{
                 inWayToHomeOperations();
             }
+
         }else{
             saveToFile("NIE ZNALAZLEM KIERUNKU :(");
             saveToFileDirections("NIE ZNALAZLEM KIERUNKU ");
@@ -129,84 +126,92 @@ public class DirectionWay {
 
     public void inHomeOperations() {
         saveToFile("SETUP IS IN HOME");
-        setIsInHome(TRUE);
-        setIsInWork(FALSE);
-        setWayToHome(FALSE);
-        setWayToWork(FALSE);
+        directionsStatus.setIsInHome(TRUE);
+        directionsStatus.setIsInWork(FALSE);
+        directionsStatus.setWayToHome(FALSE);
+        directionsStatus.setWayToWork(FALSE);
 
+        clearLeaveHomeTime();
+
+        saveToFileDatabaseTimes("===========wasSavedLeaveWorkTimeBefore = " +  userDailyTimes.getWasSavedLeaveWorkTimeBefore() + "===========");
         if(isLeaveWorkTimeNotNullAndWasntSavedBefore()){
             saveToFileDatabaseTimes("IN HOME - LeaveWork - " + userDailyTimes.getLeaveWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
-            clearLeaveWorkTime();
+            userDailyTimes.setWasSavedLeaveWorkTimeBefore(true);
         }
 
         setUpArriveToHomeTime();
 
+        saveToFileDatabaseTimes("===========wasSavedArriveToHomeTimeBefore = " + userDailyTimes.getWasSavedArriveToHomeTimeBefore() + "===========");
         if(isArriveToHomeTimeNotNullAndWasntSavedBefore()) {
             saveToFileDatabaseTimes("IN HOME - ArriveToHome - " + userDailyTimes.getArriveToHomeTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
-            isSavedArriveToHomeTimeExecuted = true;
-            clearArriveToHomeTime();
+            userDailyTimes.setWasSavedArriveToHomeTimeBefore(true);
         }
     }
 
     public void inWayToWorkOperations() {
         saveToFile("SETUP IS IN WAY TO WORK");
-        setIsInHome(FALSE);
-        setIsInWork(FALSE);
-        setWayToHome(FALSE);
-        setWayToWork(TRUE);
+        directionsStatus.setIsInHome(FALSE);
+        directionsStatus.setIsInWork(FALSE);
+        directionsStatus.setWayToHome(FALSE);
+        directionsStatus.setWayToWork(TRUE);
 
-        //setup leave home time
+        clearLeaveWorkTime();
+
         setUpLeaveHomeTime();
     }
 
     public void inWorkOperations() {
         saveToFile("SETUP IS IN WORK");
-        setIsInHome(FALSE);
-        setIsInWork(TRUE);
-        setWayToHome(FALSE);
-        setWayToWork(FALSE);
+        directionsStatus.setIsInHome(FALSE);
+        directionsStatus.setIsInWork(TRUE);
+        directionsStatus.setWayToHome(FALSE);
+        directionsStatus.setWayToWork(FALSE);
 
+        clearLeaveWorkTime();
+        clearArriveToHomeTime();
+
+        saveToFileDatabaseTimes("===========wasSavedLeaveHomeTimeBefore = " + userDailyTimes.getWasSavedLeaveHomeTimeBefore() + "===========");
         if(isLeaveHomeTimeNotNullAndWasntSavedBefore()){
             saveToFileDatabaseTimes("IN WORK - LeaveHome - " + userDailyTimes.getLeaveHomeTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
-            isSavedLeaveHomeTimeExecuted = true;
-            clearLeaveHomeTime();
+            userDailyTimes.setWasSavedLeaveHomeTimeBefore(true);
         }
 
         setUpStartWorkTime();
 
+        saveToFileDatabaseTimes("===========wasSavedStartWorkTimeBefore = " + userDailyTimes.getWasSavedStartWorkTimeBefore() + "===========");
         if(isStartWorkTimeNotNullAndWasntSavedBefore()){
             saveToFileDatabaseTimes("IN WORK - StartWorkTime - " + userDailyTimes.getStartWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
-            isSavedStartWorkTimeExecuted = true;
+            userDailyTimes.setWasSavedStartWorkTimeBefore(true);
         }
     }
 
     public void inWayToHomeOperations() {
         saveToFile("SETUP IS IN WAY TO HOME");
-        setIsInHome(FALSE);
-        setIsInWork(FALSE);
-        setWayToHome(TRUE);
-        setWayToWork(FALSE);
+        directionsStatus.setIsInHome(FALSE);
+        directionsStatus.setIsInWork(FALSE);
+        directionsStatus.setWayToHome(TRUE);
+        directionsStatus.setWayToWork(FALSE);
 
+        clearLeaveHomeTime();
         clearStartWorkTime();
 
-        //Setup leaveWorkTime
         setUpLeaveWorkTime();
     }
 
     public boolean isArriveToHomeTimeNotNullAndWasntSavedBefore() {
-        return userDailyTimes.getArriveToHomeTime() != null && !isSavedArriveToHomeTimeExecuted;
+        return userDailyTimes.getArriveToHomeTime() != null && !userDailyTimes.getWasSavedArriveToHomeTimeBefore();
     }
 
     public boolean isLeaveWorkTimeNotNullAndWasntSavedBefore() {
-        return userDailyTimes.getLeaveWorkTime() != null && !isSavedLeaveWorkTimeExecuted;
+        return userDailyTimes.getLeaveWorkTime() != null && !userDailyTimes.getWasSavedLeaveWorkTimeBefore();
     }
 
     public boolean isStartWorkTimeNotNullAndWasntSavedBefore() {
-        return userDailyTimes.getStartWorkTime() != null && !isSavedStartWorkTimeExecuted;
+        return userDailyTimes.getStartWorkTime() != null && !userDailyTimes.getWasSavedStartWorkTimeBefore();
     }
 
     public boolean isLeaveHomeTimeNotNullAndWasntSavedBefore() {
-        return userDailyTimes.getLeaveHomeTime() != null && !isSavedLeaveHomeTimeExecuted;
+        return userDailyTimes.getLeaveHomeTime() != null && !userDailyTimes.getWasSavedLeaveHomeTimeBefore();
     }
 
     public void setUpLeaveHomeTime(){
@@ -239,22 +244,22 @@ public class DirectionWay {
 
     public void clearArriveToHomeTime(){
         userDailyTimes.clearArriveToHomeTime();
-        isSavedArriveToHomeTimeExecuted = false;
+        userDailyTimes.clearWasSavedArriveToHomeTimeBefore();
     }
 
     public void clearLeaveWorkTime(){
         userDailyTimes.clearLeaveWorkTime();
-        isSavedLeaveWorkTimeExecuted = false;
+        userDailyTimes.clearWasSavedLeaveWorkTimeBefore();
     }
 
     public void clearLeaveHomeTime(){
         userDailyTimes.clearLeaveHomeTime();
-        isSavedLeaveHomeTimeExecuted = false;
+        userDailyTimes.clearWasSavedLeaveHomeTimeBefore();
     }
 
     public void clearStartWorkTime(){
         userDailyTimes.clearStartWorkTime();
-        isSavedStartWorkTimeExecuted = false;
+        userDailyTimes.clearWasSavedStartWorkTimeBefore();
     }
 
     public boolean isStillInWork(double currentDistanceToWorkInMeters) {
@@ -265,51 +270,63 @@ public class DirectionWay {
         return PropertiesValues.SAFE_LENGTH_AROUND_HOME_AND_WORK_IN_METERS > currentDistanceToHomeInMeters;
     }
 
-    public void setFirstDirections(Position currentPosition, Position homePosition, Position workPosition, double currentDistanceToHomeInMeters) {
-        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
+    public void calculateFirstDirection(Position currentPosition, Position homePosition, Position workPosition, double currentDistanceToHomeInMeters) {
+        if( !directionsStatus.isInHome() && !directionsStatus.isInWork() && !directionsStatus.isInWayToWork() && !directionsStatus.isInWayToHome()){
+            saveToFile("setFirstDirection, inHome, inWork, wayTowork, wayToWOrk = FALSE");
             decideIsInHome(currentPosition, homePosition);
             decideIsInWork(currentPosition, workPosition);
             obtainStartCurrentDirection(currentDistanceToHomeInMeters);
         }else{
-            saveToFile("HOME: " + isInHome());
-            saveToFile("WORK: " + isInWork());
-            saveToFile("WAY HOME" + isInWayToHome());
-            saveToFile("WAY WORK" + isInWayToWork());
+            saveToFile("HOME: " + directionsStatus.isInHome());
+            saveToFile("WORK: " + directionsStatus.isInWork());
+            saveToFile("WAY HOME" + directionsStatus.isInWayToHome());
+            saveToFile("WAY WORK" + directionsStatus.isInWayToWork());
         }
+
+        previousDistancesToHome.add(currentDistanceToHomeInMeters);
+        stayOnlyNewestDecisions(previousDistancesToHome);
     }
 
     public void obtainStartCurrentDirection(double currentDistanceToHomeInMeters) {
 //        saveToFile("WSZYSTKIE FLAGI FALSE, DEFAULT: is in home");
-        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
-            //Countaing is user in way to home or work
-            if(previousDistancesToHome.size() == 0){
-                previousDistancesToHome.add(currentDistanceToHomeInMeters);
-            }
+        if( !directionsStatus.isInHome() && !directionsStatus.isInWork() && !directionsStatus.isInWayToWork() && !directionsStatus.isInWayToHome()){
 
-            if(previousDistancesToHome.size() > 0){
+            if(previousDistancesToHome.size() > 1){
                 double previousDistanceToHome =  previousDistancesToHome.get(previousDistancesToHome.size() - 1);
+                //todo; prztestowac to w unit tescie
+
                 if(previousDistanceToHome > currentDistanceToHomeInMeters){
                     saveToFile("KIERUNEK: SETUP way to home");
-                    setIsInHome(FALSE);
-                    setIsInWork(FALSE);
-                    setWayToHome(TRUE);
-                    setWayToWork(FALSE);
+                    saveToFile("KIERUNEK: previousDistanceToHome = " + previousDistanceToHome);
+                    saveToFile("KIERUNEK: currentDistanceToHomeInMeters = " + currentDistanceToHomeInMeters);
+                    saveToFile("KIERUNEK: previousDistanceToHome > currentDistanceToHomeInMeters = " + (previousDistanceToHome > currentDistanceToHomeInMeters));
+
+                    directionsStatus.setIsInHome(FALSE);
+                    directionsStatus.setIsInWork(FALSE);
+                    directionsStatus.setWayToHome(TRUE);
+                    directionsStatus.setWayToWork(FALSE);
                 }else{
                     saveToFile("KIERUNEK ELSE: SETUP way to work");
-                    setIsInHome(FALSE);
-                    setIsInWork(FALSE);
-                    setWayToHome(FALSE);
-                    setWayToWork(TRUE);
+                    saveToFile("KIERUNEK: previousDistanceToHome = " + previousDistanceToHome);
+                    saveToFile("KIERUNEK: currentDistanceToHomeInMeters = " + currentDistanceToHomeInMeters);
+                    saveToFile("KIERUNEK: previousDistanceToHome > currentDistanceToHomeInMeters = " + (previousDistanceToHome > currentDistanceToHomeInMeters));
+
+                    directionsStatus.setIsInHome(FALSE);
+                    directionsStatus.setIsInWork(FALSE);
+                    directionsStatus.setWayToHome(FALSE);
+                    directionsStatus.setWayToWork(TRUE);
                 }
-                previousDistancesToHome.add(currentDistanceToHomeInMeters);
-                stayOnlyNewestDecisions(previousDistancesToHome);
+            }else{
+                saveToFile("previousDistancesToHome == 0 pomiarow");
             }
         }
     }
 
     public void stayOnlyNewestDecisions(List<Double> elements) {
         while(elements.size() >= 5){
+            Collections.reverse(elements);
             elements.subList(Math.max(elements.size() - 3, 0), elements.size()).clear();
+            Collections.reverse(elements);
         }
     }
 
@@ -448,73 +465,10 @@ public class DirectionWay {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-    }
-
-    private boolean decideIsMoveWayToHomeBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToHomeList) {
-        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
-        saveToFile(" previousBooleansIsWayToHomeList.size(): " + previousBooleansIsWayToHomeList.size());
-        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
-
-        for(Boolean previousDecision : previousBooleansIsWayToHomeList){
-            saveToFile("previousDecision HOME: " + previousDecision);
-        }
-
-        if(previousBooleansIsWayToHomeList.size() >= 2){
-            saveToFile("wayToHome = " + wayToHome);
-            return checkIsTrueDecisionIsMoreThenFalseInWayList(previousBooleansIsWayToHomeList);
         }else{
-            Log.i(TAG, "isWayToHome list is less then three boolean");
-            return false;
-        }
-    }
-
-    public boolean decideIsMoveWayToWorkBasedOnPreviousDecisions(List<Boolean> previousBooleansIsWayToWorkList) {
-        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
-        saveToFile(" previousBooleansIsWayToWorkList.size(): " + previousBooleansIsWayToWorkList.size());
-        saveToFile(" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
-
-        for(Boolean previousDecision : previousBooleansIsWayToWorkList){
-            saveToFile("previousDecision WORK: " + previousDecision);
+            System.out.println(content);
         }
 
-        if(previousBooleansIsWayToWorkList.size() >= 2){
-//            wayToWork = checkIsTrueDecisionIsMoreThenFalseInWayList(previousBooleansIsWayToWorkList);
-            saveToFile("wayToWork = " + wayToWork);
-            return checkIsTrueDecisionIsMoreThenFalseInWayList(previousBooleansIsWayToWorkList);
-        }else{
-            Log.i(TAG, "isWayToHome list is less then three boolean");
-            return false;
-        }
-    }
-
-    private Boolean checkIsTrueDecisionIsMoreThenFalseInWayList(List<Boolean> previousBooleansIsWayList) {
-        int trueDecision = 0;
-        int falseDecision = 0;
-
-        for(boolean decide : previousBooleansIsWayList){
-            if(decide){
-                trueDecision++;
-            }else{
-                falseDecision++;
-            }
-        }
-        return trueDecision > falseDecision;
-    }
-
-    public Boolean obtainDirection(List<Double> previousDistancesList, double currentDistanceToPoint){
-
-        int i = previousDistancesList.size() - 1;
-        saveToFile(">>> currentDistanceToPoint: " + currentDistanceToPoint);
-        saveToFile(">>> i: " + i);
-        if(currentDistanceToPoint < previousDistancesList.get(i)){
-//            saveToFile("Direction Decision: TRUE ");
-            return TRUE;
-        }else{
-//            saveToFile("Direction Decision: FALSE ");
-            return FALSE;
-        }
     }
 
     public double obtainDistanceBetweenInMeters(Position currentPosition, Position secondPlace){
@@ -529,34 +483,34 @@ public class DirectionWay {
 
     public void decideIsInHome(Position currentPosition, Position homePosition){
         if(decideIsInPlace(currentPosition, homePosition)){
-            setIsInHome(TRUE);
-            setIsInWork(FALSE);
-            setWayToHome(FALSE);
-            setWayToWork(FALSE);
+            directionsStatus.setIsInHome(TRUE);
+            directionsStatus.setIsInWork(FALSE);
+            directionsStatus.setWayToHome(FALSE);
+            directionsStatus.setWayToWork(FALSE);
 
             saveToFile("\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
             saveToFile("<<<<<<<<<<<<<<<< IS IN HOME DECISION TRUE >>>>>>>>>>>>>>>>>>");
         }else{
             saveToFile("<<<<<<<<<<<<<<<< NOT IN HOME >>>>>>>>>>>>>>>>>>");
-            setIsInHome(FALSE);
+            directionsStatus.setIsInHome(FALSE);
 
         }
     }
 
     public void decideIsInWork(Position currentPosition, Position workPosition){
-        if( !isInHome() && !isInWork() && !isInWayToWork() && !isInWayToHome()){
+        if( !directionsStatus.isInHome() && !directionsStatus.isInWork() && !directionsStatus.isInWayToWork() && !directionsStatus.isInWayToHome()){
             if(decideIsInPlace(currentPosition, workPosition)){
-                setIsInWork(TRUE);
-                setIsInHome(FALSE);
-                setWayToHome(FALSE);
-                setWayToWork(FALSE);
+                directionsStatus.setIsInWork(TRUE);
+                directionsStatus.setIsInHome(FALSE);
+                directionsStatus.setWayToHome(FALSE);
+                directionsStatus.setWayToWork(FALSE);
 
                 saveToFile("\n\n<<<<<<<<<<<<<<<<  >>>>>>>>>>>>>>>>>>");
                 saveToFile("<<<<<<<<<<<<<<<< IS IN WORK >>>>>>>>>>>>>>>>>>");
 
             }else{
                 saveToFile("<<<<<<<<<<<<<<<< NOT IN WORK >>>>>>>>>>>>>>>>>>");
-                setIsInWork(FALSE);
+                directionsStatus.setIsInWork(FALSE);
             }
         }
     }
@@ -578,22 +532,6 @@ public class DirectionWay {
         }
     }
 
-    public Boolean isWayToWork() {
-        return wayToWork;
-    }
-
-    public void setWayToWork(boolean wayToWork) {
-        this.wayToWork = wayToWork;
-    }
-
-    public Boolean isWayToHome() {
-        return wayToHome;
-    }
-
-    public void setWayToHome(boolean wayToHome) {
-        this.wayToHome = wayToHome;
-    }
-
     public List<Double> getDistancesToHomeList() {
         return distancesToHomeList;
     }
@@ -608,38 +546,6 @@ public class DirectionWay {
 
     public void setDistanceBetweenHomeAndWork(Distance distanceBetweenHomeAndWork) {
         this.distanceBetweenHomeAndWork = distanceBetweenHomeAndWork;
-    }
-
-    public Boolean getIsInWork() {
-        return isInWork;
-    }
-
-    public void setIsInWork(Boolean isInWork) {
-        this.isInWork = isInWork;
-    }
-
-    public Boolean getIsInHome() {
-        return isInHome;
-    }
-
-    public void setIsInHome(Boolean isInHome) {
-        this.isInHome = isInHome;
-    }
-
-    public boolean isInHome() {
-        return isInHome && !isInWork && !wayToHome && !wayToWork;
-    }
-
-    public boolean isInWork() {
-        return isInWork && !isInHome && !wayToHome && !wayToWork;
-    }
-
-    public boolean isInWayToWork() {
-        return wayToWork && !isInWork && !isInHome && !wayToHome;
-    }
-
-    public boolean isInWayToHome() {
-        return wayToHome && !isInWork && !isInHome && !wayToWork;
     }
 
     public List<Double> getDistancesToWorkList() {
@@ -666,16 +572,6 @@ public class DirectionWay {
         this.isInWayToWorkPreviousDecisions = isInWayToWorkPreviousDecisions;
     }
 
-    public void setWayToWork(Boolean wayToWork) {
-        this.wayToWork = wayToWork;
-    }
-
-    public void setWayToHome(Boolean wayToHome) {
-        this.wayToHome = wayToHome;
-    }
-
-
-
     public double getPercentageDistanceBtwHomeAndWork() {
         return percentageDistanceBtwHomeAndWork;
     }
@@ -698,5 +594,13 @@ public class DirectionWay {
 
     public void setContext(Context context) {
         this.context = context;
+    }
+
+    public DirectionsStatus getDirectionsStatus() {
+        return directionsStatus;
+    }
+
+    public void setDirectionsStatus(DirectionsStatus directionsStatus) {
+        this.directionsStatus = directionsStatus;
     }
 }
