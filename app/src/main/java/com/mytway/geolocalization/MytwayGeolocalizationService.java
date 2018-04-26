@@ -89,7 +89,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
     public MytwayGeolocalizationService(Context context) {
         this.mContext = context;
-//        TODO: prawdopodobnie do wywalenia bo uzyte jest computeMytwayWidget()
         directionWay = new DirectionWay(mContext);
     }
 
@@ -135,7 +134,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 saveToFile("----------------------------------------------------\n", "DirectionWay.txt");
 
 //                directionWay.getPercentageOfDistanceBtwHomeAndWorkInMeters();
-                directionWay.decideTravelDirectionsAre(currentPosition, session);
+                directionWay.decideTravelDirectionsAre(currentPosition);
 
                 saveToFile("--------------------AFTER-------------------------", "DirectionWay.txt");
                 saveToFile("------isInWayToWork: " + directionWay.getDirectionsStatus().isInWayToWork() + " -------- ", "DirectionWay.txt");
@@ -176,7 +175,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                               //todo: correct code, commented only for testing
 //                            if(timeToStartMorningScreen.getHourOfDay() < Hours.FIVE.getHours()){
                             //Morning screen
-                            saveToFileLocalization("Morning");
+                            saveToFileLocalizationNewVersion("Morning");
 
                             UserLocalizationsRepo localizationsRepo = new UserLocalizationsRepo(mContext);
                             UserLocalizationsTable localizationsTable = new UserLocalizationsTable();
@@ -197,7 +196,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 //
 //
 // }else{
-//                                saveToFileLocalization("Home screen");
+//                                saveToFileLocalizationNewVersion("Home screen");
 //                                DirectionWay.saveToFile("\n\n-------------------Home SCREEN-----------------------");
 //                                HomeScreen homeScreen = new HomeScreen();
 //                                homeScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, whenUserLeaveHome);
@@ -208,7 +207,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             //for now it is only for standard user time
                             StandardRepeatIntervalProcessor.calculateSamplingTimeOfWidgetRepeatForStandardUser(session, travelTime, directionWay);
 
-                            saveToFileLocalization("TravelToWork");
+                            saveToFileLocalizationNewVersion("TravelToWork");
                             DirectionWay.saveToFile("\n\n-------------------TravelToWork SCREEN-----------------------");
                             TravelToWorkScreen travelToWorkScreen = new TravelToWorkScreen();
                             travelToWorkScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, travelTime, useEstimate);
@@ -219,7 +218,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                         } else if(directionWay.getDirectionsStatus().isInWork()){
                             //WorkScreen
-                            saveToFileLocalization("Work ");
+                            saveToFileLocalizationNewVersion("Work ");
                             DirectionWay.saveToFile("\n\n-------------------Work SCREEN-----------------------");
                             WorkScreen workScreen = new WorkScreen();
                             workScreen.prepareScreen(view, directionWay, session, mContext, currentPosition, startWorkTime, travelTime, useEstimate);
@@ -230,7 +229,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
 
                         } else if(directionWay.getDirectionsStatus().isInWayToHome()){
                             //TravelToHomeScreen
-                            saveToFileLocalization("TravelToHome");
+                            saveToFileLocalizationNewVersion("TravelToHome");
                             DirectionWay.saveToFile("\n\n-------------------TravelToHome SCREEN-----------------------");
                             TravelToHomeScreen travelToHomeScreen = new TravelToHomeScreen();
 
@@ -242,7 +241,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                             StandardRepeatIntervalProcessor.saveToFileIntervals("OFTEN - IS IN WAY TO HOME");
 
                         } else {
-                            saveToFileLocalization("Not Found yet");
+                            saveToFileLocalizationNewVersion("Not Found yet");
                             DirectionWay.saveToFile("\n\n------------------NOT FOUNDED YET-----------------------");
                             view.setTextViewText(R.id.title, "NOT FOUNDED YET " + time);
                         }
@@ -252,7 +251,7 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
                 }
 
             }else{
-                saveToFileLocalization("Not Permissions granded");
+                saveToFileLocalizationNewVersion("Not Permissions granded");
                 view.setTextViewText(R.id.title, "Not Permissions granded " + time);
                 view.setImageViewResource(R.id.refreshImage, R.drawable.ic_error);
                 MyWidgetProvider.openNewActivity(mContext, manager, manager.getAppWidgetIds(thisWidget), view, R.id.refreshImage, new String[0]);
@@ -306,48 +305,6 @@ public class MytwayGeolocalizationService extends Service implements LocationLis
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void saveToFileLocalization(String screenTitle) throws IOException {
-        //-----------Only for saving current Localization to file-------
-        File sdCard = Environment.getExternalStorageDirectory();
-        File dir = new File (sdCard.getAbsolutePath() + "/dir1/dir2");
-
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-
-        LocalDateTime currentLocalDateTime = new LocalDateTime();
-
-
-
-
-        File file;
-        if(currentLocalDateTime.getHourOfDay() < 14){
-            file = new File(dir, "MYTWAY_LOCALIZATION_MORNING.txt");
-        }else{
-            file = new File(dir, "MYTWAY_LOCALIZATION_AFTERNOON.txt");
-        }
-
-        FileOutputStream fop = new FileOutputStream(file, true);
-        StringBuilder pointXml = new StringBuilder();
-
-        pointXml.append("<Placemark>\n" +
-                "        <name> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") +
-                         "</name>\n" +
-                "        <description> " + screenTitle + " " + currentLocalDateTime.toString("dd-MM-yyyy hh:mm:ss aa") + "</description>\n" +
-                "        <Point>\n" +
-                "            <coordinates> "+ getLongitude() + " , " + getLatitude() + " </coordinates>\n" +
-                "        </Point>\n" +
-                "    </Placemark>\n\n");
-
-        fop.write(pointXml.toString().getBytes());
-        fop.flush();
-        fop.close();
-
-        saveToFileLocalizationNewVersion(screenTitle);
-
-        System.out.println("Done");
     }
 
     public void saveToFileLocalizationNewVersion(String screenTitle) throws IOException {

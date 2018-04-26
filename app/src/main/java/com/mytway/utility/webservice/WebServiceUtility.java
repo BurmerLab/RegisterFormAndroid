@@ -103,13 +103,21 @@ public class WebServiceUtility {
         return isUserNameExistInExternalDatabase;
     }
 
-    public static boolean insertUserAccountToExternalDatabase(Context context, UserTable userTable, String jsonUserData) {
+    //todo: pozmieniac na zwracanie int, wszrdzie tam gdzie jest uzwyana ta metoda
+    public static int insertUserAccountToExternalDatabase(Context context, UserTable userTable, String jsonUserData) {
+
+        Integer userIdAddedInExternalDB = null;
         if(EthernetConnectivity.isEthernetOnline(context)){
             Toast.makeText(context, "Insert to External DB", Toast.LENGTH_SHORT).show();
-            new MytwayWebserviceInsertUser().execute(userTable.userName, jsonUserData);
-            return true;
+            MytwayWebserviceInsertUser mytwayWebserviceInsertUser = new MytwayWebserviceInsertUser();
+
+            try {
+                userIdAddedInExternalDB = (Integer) mytwayWebserviceInsertUser.execute(userTable.userName, jsonUserData).get();
+            } catch (Exception e) {
+                Log.i(TAG, "Problem with inserting User to External Database");
+            }
         }
-        return false;
+        return userIdAddedInExternalDB;
     }
 
     public static boolean updateUserAccountInExternalDatabase(Context context, UserTable userTable, String jsonUserData) {

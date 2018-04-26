@@ -24,7 +24,8 @@ public class ScheduledProcess {
         if(!sharedPreferences.getString(INSERT_ACCOUNT_USER_TO_EXTERNAL_DB, EMPTY).equals(EMPTY)){
             //INSERT TO EXTERNAL DB
             MytwayGeolocalizationService.saveToFile("INSERT = true","scheduled.txt");
-            if(WebServiceUtility.insertUserAccountToExternalDatabase(context, userTable, jsonUserData)){
+            int userIdAddedInExternalDB = WebServiceUtility.insertUserAccountToExternalDatabase(context, userTable, jsonUserData);
+            if(userIdAddedInExternalDB > 0){
                 MytwayGeolocalizationService.saveToFile("INSERT ZROBIONY, usuwam z shared preferences","scheduled.txt");
                 sharedPreferences.edit().putString(INSERT_ACCOUNT_USER_TO_EXTERNAL_DB, EMPTY).commit();
             }

@@ -25,7 +25,9 @@ public class MytwayWebservice {
     private final static String MYTWAY_WEBSERVICE_ADDRESS = "http://michalburmz5.nazwa.pl/MytwayWebServiceApplication/rest/";
     private final static String GOOGLE_MAPS_DIRECTION_WEB_SERVICE = "http://maps.googleapis.com/maps/api/directions/json?";
 
-    public void insertUserToMytwayWebservice(String jsonMessage){
+    public int insertUserToMytwayWebservice(String jsonMessage) throws JSONException {
+        String connectionOutput;
+        String jsonReturnFromWebService = "";
         try {
             JSONObject jsonObject = new JSONObject(jsonMessage);
             System.out.println(jsonObject);
@@ -46,13 +48,15 @@ public class MytwayWebservice {
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-                while (in.readLine() != null) {
-                    System.out.println("");
+                while((connectionOutput = in.readLine()) != null) {
+                    System.out.println("connectionOutput");
+                    jsonReturnFromWebService = connectionOutput;
                 }
+
                 Log.i(TAG, "Mytway REST Service Invoked Successfully..");
                 in.close();
             } catch (Exception e) {
-                Log.i(TAG, "Mytway Error while calling Crunchify REST Service", e);
+                Log.i(TAG, "Mytway Error while calling REST Service", e);
                 System.out.println(e);
             }
 
@@ -60,6 +64,11 @@ public class MytwayWebservice {
             Log.i(TAG, "Mytway Error: ", e);
             e.printStackTrace();
         }
+
+        JSONObject jsonResult = new JSONObject(jsonReturnFromWebService);
+        int userIdAddedInExternalDB = jsonResult.getInt("userIdAddedInExternalDB");
+
+        return userIdAddedInExternalDB;
     }
 
     public void updateUserToMytwayWebservice(String jsonMessage){

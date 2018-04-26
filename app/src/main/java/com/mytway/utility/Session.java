@@ -10,6 +10,7 @@ import com.mytway.properties.SharedPreferencesNames;
 
 public class Session {
 
+    public String userId;
     public String userName;
     public String password;
     public String email;
@@ -49,6 +50,7 @@ public class Session {
 
     public Session sessionStandardUserMock() {
         Session session = new Session();
+        session.userId = "1";
         session.userName = "mike";
         session.password = "password";
         session.email = "mike@mytway.com";
@@ -66,6 +68,7 @@ public class Session {
 
     public Session sessionFlexibleUserMock() {
         Session session = new Session();
+        session.userId = "1";
         session.userName = "mike";
         session.password = "password";
         session.email = "mike@mytway.com";
@@ -85,6 +88,7 @@ public class Session {
             //do nothing
         }else{
             sharedPreferences = context.getSharedPreferences(SharedPreferencesNames.USER_SHARED_PREFERENCES, 1);
+            getUserId();
             getUserName();
             getPassword();
             getEmail();
@@ -102,6 +106,22 @@ public class Session {
         }
     }
 
+    //------- userID ---------------
+    public void setUserId(String userId) {
+        sharedPreferences.edit().putString("userId", userId).commit();
+    }
+
+    public String getUserId() {
+        String userId;
+        if(PropertiesValues.MOCK_APP_TO_TESTS){
+            userId = "mike";
+        }else{
+            userId = sharedPreferences.getString("userId","");
+            this.userId = userId;
+        }
+        return userId;
+    }
+    
     //------- UserName ---------------
     public void setUserName(String userName) {
         sharedPreferences.edit().putString("userName", userName).commit();

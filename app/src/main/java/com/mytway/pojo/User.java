@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 public class User implements Parcelable {
 
+    private int userId;
     private String userName;
     private String email;
     private String password;
@@ -91,6 +92,14 @@ public class User implements Parcelable {
 
     public void setWorkWeek(WorkWeek workWeek) {
         this.workWeek = workWeek;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     @Override

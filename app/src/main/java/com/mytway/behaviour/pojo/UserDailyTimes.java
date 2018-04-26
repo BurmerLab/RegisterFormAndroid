@@ -17,15 +17,15 @@ public class UserDailyTimes {
     public static final String LOCAL_DATE_TIME_TO_STRING_FORMAT = "yyyy-MM-dd HH:mm";
 
     private static final String TAG = "UserDailyTimes";
-    private static final String LEAVE_HOME_TIME = "leaveHomeTime";
-    private static final String START_WORK_TIME = "startWorkTime";
-    private static final String LEAVE_WORK_TIME = "leaveWorkTime";
-    private static final String ARRIVE_TO_HOME_TIME = "arriveToHomeTime";
+    public static final String LEAVE_HOME_TIME = "leaveHomeTime";
+    public static final String START_WORK_TIME = "startWorkTime";
+    public static final String LEAVE_WORK_TIME = "leaveWorkTime";
+    public static final String ARRIVE_TO_HOME_TIME = "arriveToHomeTime";
 
-    private static final String WAS_SAVED_ARRIVE_TO_HOME_TIME_BEFORE = "wasSavedArriveToHomeTimeBefore";
-    private static final String WAS_SAVED_LEAVE_HOME_TIME_BEFORE = "wasSavedLeaveHomeTimeBefore";
-    private static final String WAS_SAVED_START_WORK_TIME_BEFORE = "wasSavedStartWorkTimeBefore";
-    private static final String WAS_SAVED_LEAVE_WORK_TIME_BEFORE = "wasSavedLeaveWorkTimeBefore";
+    public static final String WAS_SAVED_ARRIVE_TO_HOME_TIME_BEFORE = "wasSavedArriveToHomeTimeBefore";
+    public static final String WAS_SAVED_LEAVE_HOME_TIME_BEFORE = "wasSavedLeaveHomeTimeBefore";
+    public static final String WAS_SAVED_START_WORK_TIME_BEFORE = "wasSavedStartWorkTimeBefore";
+    public static final String WAS_SAVED_LEAVE_WORK_TIME_BEFORE = "wasSavedLeaveWorkTimeBefore";
 
     private LocalDateTime leaveHomeTime;
     private LocalDateTime startWorkTime;
@@ -75,8 +75,8 @@ public class UserDailyTimes {
             if(wasSavedLeaveWorkTimeBeforeString.equals("")){
                 wasSavedLeaveWorkTimeBefore = false;
             }else{
-                this.wasSavedLeaveWorkTimeBefore = Boolean.getBoolean(wasSavedLeaveWorkTimeBeforeString);
-                wasSavedLeaveWorkTimeBefore = Boolean.getBoolean(wasSavedLeaveWorkTimeBeforeString);
+                this.wasSavedLeaveWorkTimeBefore = Boolean.valueOf(wasSavedLeaveWorkTimeBeforeString);
+                wasSavedLeaveWorkTimeBefore = Boolean.valueOf(wasSavedLeaveWorkTimeBeforeString);
             }
         }
         return wasSavedLeaveWorkTimeBefore;
@@ -108,8 +108,8 @@ public class UserDailyTimes {
             if(wasSavedStartWorkTimeBeforeString.equals("")){
                 wasSavedStartWorkTimeBefore = false;
             }else{
-                this.wasSavedStartWorkTimeBefore = Boolean.getBoolean(wasSavedStartWorkTimeBeforeString);
-                wasSavedStartWorkTimeBefore = Boolean.getBoolean(wasSavedStartWorkTimeBeforeString);
+                this.wasSavedStartWorkTimeBefore = Boolean.valueOf(wasSavedStartWorkTimeBeforeString);
+                wasSavedStartWorkTimeBefore = Boolean.valueOf(wasSavedStartWorkTimeBeforeString);
             }
         }
         return wasSavedStartWorkTimeBefore;
@@ -141,8 +141,8 @@ public class UserDailyTimes {
             if(wasSavedLeaveHomeTimeBeforeString.equals("")){
                 wasSavedLeaveHomeTimeBefore = false;
             }else{
-                this.wasSavedLeaveHomeTimeBefore = Boolean.getBoolean(wasSavedLeaveHomeTimeBeforeString);
-                wasSavedLeaveHomeTimeBefore = Boolean.getBoolean(wasSavedLeaveHomeTimeBeforeString);
+                this.wasSavedLeaveHomeTimeBefore = Boolean.valueOf(wasSavedLeaveHomeTimeBeforeString);
+                wasSavedLeaveHomeTimeBefore = Boolean.valueOf(wasSavedLeaveHomeTimeBeforeString);
             }
         }
         return wasSavedLeaveHomeTimeBefore;
@@ -161,7 +161,9 @@ public class UserDailyTimes {
         if(PropertiesValues.MOCK_APP_TO_TESTS){
             this.wasSavedArriveToHomeTimeBefore = wasSavedArriveToHomeTimeBefore;
         }else{
-            sharedPreferences.edit().putString(WAS_SAVED_ARRIVE_TO_HOME_TIME_BEFORE, String.valueOf(wasSavedArriveToHomeTimeBefore)).commit();
+            sharedPreferences.edit().putString(WAS_SAVED_ARRIVE_TO_HOME_TIME_BEFORE,
+                    String.valueOf(wasSavedArriveToHomeTimeBefore))
+                    .commit();
         }
     }
 
@@ -174,8 +176,8 @@ public class UserDailyTimes {
             if(wasSavedArriveToHomeTimeBeforeString.equals("")){
                 wasSavedArriveToHomeTimeBefore = false;
             }else{
-                this.wasSavedArriveToHomeTimeBefore = Boolean.getBoolean(wasSavedArriveToHomeTimeBeforeString);
-                wasSavedArriveToHomeTimeBefore = Boolean.getBoolean(wasSavedArriveToHomeTimeBeforeString);
+                this.wasSavedArriveToHomeTimeBefore = Boolean.valueOf(wasSavedArriveToHomeTimeBeforeString);
+                wasSavedArriveToHomeTimeBefore = Boolean.valueOf(wasSavedArriveToHomeTimeBeforeString);
             }
         }
         return wasSavedArriveToHomeTimeBefore;
@@ -330,6 +332,11 @@ public class UserDailyTimes {
         }
     }
 
+    public SharedPreferences getSharedPreferences() {
+        return sharedPreferences;
+    }
 
-
+    public void setSharedPreferences(SharedPreferences sharedPreferences) {
+        this.sharedPreferences = sharedPreferences;
+    }
 }

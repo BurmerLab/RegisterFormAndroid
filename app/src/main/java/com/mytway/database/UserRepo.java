@@ -27,6 +27,7 @@ public class UserRepo {
         //Open connection to write data
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(UserTable.KEY_ID, userTable.userId);
         values.put(UserTable.KEY_USER_NAME, userTable.userName);
         values.put(UserTable.EMAIL,userTable.email);
         values.put(UserTable.PASSWORD, userTable.password);

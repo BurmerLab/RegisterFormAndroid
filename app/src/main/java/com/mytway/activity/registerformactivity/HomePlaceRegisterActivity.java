@@ -88,6 +88,8 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                 Position workPosition = user.getWorkPlace();
                 Position homePosition = new Position(longitudeLocalization, latitudeLocalization);
 
+                int userIdAddedInExternalDB = 0;
+
                 if (Validation.homePositionIsNotTheSameWorkPosition(homePosition, workPosition, registerHomeLocalizationButton, getString(R.string.home_place_equals_work_place))) {
                     user.setHomePlace(homePosition);
 
@@ -164,9 +166,10 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
                         //INSERT USER ACCOUNT
                         if (userId == 0) {
 
-                            insertUserAccountToExternalDatabase(userTable);
+                            userIdAddedInExternalDB = insertUserAccountToExternalDatabase(userTable);
 
                             if(!userRepo.isUserExistInLocalDatabase(userTable.userName)){
+                                userTable.userId = userIdAddedInExternalDB;
                                 userId = userRepo.insert(userTable);
                             }
                         } else {
@@ -193,12 +196,15 @@ public class HomePlaceRegisterActivity extends FragmentActivity implements OnMap
         }
     }
 
-    public void insertUserAccountToExternalDatabase(UserTable userTable) {
-        if(WebServiceUtility.insertUserAccountToExternalDatabase(getApplicationContext(), userTable, getJsonUserDataMessage())){
+    public int insertUserAccountToExternalDatabase(UserTable userTable) {
+        int userIdAddedInExternalDB = WebServiceUtility.insertUserAccountToExternalDatabase(getApplicationContext(), userTable, getJsonUserDataMessage());
+        if(userIdAddedInExternalDB > 0){
             Log.i(TAG, "Correctly inserted user account to external database");
         }else{
             sharedPreferences.edit().putString(ScheduledProcess.INSERT_ACCOUNT_USER_TO_EXTERNAL_DB, ScheduledProcess.INSERT_ACCOUNT_USER_TO_EXTERNAL_DB).commit();
         }
+
+        return userIdAddedInExternalDB;
     }
 
     @Override

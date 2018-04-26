@@ -4,6 +4,10 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.mytway.database.userLocalizations.UserLocalizationsRepo;
+import com.mytway.database.userLocalizations.UserLocalizationsTable;
+import com.mytway.database.userTimes.UserTimesRepo;
+import com.mytway.database.userTimes.UserTimesTable;
 import com.mytway.pojo.Distance;
 import com.mytway.pojo.Position;
 import com.mytway.properties.PropertiesValues;
@@ -28,6 +32,7 @@ public class DirectionWay {
     private static final double HOME_OR_WORK_ZONE = 300.0;
 
     private Context context;
+    private Session session;
 
     private Distance distanceBetweenHomeAndWork;
     private double percentageDistanceBtwHomeAndWork;
@@ -48,6 +53,7 @@ public class DirectionWay {
         setContext(context);
         userDailyTimes = new UserDailyTimes(context);
         directionsStatus = new DirectionsStatus(context);
+        session = new Session(context);
     }
 
     public DirectionWay(boolean wayToWork, boolean wayToHome) {
@@ -63,7 +69,11 @@ public class DirectionWay {
         return previousDistancesToHome;
     }
 
-    public void decideTravelDirectionsAre(Position currentPosition, Session session){
+    //todo: commented because session is created for whole DirectionWay not need to transfer as argument
+//    public void decideTravelDirectionsAre(Position currentPosition, Session session){
+//        this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
+//    }
+    public void decideTravelDirectionsAre(Position currentPosition){
         this.decideDirectionNew(currentPosition, session.getHomePlace(), session.getWorkPlace());
     }
 
@@ -135,6 +145,25 @@ public class DirectionWay {
 
         saveToFileDatabaseTimes("===========wasSavedLeaveWorkTimeBefore = " +  userDailyTimes.getWasSavedLeaveWorkTimeBefore() + "===========");
         if(isLeaveWorkTimeNotNullAndWasntSavedBefore()){
+
+            //todo: dorobic poberanie i zapisyawnie ID uzytkownika w bazie i w ogole wszdzie- przemyslec czy pob ierac to ID od bazy zewnetrznejs
+            UserTimesRepo userTimesRepo = new UserTimesRepo(context);
+            UserTimesTable userTimesTable = new UserTimesTable();
+            userTimesTable.setUserTimesId(Integer.parseInt(session.getUserId()));
+            userTimesTable.setUserName(session.getUserName());
+            userTimesTable.setTimeStatus(UserDailyTimes.LEAVE_WORK_TIME);
+            userTimesTable.setCreationDate(new LocalDateTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
+            userTimesTable.setTime(userDailyTimes.getLeaveWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
+
+            UserLocalizationsRepo localizationsRepo = new UserLocalizationsRepo(context);
+            UserLocalizationsTable localizationsTable = new UserLocalizationsTable();
+            localizationsTable.setCreationDate("2018-03-18");
+            localizationsTable.setLatitude(String.valueOf());
+            localizationsTable.setLongitude(String.valueOf(getLongitude()));
+            localizationsTable.setTimeStatus("Morning");
+            localizationsTable.setUserName("Mike");
+            localizationsRepo.insert(localizationsTable);
+
             saveToFileDatabaseTimes("IN HOME - LeaveWork - " + userDailyTimes.getLeaveWorkTime().toString(UserDailyTimes.LOCAL_DATE_TIME_TO_STRING_FORMAT));
             userDailyTimes.setWasSavedLeaveWorkTimeBefore(true);
         }

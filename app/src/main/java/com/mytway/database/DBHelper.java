@@ -45,14 +45,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     String CREATE_TABLE_USER_TIMES = "CREATE TABLE if not exists " + UserTimesTable.TABLE  + "("
             + UserTimesTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-            + UserTimesTable.KEY_USER_NAME + " TEXT not null unique, "
+            + UserTimesTable.KEY_USER_NAME + " TEXT not null, "
             + UserTimesTable.CREATION_DATE + " TEXT, "
             + UserTimesTable.TIME_STATUS + " TEXT, "
             + UserTimesTable.TIME + " TEXT )";
 
     String CREATE_TABLE_USER_LOCALIZATIONS = "CREATE TABLE if not exists " + UserLocalizationsTable.TABLE  + "("
             + UserLocalizationsTable.KEY_ID  + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
-            + UserLocalizationsTable.KEY_USER_NAME + " TEXT not null unique, "
+            + UserLocalizationsTable.KEY_USER_NAME + " TEXT not null, "
             + UserLocalizationsTable.CREATION_DATE + " TEXT, "
             + UserLocalizationsTable.LATITUDE + " TEXT, "
             + UserLocalizationsTable.LONGITUDE + " TEXT, "
@@ -61,9 +61,9 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //temporary only for one time execution to create new table
-//        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
-//        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
-//        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + UserTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + UserTimesTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + UserLocalizationsTable.TABLE);
 
         //All necessary tables you like to create will create here
         db.execSQL(CREATE_TABLE_USER);
